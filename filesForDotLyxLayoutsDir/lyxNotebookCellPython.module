@@ -519,8 +519,10 @@ InsetLayout Flex:LyxNotebookCell:Init:Python
          % -----------------------------------------------------------------------
       }% end of lstnewenvironment starting code block
       { % begin of lstnewenvironment ending code block
-         % try to avoid breaks between code cells and output cells
+         % try to avoid breaks between code cells and output cells (if output printed)
+         \ifthenelse{\equal{\lyxNotebookPrintingIsOffOutputPython}{false}}{%
          \nopagebreak
+         }{}%
       }% end of lstnewenvironment ending code block
    EndPreamble
 End
@@ -656,8 +658,10 @@ InsetLayout Flex:LyxNotebookCell:Standard:Python
          % -----------------------------------------------------------------------
       }% end of lstnewenvironment starting code block
       { % begin of lstnewenvironment ending code block
-         % try to avoid breaks between code cells and output cells
+         % try to avoid breaks between code cells and output cells (if output printed)
+         \ifthenelse{\equal{\lyxNotebookPrintingIsOffOutputPython}{false}}{%
          \nopagebreak
+         }{}%
       }% end of lstnewenvironment ending code block
    EndPreamble
 End

@@ -483,8 +483,10 @@ InsetLayout Flex:LyxNotebookCell:Init:R
          % -----------------------------------------------------------------------
       }% end of lstnewenvironment starting code block
       { % begin of lstnewenvironment ending code block
-         % try to avoid breaks between code cells and output cells
+         % try to avoid breaks between code cells and output cells (if output printed)
+         \ifthenelse{\equal{\lyxNotebookPrintingIsOffOutputR}{false}}{%
          \nopagebreak
+         }{}%
       }% end of lstnewenvironment ending code block
    EndPreamble
 End
@@ -620,8 +622,10 @@ InsetLayout Flex:LyxNotebookCell:Standard:R
          % -----------------------------------------------------------------------
       }% end of lstnewenvironment starting code block
       { % begin of lstnewenvironment ending code block
-         % try to avoid breaks between code cells and output cells
+         % try to avoid breaks between code cells and output cells (if output printed)
+         \ifthenelse{\equal{\lyxNotebookPrintingIsOffOutputR}{false}}{%
          \nopagebreak
+         }{}%
       }% end of lstnewenvironment ending code block
    EndPreamble
 End

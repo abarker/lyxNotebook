@@ -14,7 +14,12 @@ See the file lyxNotebookDocs.pdf for a detailed description.  There are example
 Lyx files in the examples directory.
 
 This program only works on Linux systems, and has only been tested on Fedora 15
-with Lyx 2.0.3.  Most of the testing has been with Python 2 code cells.  There
-may well be portability problems to other Linux distributions, but probably not
-serious ones.  The program is licensed under the same GPL as Lyx.
+with Lyx 2.0.3.  Most of the testing has been with Python 2 code cells.  The
+easyGUI package for Python is required; in Fedora the command
+
+   sudo yum install python-easygui
+
+will install it if it is not already installed.  There may be portability
+problems to other Linux distributions, but probably not serious ones.  The
+program is licensed under the same GPL as Lyx.
 

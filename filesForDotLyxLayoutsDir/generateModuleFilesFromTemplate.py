@@ -254,8 +254,10 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
          % -----------------------------------------------------------------------
       }% end of lstnewenvironment starting code block
       { % begin of lstnewenvironment ending code block
-         % try to avoid breaks between code cells and output cells
+         % try to avoid breaks between code cells and output cells (if output printed)
+         \ifthenelse{\equal{\lyxNotebookPrintingIsOffOutput<<insetSpecifier>>}{false}}{%
          \nopagebreak
+         }{}%
       }% end of lstnewenvironment ending code block
    EndPreamble
 End
