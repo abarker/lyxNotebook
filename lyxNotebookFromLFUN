@@ -1,0 +1,111 @@
+#! /usr/bin/python
+"""
+=========================================================================
+This file is part of LyX Notebook, which works with LyX (and is licensed 
+in the same way) but is an independent project.  License details (GPL V2) 
+can be found in the file COPYING.
+
+Copyright (C) 2012 Allen Barker
+=========================================================================
+
+Python will not run the lyxNotebook program correctly unless it has stdout 
+associated with some tty.  So we have to make that happen.
+
+We have three cases to deal with.  First, either the "tty" command will return
+a terminal (this script was run from the command line) or it will not (this
+script was run from a Lyx LFUN).  In the latter case we need to associate the
+Lyx notebook process with SOME tty, and we have two different subcases.  Either
+the user's running Lyx process is associated with a tty (it was run from a
+command line) or it does not (it was run from the start menu or an icon).  In
+the first subcase we use the tty for the running Lyx process, and in the latter
+case we run the program in a new terminal window.
+
+This script is assumed to be located in the same directory as the lyxNotebook 
+script (otherwise it will not find the lyxNotebook script).
+"""
+
+from __future__ import print_function, division
+import subprocess, time, os, sys
+import lyxNotebookUserSettings # for the LyX command basename in ps process list
+
+# This string should match whatever Lyx runs as when the command "ps -eo command" 
+# is run.  If this process is not found then an xterm will be opened (so setting 
+# this to some "wrong" string will force an xterm to open rather than using the
+# Lyx process' tty for writing output).
+lyxCommandString = lyxNotebookUserSettings.lyxCommandString
+
+myPID = os.getpid()
+myCWD = os.getcwd()
+
+# get the path of the lyxNotebook script from calling command for this script
+callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
+lyxNotebookSourceDir = os.path.dirname(callingCommand)
+runPath = os.path.join(lyxNotebookSourceDir, "lyxNotebook")
+
+#
+# If we're running from a tty, just run the program.
+#
+
+try:
+   tty = subprocess.check_output(["tty"])
+except:
+   # if tty command fails, assume there is no associated tty
+   tty = "not a tty"
+
+if tty != "not a tty":
+   try:
+      subprocess.call(runPath, shell=True)
+   except:
+      sys.exit(0)
+   sys.exit(0)
+
+#
+# No tty, so find one associated with Lyx or create one with xterm.
+#
+
+processData = subprocess.check_output(["ps", "-eo", "pid,tty,user,command"])
+processData = processData.splitlines()
+del processData[0] # remove the first line of the output, with column labels
+
+for i in range(len(processData)):
+   processData[i] = processData[i].split() # split on whitespace
+   pid = int(processData[i][0])
+   if pid == myPID: # get user ID
+      myTTY = processData[i][1] # should be "?" at this point, could use vs. tty above
+      myUSER = processData[i][2] # user of this current running script process
+   # only look at the basename of the command which was run
+   processData[i][3] = os.path.basename(processData[i][3])
+
+myLyxProcs = [ p for p in processData if p[3] == lyxCommandString and p[2] == myUSER ]
+
+if len(myLyxProcs) == 0:
+   print("No terminal found and no Lyx process running, trying an xterm anyway.")
+if len(myLyxProcs) > 1:
+   print("Multiple Lyx processes running, trying an xterm anyway.")
+
+myLyxProcsWithTerminals = [ p for p in myLyxProcs if p[1] != "?" ]
+
+# try opening ttys to select only user-accessible ones (su to tty fails, for example)
+myLyxProcsWithWriteableTerminals = []
+for p in myLyxProcsWithTerminals:
+   try:
+      ttyName = "/dev/" + p[1]
+      test = open(ttyName, "rw")
+   except:
+      print("Rejecting terminal", ttyName, "since it is not user-accessible.")
+      continue
+   test.close()
+   myLyxProcsWithWriteableTerminals.append(p)
+
+# if a unique writeable terminal use it, otherwise open an xterm window
+if len(myLyxProcsWithWriteableTerminals) != 1:
+   # recurse on this script, so debug info from this script also printed to terminal
+   proc = subprocess.Popen(
+         ["xterm -e /bin/bash -l -c 'cd %s ;  %sFromLFUN'" % (myCWD, runPath)], 
+         shell=True)
+else:
+   terminal = "/dev/" + myLyxProcsWithWriteableTerminals[0][1]
+   print("Sending I/O to the Lyx terminal:", terminal)
+   proc = subprocess.Popen(["%s >%s 2>&1" % (runPath,terminal)], shell=True)
+
+

@@ -1,0 +1,21 @@
+#
+# Load one of the default bindings, then load the Lyx Notebook key bindings, and
+# then the user can make any further modifications.  A \bind_file command can,
+# for example, be used to read in another file of key bindings (such as if
+# a user already had such a file defined).
+#
+# This file is copied to the user's home Lyx directory by the Lyx Notebook 
+# setup.py program, after the string < <userHomeLyxDirectory> > is replaced
+# with the actual value.  It *will not* be overwritten if it is already there.
+# So changes can be made to this file in the user's home Lyx directory.
+#
+
+# include one of the basic binding files (cua or emacs, here cua)
+\bind_file "cua"
+#\bind_file "emacs"
+
+# include the Lyx Notebook key bindings
+\bind_file "<<userHomeLyxDirectory>>/lyxNotebookKeyBindings"
+
+# make any additional bind definitions or include any other .bind files below
+

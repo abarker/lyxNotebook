@@ -1,0 +1,174 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\begin_modules
+lyxNotebookCellPythonTwo
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman lmodern
+\font_sans lmss
+\font_typewriter lmtt
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Using Python 2 in Lyx Notebook
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This document contains a few simple examples of using Python 
+\begin_inset Formula $2$
+\end_inset
+
+.x cells with the Lyx Notebook system.
+ The module for Python 
+\begin_inset Formula $2$
+\end_inset
+
+ (named PythonTwo) has already been added to the document settings, so PythonTwo
+ cell types appear on the 
+\family sans
+\series bold
+Insert\SpecialChar \menuseparator
+Custom
+\begin_inset space ~
+\end_inset
+
+Insets
+\family default
+\series default
+ menu.
+ Feel free to experiment and add new cells.
+ Remember that F
+\begin_inset Formula $12$
+\end_inset
+
+ starts Lyx Notebook, and F
+\begin_inset Formula $1$
+\end_inset
+
+ gives a menu.
+\end_layout
+
+\begin_layout Standard
+This document uses the default settings for Lyx except that the fonts are
+ changed to the Type 1 Latin Modern fonts which look better in PDF.
+ Latex highlighting of code cells uses a slight redefinition of the Python
+ language Listings package definitions of keywords, comments, etc.
+ The default Lyx Notebook definitions are used for fonts, colors, boldface,
+ etc.
+\end_layout
+
+\begin_layout Section
+Examples
+\end_layout
+
+\begin_layout Standard
+Here is a simple loop in Python.
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+for i in ["cat", "dog"]:
+\end_layout
+
+\begin_layout Plain Layout
+
+   for j in ["pencil", "pen"]:
+\end_layout
+
+\begin_layout Plain Layout
+
+      print i, j
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+cat pencil
+\end_layout
+
+\begin_layout Plain Layout
+
+cat pen
+\end_layout
+
+\begin_layout Plain Layout
+
+dog pencil
+\end_layout
+
+\begin_layout Plain Layout
+
+dog pen
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,45 @@
+#
+# The key bindings for Lyx Notebook.  The .template file contains the string
+# < <absPathToLyxNotebookSourceDir> >, without spaces between the << and >>
+# delimiters, which is automatically replaced with the absolute path of the 
+# Lyx Notebook source directory by the setup.py program.  The result is 
+# written to the .bind file.
+#
+# If not using setup.py, edit the .template file to replace the absolute pathname in 
+# the line binding the F12 key with the correct path to lyxNotebookFromLFUN in 
+# your own Lyx Notebook directory.  Save as a .bind file (i.e. changing the suffix).
+# 
+# The setup.py program automatically copies the generated .bind file to your local 
+# Lyx directory (usually ~/.lyx).  If not using setup.py the .bind file should be
+# copied there by hand.
+#
+
+# include one of the basic binding files (cua or emacs, here cua)
+# uncomment ONLY if you load this file directly as the active .bind file
+#\bind_file "cua"
+
+\bind "F1" "server-notify"
+\bind "S-F1" "server-notify"
+\bind "F2" "server-notify"
+\bind "S-F2" "server-notify"
+\bind "F3" "server-notify"
+\bind "S-F3" "server-notify"
+\bind "F4" "server-notify"
+\bind "S-F4" "server-notify"
+\bind "F5" "server-notify"
+\bind "S-F5" "server-notify"
+\bind "F6" "server-notify"
+\bind "S-F6" "server-notify"
+\bind "F7" "server-notify"
+\bind "S-F7" "server-notify"
+\bind "F8" "server-notify"
+\bind "S-F8" "server-notify"
+\bind "F9" "server-notify"
+\bind "S-F9" "server-notify"
+\bind "F10" "server-notify"
+\bind "S-F10" "server-notify"
+\bind "F11" "server-notify"
+\bind "S-F11" "server-notify"
+\bind "F12" "vc-command U $$p <<absPathToLyxNotebookSourceDir>>/lyxNotebookFromLFUN"
+\bind "S-F12" "server-notify"
+
