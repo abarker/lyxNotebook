@@ -759,10 +759,11 @@ class InteractWithLyxCells(object):
       # and 2) writes fresh auto-save file if possible
       (bufferDirName,
             bufferFileName,
-            autoSaveFileName) = self.getUpdatedLyxDirectoryData() 
+            autoSaveFileName, fullPath) = self.getUpdatedLyxDirectoryData() 
       if useLatexExport:
          print("debug in Latex section of getAllCellText")
          # always export to local Latex file, and wait only briefly
+         # TODO can use fullPath now instead of re-join
          absLocalFilePath = os.path.join(bufferDirName, self.localLatexFilename)
          if os.path.exists(absLocalFilePath): os.remove(absLocalFilePath)
          self.exportLatexToFile(absLocalFilePath)
@@ -990,15 +991,16 @@ class InteractWithLyxCells(object):
    def getUpdatedLyxDirectoryData(self,autoSaveUpdate=True):
       """
       This function returns a tuple of the form:
-         (<currentBufferFileDirectory>,<currentBufferFilename>,<auto-saveFilename>)
+         (<currentBufferFileDirectory>,<currentBufferFilename>,
+         <auto-saveFilename>, <currentBufferFullPath>)
       It tries to save an auto-save file (unless autoSaveUpdate is False), and 
       returns "" for the auto-save file if the file still does not exist.  The 
       current directory is always changed to <currentBufferFileDirectory>.
       """
       # get the ordinary pathname and directory name of the buffer file
-      path = self.serverGetFilename()
-      dirname = os.path.dirname(path)
-      basename = os.path.basename(path)
+      fullpath = self.serverGetFilename()
+      dirname = os.path.dirname(fullpath)
+      basename = os.path.basename(fullpath)
 
       # change directory (the document in the current buffer may change, new dir)
       os.chdir(dirname)
@@ -1014,7 +1016,7 @@ class InteractWithLyxCells(object):
          autoSaveFilename = ""
 
       # return the tuple
-      retData = (dirname, basename, autoSaveFilename)
+      retData = (dirname, basename, autoSaveFilename, fullpath)
       return retData
 
    def getMostRecentTempDirLatexFilename(self):
@@ -1206,7 +1208,7 @@ class InteractWithLyxCells(object):
       # update the Latex and get the name of the file it was exported to
       (currentBufferFileDirectory, 
             currentBufferFilename,
-            autoSaveFilename) = self.getUpdatedLyxDirectoryData()
+            autoSaveFilename, fullPath) = self.getUpdatedLyxDirectoryData()
       
       # get all the cells and open the file with name filename
       allCells = self.getAllCellText()

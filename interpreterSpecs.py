@@ -575,6 +575,72 @@ R.colorListingsOutputFormat = python2.colorListingsOutputFormat
 allSpecs.append(R)
 
 # ==================================================================================
+#
+# Bash
+#
+# ==================================================================================
+
+# TODO: only started, need to set all values and test
+
+bash = SpecRecord()
+bash.params = {
+      "progName"            :  "R",
+      "mainPrompt"          :  "> ",
+      "contPrompt"          :  "+ ",
+      "runCommand"          :  "bash",
+      "runArguments"        :  ["--no-save", "--no-restore", "--no-readline"],
+      "fileSuffix"          :  ".bash",
+      "commentLine"         :  "#",
+      "lineContinuation"    :  None,
+      "insetSpecifier"      :  "R", # e.g., Flex:LyxNotebook:Standard:Scala
+      "listingsLanguage"    :  "R", # no Scala predefined yet in Listings
+      "startupSleepSecs"    :  1.0,
+      "beforeReadSleepSecs" :  0.01,
+      "noopAtCellEnd"       :  None,
+      "exitCommand"         :  "quit(save=\"no\")\n",
+      "delNewlinePrePrompt" :  False, 
+      "promptAtCellEnd"     :  True, 
+      "indentDownToZeroNewline" : False,
+      "ignoreEmptyLines"    :  True,
+      "runOnlyOnDemand"     :  True
+      }
+
+# debug remove final comma if revert
+bash.generalListingsCodeFormat= r"""
+      % generalListingsCodeFormat
+      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      sensitive=true,
+      upquote=true,
+      %mathescape=true,
+      % Use backslash for line continuation.
+      prebreak=\bf\textbackslash,
+      showstringspaces=false,
+      % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
+      % columns=flexible, % 
+      % columns=fullflexible, % good with monospace font, & more chars per line
+      columns=fixed, % fewer chars per line, but keeps extra spaces inserted
+      linewidth=\linewidth, % boxes smaller, same right margin in indented env.
+      breaklines=true,
+      breakatwhitespace=true,
+      breakindent=1.5em, 
+      breakautoindent=true,
+"""
+
+# use same code in the preamble
+bash.preambleLatexCode = python2.preambleLatexCode
+
+# re-use the color settings from Python2
+bash.nonColorListingsCodeFormat = python2.nonColorListingsCodeFormat
+bash.colorListingsCodeFormat = python2.colorListingsCodeFormat
+
+# use the same output cells as Python2
+bash.generalListingsOutputFormat = python2.generalListingsOutputFormat
+bash.nonColorListingsOutputFormat = python2.nonColorListingsOutputFormat
+bash.colorListingsOutputFormat = python2.colorListingsOutputFormat
+
+allSpecs.append(bash)
+
+# ==================================================================================
 # end of spec definitions
 # ==================================================================================   
 

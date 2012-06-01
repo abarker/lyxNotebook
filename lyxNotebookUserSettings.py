@@ -32,6 +32,10 @@ numBackupBufferCopies = 5
 # strings have been tested.  Definitely cannot contain a semicolon.
 magicCookieString = "zZ3Qq"
 
+# Whether Lyx Notebook should start up separate interpreter processes for the same
+# cell types in different buffers.
+separateInterpretersForEachBuffer = True
+
 # ===============================================================================
 # Pathnames also set in Lyx.  These must match whatever the Lyx program uses.
 # They are initially set to the Lyx default values.

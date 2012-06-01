@@ -171,8 +171,10 @@ class IndentCalc(object):
          elif char == "}": self.curlys -= 1
 
          # Increase indent if a colon is found not inside a comment, string,
-         # or any delimiters.  We've ruled out all but delimeters above.
-         # This is for one-liners like 
+         # or any paren/bracket/curly delimiters.  We've already ruled out all 
+         # cases but those delimeters above.
+         #
+         # This is to allow one-liners like 
          #   def sqr(x): return x*x
          # and like the "if" line below.
          #
@@ -183,6 +185,87 @@ class IndentCalc(object):
          if char == ":" and not self.inParenBracketCurly(): self.indentationLevel += 3
       return
 
+
+class InterpreterProcess(object):
+   """An instance of this class represents a data record for a running
+   interpreter process.  Contains an ExternalInterpreter instance for that
+   process, but also has an IndentCalc instance, and keeps track of the most
+   recent prompt received from the interpreter."""
+   def __init__(self, spec):
+      self.spec = spec
+      self.mostRecentPrompt = self.spec["mainPrompt"]
+      self.indentCalc = IndentCalc()
+      self.externalInterp = ExternalInterpreter(self.spec)
+
+
+class InterpreterProcessCollection(object):
+   """A class to hold multiple InterpreterProcess instances.  There will
+   probably only be a single instance, but multiple instances should not cause
+   problems.  Basically a dict mapping (bufferName,insetSpecifier) tuples to
+   InterpreterProcess class instances.  Starts processes when necessary."""
+   def __init__(self, currentBuffer):
+      if lyxNotebookUserSettings.separateInterpretersForEachBuffer == False:
+         currentBuffer = "___dummy___" # force all to use same buffer if not set
+      self.interpreterSpecList = [ specName.params
+            for specName in interpreterSpecs.allSpecs ]
+      self.numSpecs = len(self.interpreterSpecList)
+      self.insetSpecifierToInterpreterSpecDict = {}
+      self.allInsetSpecifiers = []
+      for spec in self.interpreterSpecList:
+         self.insetSpecifierToInterpreterSpecDict[spec["insetSpecifier"]] = spec
+         self.allInsetSpecifiers.append(spec["insetSpecifier"])
+      self.mainDict = {} # map (bufferName,insetSpecifier) tuple to InterpreterProcess
+      # Start up not-on-demand interpreters, but only for the current buffer
+      # (in principle we could use buffer-next to get all buffers and start for all, 
+      # but they may not all even # use Lyx Notebook).
+      self.reset(currentBuffer)
+
+   def getInterpreterProcess(self, bufferName, insetSpecifier):
+      """Get interpreter process, creating/starting one if one not there already."""
+      if lyxNotebookUserSettings.separateInterpretersForEachBuffer == False:
+         bufferName = "___dummy___" # force all to use same buffer if not set
+      key = (bufferName, insetSpecifier)
+      if not key in self.mainDict:
+         msg = "Starting interpreter for " + insetSpecifier
+         if lyxNotebookUserSettings.separateInterpretersForEachBuffer == True: 
+            msg += ", for buffer:\n   " + bufferName
+         print(msg)
+         self.mainDict[key] = InterpreterProcess(
+               self.insetSpecifierToInterpreterSpecDict[insetSpecifier])
+      return self.mainDict[key]
+
+   def reset(self, bufferName, insetSpecifier=""):
+      """Reset the interpreter for insetSpecifier cells for buffer bufferName.  
+      Restarts the whole process.  If insetSpecifier is the empty string then 
+      reset for all inset specifiers."""
+      if lyxNotebookUserSettings.separateInterpretersForEachBuffer == False:
+         bufferName = "___dummy___" # force all to use same buffer if not set
+      insetSpecifierList = [ insetSpecifier ]
+      if insetSpecifier == "": # do all if empty string
+         insetSpecifierList = self.allInsetSpecifiers
+      for insetSpecifier in insetSpecifierList:
+         key = (bufferName, insetSpecifier)
+         spec = self.insetSpecifierToInterpreterSpecDict[insetSpecifier]
+         if key in self.mainDict: del self.mainDict[key]
+         if not spec["runOnlyOnDemand"]: 
+            self.getInterpreterProcess(bufferName, insetSpecifier)
+
+   def resetAllInterpretersForAllBuffers(self):
+      self.mainDict = {}
+
+   def printStartMessage(self):
+      startMsg = "Running for " + str(self.numSpecs) + \
+            " possible interpreters (cell languages):\n"
+      interpStr = ""
+      for i in range(self.numSpecs):
+         interpStr += "      " + self.interpreterSpecList[i]["insetSpecifier"]
+         interpStr += " (label=\"" + self.interpreterSpecList[i]["progName"] + "\""
+         if not self.interpreterSpecList[i]["runOnlyOnDemand"]:
+            interpStr += ", autostarted in current buffer"
+         interpStr += ")\n"
+      startMsg += interpStr
+      print(startMsg)
+      
 
 class ControllerLyxWithInterpreter(object):
    """This class is the high-level controller class which deals with user
@@ -195,31 +278,16 @@ class ControllerLyxWithInterpreter(object):
       self.noEcho = lyxNotebookUserSettings.noEcho
       self.bufferReplaceOnBatchEval = lyxNotebookUserSettings.bufferReplaceOnBatchEval
 
-      # make a class-local list of each params field for each interpreter
-      # (ignoring the fields dealing with Latex (Listings) formatting)
-      self.interpreterSpecList = [ specName.params
-            for specName in interpreterSpecs.allSpecs ]
-
-      self.numInterpreters = len(self.interpreterSpecList)
-      startMsg = "Running for " + str(self.numInterpreters) + \
-            " possible interpreters (cell languages):\n"
-      interpString = ""
-      for i in range(self.numInterpreters):
-         interpString += "      " + self.interpreterSpecList[i]["insetSpecifier"]
-         interpString += " (label=\"" + self.interpreterSpecList[i]["progName"] + "\")\n"
-      startMsg += interpString[0:-1] # remove last newline
-      print(startMsg)
-
-      # Initialize and spawn all the interpreters (in self.interpreterList)
-      # TODO: we really would like a different list for each buffer in which an
-      # evaluate command has been executed!  Maybe consider implementing...
-      self.resetInterpreters()
-
       # Set up interactions with Lyx.
       self.clientname = clientname
       self.lyxProcess = InteractWithLyxCells(clientname) 
 
-      # Display a startup notification message.
+      # Initialize the collection of interpreter processes.
+      self.allInterps = InterpreterProcessCollection(
+            self.lyxProcess.serverGetFilename()) # buffer name is file name
+      self.allInterps.printStartMessage()
+
+      # Display a startup notification message in Lyx.
       message = "LyX Notebook is now running..."
       self.lyxProcess.showMessage(message)
       #self.displayPopupMessage(message=message, text=startMsg, seconds=3)
@@ -228,24 +296,11 @@ class ControllerLyxWithInterpreter(object):
       self.serverNotifyLoop()
       return # never executed; command loop above continues until sys.exit
 
-   def resetInterpreters(self):
-      """Reset all the interpreters by starting completely new processes for them."""
-
-      # set up a list of interpreters, one for each spec in interpreterSpecList
-      self.interpreterList = []
-      for i in range(self.numInterpreters):
-         if self.interpreterSpecList[i]["runOnlyOnDemand"]:
-            self.interpreterList.append(None)
-         else:
-            self.interpreterList.append(
-                  ExternalInterpreter(self.interpreterSpecList[i]))
-      
-      # assume the initial "most recent prompts" are main prompts
-      self.mostRecentPromptList = [ self.interpreterSpecList[i]["mainPrompt"]
-            for i in range(self.numInterpreters) ]
-
-      # initialize an IndentCalc class for each interpreter (even if not needed)
-      self.indentCalcList = [ IndentCalc() for i in range(self.numInterpreters) ]
+   def resetInterpreters(self, bufferName=""):
+      """Reset all the interpreters for the buffer, starting completely new processes 
+      for them.  If bufferName is empty the current buffer is used."""
+      if bufferName == "": bufferName = self.lyxProcess.serverGetFilename()
+      self.allInterps.reset(bufferName)
       return
 
    def serverNotifyLoop(self):
@@ -470,17 +525,17 @@ class ControllerLyxWithInterpreter(object):
             if filePrefix.rstrip()[-4:] != ".lyx": continue
             filePrefix = filePrefix.rstrip()[0:-4]
             dataTupleList = []
-            for i in range(self.numInterpreters):
+            for spec in self.allInterps.interpreterSpecList:
                # currently the interactWithLyx module does not make use of any
                # of the interpreterSpec data or its format, so we need to
                # look some things up to pass in
-               insetSpecifier = self.interpreterSpecList[i]["insetSpecifier"]
-               fileSuffix = self.interpreterSpecList[i]["fileSuffix"]
+               insetSpecifier = spec["insetSpecifier"]
+               fileSuffix = spec["fileSuffix"]
                # data tuple format is (filename, insetSpecifier, commentBeginChar)
                dataTupleList.append((
                      filePrefix + ".allcells." + insetSpecifier + fileSuffix,
                      insetSpecifier,
-                     self.interpreterSpecList[i]["commentLine"]
+                     spec["commentLine"]
                      ))
             self.lyxProcess.writeAllCellCodeToFile(dataTupleList)
             self.lyxProcess.showMessage("all code cells were written to files")
@@ -623,8 +678,7 @@ class ControllerLyxWithInterpreter(object):
       # calc the name of the auto-save file and the new .lyx file's name
       fromFileName = currentDirData[2] # prefer auto-save file
       if fromFileName == "": fromFileName =  currentDirData[1] # buffer's file
-      toFileName = (os.path.join(currentDirData[0],currentDirData[1])[:-4] 
-            + ".newOutput.lyx")
+      toFileName = currentDirData[3][:-4] + ".newOutput.lyx"
 
       # create the new .lyx file from the evaluated list of cells
       self.lyxProcess.replaceAllCellTextInLyxFile(
@@ -730,29 +784,16 @@ class ControllerLyxWithInterpreter(object):
       codeCellText instance as the data field evaluationOutput.  Returns
       None for a non-code cell."""
 
-      (basicType, insetSpecifierLanguage) = codeCellText.getCellType()
+      (basicType, insetSpecifierLang) = codeCellText.getCellType()
       if basicType == "Output": # if not a code cell
          codeCellText.evaluationOutput = None
          return None
 
       # Find the appropriate interpreter to evaluate the cell.
       # Note that the insetSpecifier names are required to be unique.
-      interpreterIndex = -1
-      for i in range(self.numInterpreters):
-         # look for the matching specifier in one of the interpreterSpecList items
-         if self.interpreterSpecList[i]["insetSpecifier"] == insetSpecifierLanguage:
-            interpreterIndex = i
-            break
-
-      if interpreterIndex == -1:
-         print("No interpreter for cell type!  Ignoring command.")
-         return
-
-      interpreterSpec = self.interpreterSpecList[interpreterIndex]
-
-      # start up any "runOnlyOnDemand" interpreter which is not yet started
-      if self.interpreterList[interpreterIndex] == None:
-         self.interpreterList[interpreterIndex] = ExternalInterpreter(interpreterSpec)
+      interpreterProcess = self.allInterps.getInterpreterProcess(
+            self.lyxProcess.serverGetFilename(), insetSpecifierLang)
+      interpreterSpec = interpreterProcess.spec
 
       # If the interpreterSpec defines a noopAtCellEnd then append it to the cell 
       # code.  Python can add "pass\n", for example, to always return to outer 
@@ -774,7 +815,7 @@ class ControllerLyxWithInterpreter(object):
       for codeLine in modifiedCodeCellText:
          #print("debug processing line:", [codeLine])
          interpResult = self.processPhysicalCodeLine(
-               interpreterIndex, codeLine, ignoreEmptyLines=ignoreEmptyLines)
+               interpreterProcess, codeLine, ignoreEmptyLines=ignoreEmptyLines)
          #print("debug result of line:", [interpResult])
          output = output + interpResult # get the result, per line
 
@@ -783,12 +824,12 @@ class ControllerLyxWithInterpreter(object):
          output.append("<<< WARNING: Lines truncated by LyX Notebook. >>>""")
 
       if self.noEcho == False and interpreterSpec["promptAtCellEnd"]:
-         output.append(self.mostRecentPromptList[interpreterIndex])
+         output.append(interpreterProcess.mostRecentPrompt)
 
       codeCellText.evaluationOutput = output
       return output
 
-   def updatePrompts(self, interpResult, interpIndex):
+   def updatePrompts(self, interpResult, interpreterProcess):
       """A utility function to update prompts across interpreter evaluation
       lines.  The argument interpResult is a list of lines resulting from
       an interpreter evaluation.  This routine prepends the most recently saved 
@@ -796,25 +837,21 @@ class ControllerLyxWithInterpreter(object):
       list as the new most recently saved prompt (to prepend next time).  Any 
       autoindenting after prompts is stripped off."""
       if len(interpResult) == 0: return
-      interpResult[0] = self.mostRecentPromptList[interpIndex] + interpResult[0]
+      interpResult[0] = interpreterProcess.mostRecentPrompt + interpResult[0]
       mostRecentPrompt = interpResult[-1]
       # remove any autoindent from mostRecentPrompt; note main and continuation 
       # prompts might have different lengths (though they usually do not)
-      if mostRecentPrompt.find(
-            self.interpreterSpecList[interpIndex]["mainPrompt"]) == 0:
-         self.mostRecentPromptList[interpIndex] = \
-               self.interpreterSpecList[interpIndex]["mainPrompt"]
+      if mostRecentPrompt.find(interpreterProcess.spec["mainPrompt"]) == 0:
+         interpreterProcess.mostRecentPrompt = interpreterProcess.spec["mainPrompt"]
          #print("debug replaced a main prompt")
-      elif mostRecentPrompt.find(
-            self.interpreterSpecList[interpIndex]["contPrompt"]) == 0:
-         self.mostRecentPromptList[interpIndex] = \
-               self.interpreterSpecList[interpIndex]["contPrompt"]
+      elif mostRecentPrompt.find(interpreterProcess.spec["contPrompt"]) == 0:
+         interpreterProcess.mostRecentPrompt = interpreterProcess.spec["contPrompt"]
          #print("debug replaced a cont prompt")
       else: 
          print("Warning: prompt not recognized as main or continuation prompt.")
       return interpResult[0:-1]
 
-   def processPhysicalCodeLine(self, interpIndex, codeLine, 
+   def processPhysicalCodeLine(self, interpreterProcess, codeLine, 
          ignoreEmptyLines = True):
       """Process the physical line of code codeLine in the interpreter with 
       index interpIndex.  Return a (possibly empty) list of all the result lines.
@@ -823,9 +860,8 @@ class ControllerLyxWithInterpreter(object):
 
       # TODO, maybe convert any tabs to spaces in input lines
 
-      interp = self.interpreterList[interpIndex]
-      interpSpec = self.interpreterSpecList[interpIndex]
-      indentCalc = self.indentCalcList[interpIndex]
+      interpSpec = interpreterProcess.spec
+      indentCalc = interpreterProcess.indentCalc
 
       #print("\ndebug codeLine being processed is", codeLine.rstrip())
 
@@ -843,14 +879,14 @@ class ControllerLyxWithInterpreter(object):
       # (uses a recursive function call which does not ignoreEmptyLines)
       firstResults = []
       if interpSpec["indentDownToZeroNewline"] and indentCalc.indentLevelDownToZero():
-         firstResults = self.processPhysicalCodeLine(interpIndex, "\n", 
+         firstResults = self.processPhysicalCodeLine(interpreterProcess, "\n", 
                ignoreEmptyLines = False)
 
       # send the line of code to the interpreter
-      interp.write(codeLine) 
+      interpreterProcess.externalInterp.write(codeLine) 
 
       # get the result of interpreting the line
-      interpResult = interp.read()
+      interpResult = interpreterProcess.externalInterp.read()
       interpResult = interpResult.splitlines(True) # keepends=True
 
       # if the final prompt was a main prompt, not continuation, reset indent counts
@@ -860,7 +896,7 @@ class ControllerLyxWithInterpreter(object):
          indentCalc.reset()
 
       # update the prompts (to remove final prompt and put prev prompt at beginning)
-      interpResult = self.updatePrompts(interpResult, interpIndex)
+      interpResult = self.updatePrompts(interpResult, interpreterProcess)
       
       # if spec removeNewlineBeforePrompt is True and last line is empty, remove it
       if len(interpResult) > 0 and interpSpec["delNewlinePrePrompt"]:
@@ -966,7 +1002,7 @@ class ControllerLyxWithInterpreter(object):
 
       mostRecentBackup =  ".LyxNotebookSave0_" + dirData[1]
       mostRecentBackupFull = os.path.join(dirData[0], mostRecentBackup)
-      currentBufferFull = os.path.join(dirData[0], dirData[1])
+      currentBufferFull = dirData[3]
       
       if not os.path.exists(mostRecentBackupFull):
          if messages:
