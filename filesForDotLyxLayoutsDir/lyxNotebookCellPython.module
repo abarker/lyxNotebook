@@ -192,7 +192,7 @@ AddToPreamble
    \lstdefinestyle{lyxNotebookNoColorInitPython}{
       language=python,
       % generalListingsCodeFormat
-      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morecomment=[s]{"""}{"""},
       %alsoletter={1234567890}, % numbers like letters
@@ -251,7 +251,7 @@ AddToPreamble
    \lstdefinestyle{lyxNotebookColorInitPython}{
       language=python,
       % generalListingsCodeFormat
-      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morecomment=[s]{"""}{"""},
       %alsoletter={1234567890}, % numbers like letters
@@ -326,7 +326,7 @@ AddToPreamble
    \lstdefinestyle{lyxNotebookNoColorOutputPython}{
       language=,
       % generalListingsOutputFormat
-      showlines=true, % keep blank lines at end, broken in 1.3
+      showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
       breaklines=true,
@@ -357,7 +357,7 @@ AddToPreamble
    \lstdefinestyle{lyxNotebookColorOutputPython}{
       language=,
       % generalListingsOutputFormat
-      showlines=true, % keep blank lines at end, broken in 1.3
+      showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
       breaklines=true,

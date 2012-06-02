@@ -65,7 +65,8 @@ allCommandsAndKeymap = [
  
    # Misc commands.
    ("F8",          "reinitialize current interpreter"),
-   ("Shift+F8",    "reinitialize all interpreters"),
+   ("Shift+F8",    "reinitialize all interpreters for buffer"),
+   (None,          "reinitialize all interpreters for all buffers"),
    (None,          "write all code cells to files"),
    # Note F9 and F10 are unavailable in KDE: window walk forward/backward.
    # Shift+F10 is currently free

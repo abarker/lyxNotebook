@@ -31,6 +31,7 @@ With scala,
 
 from __future__ import print_function, division
 import sys, os, time, pty, signal
+# import subprocess # for alternative where subprocess.call is used
 import interpreterSpecs # only needed for testing code at end
 
 
@@ -104,11 +105,13 @@ class ExternalInterpreter(object):
          # Example:
          #    os.execlp("python","ThePythonProgram", "-u", "pyecho.py")
          try:
-            os.execlp(self.runCommand,"LyxNotebook"+self.insetSpecifier+"Process",
+            os.execlp(self.runCommand, "LyxNotebook"+self.insetSpecifier+"Process",
                   *self.runArguments)
+            # below line also works in place of above (with exit below and import)
+            #subprocess.call([self.runCommand]+self.runArguments, shell=True)
          except:
             print("Cannot spawn execlp...")
-      
+         # sys.exit(0) # needed when subprocess.call is used above
       #
       # Parent process handling code.
       #

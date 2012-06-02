@@ -192,7 +192,7 @@ AddToPreamble
    \lstdefinestyle{lyxNotebookNoColorInitScala}{
       language=,
       % generalListingsCodeFormat
-      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morekeywords={abstract,case,catch,class,def,%
          do,else,extends,false,final,finally,%
@@ -246,7 +246,7 @@ AddToPreamble
    \lstdefinestyle{lyxNotebookColorInitScala}{
       language=,
       % generalListingsCodeFormat
-      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morekeywords={abstract,case,catch,class,def,%
          do,else,extends,false,final,finally,%
@@ -316,7 +316,7 @@ AddToPreamble
    \lstdefinestyle{lyxNotebookNoColorOutputScala}{
       language=,
       % generalListingsOutputFormat
-      showlines=true, % keep blank lines at end, broken in 1.3
+      showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
       breaklines=true,
@@ -347,7 +347,7 @@ AddToPreamble
    \lstdefinestyle{lyxNotebookColorOutputScala}{
       language=,
       % generalListingsOutputFormat
-      showlines=true, % keep blank lines at end, broken in 1.3
+      showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
       breaklines=true,

@@ -214,27 +214,21 @@ class InterpreterProcessCollection(object):
       for spec in self.interpreterSpecList:
          self.insetSpecifierToInterpreterSpecDict[spec["insetSpecifier"]] = spec
          self.allInsetSpecifiers.append(spec["insetSpecifier"])
+      self.resetAllInterpretersForAllBuffers(currentBuffer)
+
+   def resetAllInterpretersForAllBuffers(self, currentBuffer=""):
+      """Reset all the interpreters, restarting any not-on-demand ones for the
+      buffer currentBuffer (unless it equals the empty string).  This also
+      frees any processes for former buffers, such as for closed buffers and
+      renamed buffers."""
       self.mainDict = {} # map (bufferName,insetSpecifier) tuple to InterpreterProcess
       # Start up not-on-demand interpreters, but only for the current buffer
       # (in principle we could use buffer-next to get all buffers and start for all, 
       # but they may not all even # use Lyx Notebook).
-      self.reset(currentBuffer)
+      if currentBuffer != "":
+         self.resetForBuffer(currentBuffer)
 
-   def getInterpreterProcess(self, bufferName, insetSpecifier):
-      """Get interpreter process, creating/starting one if one not there already."""
-      if lyxNotebookUserSettings.separateInterpretersForEachBuffer == False:
-         bufferName = "___dummy___" # force all to use same buffer if not set
-      key = (bufferName, insetSpecifier)
-      if not key in self.mainDict:
-         msg = "Starting interpreter for " + insetSpecifier
-         if lyxNotebookUserSettings.separateInterpretersForEachBuffer == True: 
-            msg += ", for buffer:\n   " + bufferName
-         print(msg)
-         self.mainDict[key] = InterpreterProcess(
-               self.insetSpecifierToInterpreterSpecDict[insetSpecifier])
-      return self.mainDict[key]
-
-   def reset(self, bufferName, insetSpecifier=""):
+   def resetForBuffer(self, bufferName, insetSpecifier=""):
       """Reset the interpreter for insetSpecifier cells for buffer bufferName.  
       Restarts the whole process.  If insetSpecifier is the empty string then 
       reset for all inset specifiers."""
@@ -250,8 +244,19 @@ class InterpreterProcessCollection(object):
          if not spec["runOnlyOnDemand"]: 
             self.getInterpreterProcess(bufferName, insetSpecifier)
 
-   def resetAllInterpretersForAllBuffers(self):
-      self.mainDict = {}
+   def getInterpreterProcess(self, bufferName, insetSpecifier):
+      """Get interpreter process, creating/starting one if one not there already."""
+      if lyxNotebookUserSettings.separateInterpretersForEachBuffer == False:
+         bufferName = "___dummy___" # force all to use same buffer if not set
+      key = (bufferName, insetSpecifier)
+      if not key in self.mainDict:
+         msg = "Starting interpreter for " + insetSpecifier
+         if lyxNotebookUserSettings.separateInterpretersForEachBuffer == True: 
+            msg += ", for buffer:\n   " + bufferName
+         print(msg)
+         self.mainDict[key] = InterpreterProcess(
+               self.insetSpecifierToInterpreterSpecDict[insetSpecifier])
+      return self.mainDict[key]
 
    def printStartMessage(self):
       startMsg = "Running for " + str(self.numSpecs) + \
@@ -296,11 +301,18 @@ class ControllerLyxWithInterpreter(object):
       self.serverNotifyLoop()
       return # never executed; command loop above continues until sys.exit
 
-   def resetInterpreters(self, bufferName=""):
+   def resetInterpretersForBuffer(self, bufferName=""):
       """Reset all the interpreters for the buffer, starting completely new processes 
       for them.  If bufferName is empty the current buffer is used."""
       if bufferName == "": bufferName = self.lyxProcess.serverGetFilename()
-      self.allInterps.reset(bufferName)
+      self.allInterps.resetForBuffer(bufferName)
+      return
+
+   def resetAllInterpretersForAllBuffers(self):
+      """Reset all the interpreters for all buffers, starting not-on-demand
+      interpreters for the current buffer."""
+      currentBuffer = self.lyxProcess.serverGetFilename()
+      self.allInterps.resetAllInterpretersForAllBuffers(currentBuffer)
       return
 
    def serverNotifyLoop(self):
@@ -405,7 +417,7 @@ class ControllerLyxWithInterpreter(object):
          elif keyAction == "evaluate current cell after reinit":
             self.lyxProcess.showMessage("evaluating the current cell after reinit")
             print("Restarting all interpreters, single-interp restart unimplemented.")
-            self.resetInterpreters() # TODO currently restarts them all
+            self.resetInterpretersForBuffer() # TODO currently restarts them all
             self.evaluateLyxCell()
          
          elif keyAction == "evaluate all code cells":
@@ -414,7 +426,7 @@ class ControllerLyxWithInterpreter(object):
          
          elif keyAction == "evaluate all code cells after reinit":
             self.lyxProcess.showMessage("evaluating all code cells after reinit")
-            self.resetInterpreters() 
+            self.resetInterpretersForBuffer() 
             self.evaluateAllCodeCells()
          
          elif keyAction == "evaluate all init cells":
@@ -423,7 +435,7 @@ class ControllerLyxWithInterpreter(object):
          
          elif keyAction == "evaluate all init cells after reinit":
             self.lyxProcess.showMessage("evaluating all init cells after reinit")
-            self.resetInterpreters() 
+            self.resetInterpretersForBuffer() 
             self.evaluateAllCodeCells(standard=False)
          
          elif keyAction == "evaluate all standard cells":
@@ -432,7 +444,7 @@ class ControllerLyxWithInterpreter(object):
          
          elif keyAction == "evaluate all standard cells after reinit":
             self.lyxProcess.showMessage("evaluating all standard cells after reinit")
-            self.resetInterpreters() 
+            self.resetInterpretersForBuffer() 
             self.evaluateAllCodeCells(init=False)
          
          #
@@ -459,7 +471,7 @@ class ControllerLyxWithInterpreter(object):
                      reloadBuffer=True, messages=True)
 
          elif keyAction == "batch evaluate all code cells after reinit":
-            self.resetInterpreters() 
+            self.resetInterpretersForBuffer() 
             toFileName = self.batchEvaluateAllCodeCellsToLyxFile(
                   init=True, standard=True, messages=True)
             if not self.bufferReplaceOnBatchEval:
@@ -478,7 +490,7 @@ class ControllerLyxWithInterpreter(object):
                      reloadBuffer=True, messages=True)
 
          elif keyAction == "batch evaluate all init cells after reinit":
-            self.resetInterpreters() 
+            self.resetInterpretersForBuffer() 
             toFileName = self.batchEvaluateAllCodeCellsToLyxFile(
                   init=True, standard=False, messages=True)
             if not self.bufferReplaceOnBatchEval:
@@ -498,7 +510,7 @@ class ControllerLyxWithInterpreter(object):
 
          elif (keyAction == 
                "batch evaluate all standard cells after reinit"):
-            self.resetInterpreters() 
+            self.resetInterpretersForBuffer() 
             toFileName = self.batchEvaluateAllCodeCellsToLyxFile(
                   init=False, standard=True, messages=True)
             if not self.bufferReplaceOnBatchEval:
@@ -513,12 +525,18 @@ class ControllerLyxWithInterpreter(object):
 
          elif keyAction == "reinitialize current interpreter":
             print("Not implemented, restarting all interpreters.")
-            self.resetInterpreters() # TODO, currently restarts all
+            self.resetInterpretersForBuffer() 
+            # TODO, currently restarts all: need to look up current interp
             self.lyxProcess.showMessage("all interpreters reinitialized")
          
-         elif keyAction == "reinitialize all interpreters":
-            self.resetInterpreters() 
-            self.lyxProcess.showMessage("all interpreters reinitialized")
+         elif keyAction == "reinitialize all interpreters for buffer":
+            self.resetInterpretersForBuffer() 
+            self.lyxProcess.showMessage("all interpreters for buffer reinitialized")
+         
+         elif keyAction == "reinitialize all interpreters for all buffers":
+            self.resetAllInterpretersForAllBuffers() 
+            self.lyxProcess.showMessage(
+                  "all interpreters for all buffer reinitialized")
          
          elif keyAction == "write all code cells to files":
             filePrefix = self.lyxProcess.serverGetFilename()

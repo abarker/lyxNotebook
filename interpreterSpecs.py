@@ -19,6 +19,8 @@ default values.
 We now briefly describe some of the fields.  See the python2 spec below for
 descriptions of the others.
 
+----
+
 progName : An arbitrary descriptive string for the interpreter.  It is what
    will be printed out to describe the interpreter.  Uniqueness is not required.
    For example, by default Python 2 and Python 3 are both simply called Python.
@@ -36,7 +38,16 @@ listingsLanguage : the "language=xxxxx" setting for the Listings program.  It
    Changing this requires running setup.py again.
 
 Changing any field other than one of the three above only requires restarting
-Lyx Notebook.
+Lyx Notebook.  The above three require setup.py be run again to re-generate
+the module files.
+
+runCommand : The command which is to be run; must be in PATH or a full pathname.
+
+runArguments : A list of arguments to the runCommand.  Note that each part must
+   be a separate element of the list.  For example, ["--rcfile", "/tmp/myRcFile"]
+   rather than putting the file with the flag part.
+
+----
 
 The preambleLatexCode string is initialization code which is substituted in the
 preamble of the document for each module is loaded (each interpreterSpec is
@@ -223,7 +234,7 @@ python2.preambleLatexCode= r"""
 
 python2.generalListingsCodeFormat = r"""
       % generalListingsCodeFormat
-      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morecomment=[s]{<<tripleQuote>>}{<<tripleQuote>>},
       %alsoletter={1234567890}, % numbers like letters
@@ -296,7 +307,7 @@ python2.colorListingsCodeFormat = r"""
 # debug remove final comma if revert
 python2.generalListingsOutputFormat = r"""
       % generalListingsOutputFormat
-      showlines=true, % keep blank lines at end, broken in 1.3
+      showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
       breaklines=true,
@@ -465,7 +476,7 @@ scala.params = {
 
 scala.generalListingsCodeFormat = r"""
       % generalListingsCodeFormat
-      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morekeywords={abstract,case,catch,class,def,%
          do,else,extends,false,final,finally,%
@@ -542,7 +553,7 @@ R.params = {
 # debug remove final comma if revert
 R.generalListingsCodeFormat= r"""
       % generalListingsCodeFormat
-      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       upquote=true,
       %mathescape=true,
@@ -580,24 +591,25 @@ allSpecs.append(R)
 #
 # ==================================================================================
 
-# TODO: only started, need to set all values and test
+# TODO: now works, but need to work out how to do the bashrc part...
+# Could just write a string to a file, but there may be a better way...
 
 bash = SpecRecord()
 bash.params = {
-      "progName"            :  "R",
-      "mainPrompt"          :  "> ",
-      "contPrompt"          :  "+ ",
+      "progName"            :  "Bash",
+      "mainPrompt"          :  "bash $ ",
+      "contPrompt"          :  "bash > ",
       "runCommand"          :  "bash",
-      "runArguments"        :  ["--no-save", "--no-restore", "--no-readline"],
+      "runArguments"        :  ["--rcfile", "/tmp/lyxNotebookBashrcTest"], 
       "fileSuffix"          :  ".bash",
       "commentLine"         :  "#",
       "lineContinuation"    :  None,
-      "insetSpecifier"      :  "R", # e.g., Flex:LyxNotebook:Standard:Scala
-      "listingsLanguage"    :  "R", # no Scala predefined yet in Listings
-      "startupSleepSecs"    :  1.0,
+      "insetSpecifier"      :  "Bash", # e.g., Flex:LyxNotebook:Standard:Scala
+      "listingsLanguage"    :  "bash", # no Scala predefined yet in Listings
+      "startupSleepSecs"    :  0.2,
       "beforeReadSleepSecs" :  0.01,
       "noopAtCellEnd"       :  None,
-      "exitCommand"         :  "quit(save=\"no\")\n",
+      "exitCommand"         :  "exit\n",
       "delNewlinePrePrompt" :  False, 
       "promptAtCellEnd"     :  True, 
       "indentDownToZeroNewline" : False,
@@ -608,7 +620,7 @@ bash.params = {
 # debug remove final comma if revert
 bash.generalListingsCodeFormat= r"""
       % generalListingsCodeFormat
-      showlines=true, % keep blank lines at end of listing blocks, broken in 1.3
+      showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       upquote=true,
       %mathescape=true,
