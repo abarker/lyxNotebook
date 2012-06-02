@@ -37,7 +37,7 @@ lyxCommandString = lyxNotebookUserSettings.lyxCommandString
 myPID = os.getpid()
 myCWD = os.getcwd()
 
-# get the path of the lyxNotebook script from calling command for this script
+# get the path of the lyxNotebook script and dir from calling command for this script
 callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
 lyxNotebookSourceDir = os.path.dirname(callingCommand)
 runPath = os.path.join(lyxNotebookSourceDir, "lyxNotebook")

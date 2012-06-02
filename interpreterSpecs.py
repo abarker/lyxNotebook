@@ -77,6 +77,7 @@ of different interpreters.
 """
 
 from __future__ import print_function, division
+import os
 
 class SpecRecord(object):
    """A class used as a data record for an interpreter specification.  All the
@@ -304,7 +305,6 @@ python2.colorListingsCodeFormat = r"""
       keywordstyle=[3]\bfseries\color{yellowGold9},
 """
 
-# debug remove final comma if revert
 python2.generalListingsOutputFormat = r"""
       % generalListingsOutputFormat
       showlines=true, % keep blank lines at end
@@ -550,7 +550,6 @@ R.params = {
       "runOnlyOnDemand"     :  True
       }
 
-# debug remove final comma if revert
 R.generalListingsCodeFormat= r"""
       % generalListingsCodeFormat
       showlines=true, % keep blank lines at end of listing blocks
@@ -591,8 +590,12 @@ allSpecs.append(R)
 #
 # ==================================================================================
 
-# TODO: now works, but need to work out how to do the bashrc part...
-# Could just write a string to a file, but there may be a better way...
+# Note that this interpreter is set-up to use a bashrc file provided in the directory
+# auxiliaryFilesForInterpreters.  This bashrc file sources the usual ~/.bashrc
+# (if it exists and is readable) but then redefines the prompt strings to the
+# values which are set in the spec below.
+bashrcFile = os.path.join(lyxNotebookSourceDir, "auxiliaryFilesForInterpreters",
+      "lyxNotebookBashrc")
 
 bash = SpecRecord()
 bash.params = {
@@ -600,7 +603,7 @@ bash.params = {
       "mainPrompt"          :  "bash $ ",
       "contPrompt"          :  "bash > ",
       "runCommand"          :  "bash",
-      "runArguments"        :  ["--rcfile", "/tmp/lyxNotebookBashrcTest"], 
+      "runArguments"        :  ["--rcfile", bashrcFile], 
       "fileSuffix"          :  ".bash",
       "commentLine"         :  "#",
       "lineContinuation"    :  None,
@@ -617,7 +620,6 @@ bash.params = {
       "runOnlyOnDemand"     :  True
       }
 
-# debug remove final comma if revert
 bash.generalListingsCodeFormat= r"""
       % generalListingsCodeFormat
       showlines=true, % keep blank lines at end of listing blocks

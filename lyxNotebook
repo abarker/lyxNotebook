@@ -15,6 +15,7 @@ it launches an instance of the main ControllerLyxWithInterpreter class.
 """
 
 from __future__ import print_function, division
+import os, sys
 from controllerLyxWithInterpreter import *
 import lyxNotebookUserSettings
 
@@ -50,12 +51,19 @@ pidfile = open(lockfilePath, "w")
 pidfile.write(str(os.getpid()))
 pidfile.close()
 
+# Get the Lyx Notebook home directory; some interpreters may use this if they
+# store data in the auxiliaryFilesForInterpreters directory.
+myCWD = os.getcwd()
+callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
+lyxNotebookSourceDir = os.path.dirname(callingCommand)
+
 #
 # Start the main controller class.
 #
   
 print("\n===================================================\n")
 print("Starting the Lyx Notebook program...")
+print("Version from source directory", lyxNotebookSourceDir)
 
 controller = ControllerLyxWithInterpreter("lyxNotebookClient") 
 
