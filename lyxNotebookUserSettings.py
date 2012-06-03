@@ -3,9 +3,11 @@
 User-modifiable settings for the Lyx Notebook program.
 """
 
+
 # ===============================================================================
 # General settings.
 # ===============================================================================
+
 
 # The maximum number of lines written to an output cell (before truncation).
 maxLinesInOutputCell = 1000 
@@ -36,10 +38,12 @@ magicCookieString = "zZ3Qq"
 # cell types in different buffers.
 separateInterpretersForEachBuffer = True
 
+
 # ===============================================================================
 # Pathnames also set in Lyx.  These must match whatever the Lyx program uses.
 # They are initially set to the Lyx default values.
 # ===============================================================================
+
 
 # The LyX user home directory.
 userHomeLyxDirectory = "~/.lyx"
@@ -51,4 +55,13 @@ lyxServerPipe = "~/.lyx/lyxpipe"
 
 # This should be the same as: Tools->Preferences->Paths->TemporaryDirectory
 lyxTemporaryDirectory = "/tmp"
+
+
+# ===============================================================================
+# Values calculated on-the-fly by the program, saved and shared in this namespace.
+# ===============================================================================
+
+# The source directory of the Lyx Notebook program, where the command lyxNotebook
+# lives (the directory is calculated in that command's code, from argv[0]).
+lyxNotebookSourceDir = "__dummy__"
 

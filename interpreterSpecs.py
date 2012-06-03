@@ -77,6 +77,7 @@ of different interpreters.
 """
 
 from __future__ import print_function, division
+import lyxNotebookUserSettings # in case any of these settings are needed
 import os
 
 class SpecRecord(object):
@@ -594,8 +595,8 @@ allSpecs.append(R)
 # auxiliaryFilesForInterpreters.  This bashrc file sources the usual ~/.bashrc
 # (if it exists and is readable) but then redefines the prompt strings to the
 # values which are set in the spec below.
-bashrcFile = os.path.join(lyxNotebookSourceDir, "auxiliaryFilesForInterpreters",
-      "lyxNotebookBashrc")
+bashrcFile = os.path.join(lyxNotebookUserSettings.lyxNotebookSourceDir, 
+      "auxiliaryFilesForInterpreters", "lyxNotebookBashrc")
 
 bash = SpecRecord()
 bash.params = {

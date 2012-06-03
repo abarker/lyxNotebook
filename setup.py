@@ -41,6 +41,7 @@ import lyxNotebookUserSettings
 userHomeLyxDirectory = lyxNotebookUserSettings.userHomeLyxDirectory
 userHomeLyxDirectoryExpanded = path.expanduser(userHomeLyxDirectory)
 
+print("="*70)
 print("\nStarting the setup of LyX Notebook...\n")
 
 # find the Lyx Notebook source directory from the invoking pathname and cwd
@@ -49,11 +50,11 @@ cwd = os.getcwd()
 absPathToSetupProg = path.join(cwd, invokingCommand)
 
 sourceDir = path.dirname(path.normpath(absPathToSetupProg))
-print("\nThe absolute path of the Lyx Notebook source directory is:\n   ", sourceDir)
+print("The absolute path of the Lyx Notebook source directory is:\n   ", sourceDir)
 
 sourceDirWithTilde = path.join("~", path.relpath(sourceDir, path.expanduser("~")))
 print("\nThe path of the Lyx Notebook source directory relative to home is:\n   ", 
-      sourceDirWithTilde)
+      sourceDirWithTilde, "\n")
 
 #
 # User-modifiable key-binding file (TODO: better as a fun or 3)
@@ -74,7 +75,7 @@ bindFilePathname = path.join(
 bindFile = open(bindFilePathname, "w")
 bindFile.write(bindContentsStr)
 bindFile.close()
-print("\nGenerated the key-binding file\n   ", 
+print("Generated the key-binding file\n   ", 
       bindFilePathname, "\nfrom the corresponding .template file.")
 
 # copy the user-modifiable .bind file to the userHomeLyxDirectory
@@ -113,7 +114,7 @@ bindFilePathname = path.join(
 bindFile = open(bindFilePathname, "w")
 bindFile.write(bindContentsStr)
 bindFile.close()
-print("\nGenerated the key-binding file\n   ", 
+print("Generated the key-binding file\n   ", 
       bindFilePathname, "\nfrom the corresponding .template file.")
 
 # copy the Lyx Notebook .bind file to the userHomeLyxDirectory
@@ -158,16 +159,18 @@ for newModuleFile in dotModuleFiles:
    shutil.copyfile(newModuleFile, pathInLayoutsDir)
 
 msg = "Finished the first phase of the setup."
-text = """Finished the first phase of the LyX Notebook (version 0.1alpha) setup.  Next do 
-the following steps to finish the setup.  (You can keep this window open as a reminder.)
+text = """Finished the first phase of the LyX Notebook setup.  Next do the following
+steps to finish the setup.  (You can keep this window open as a reminder.)
    
    1) Open LyX.
 
    2) Goto the menu
            Tools > Preferences > Editing > Shortcuts
-      and enter (or browse to) the filename
-           userCustomizableKeyBindings
-      in the "Bind file" box on the top right (enter it WITHOUT the .bind suffix).
+      and enter the filename
+           ~/.lyx/userCustomizableKeyBindings
+      in the "Bind file" box on the top right (enter it WITHOUT a .bind suffix).
+      Modify the above in the obvious way if ~/.lyx is not your home Lyx directory;
+      in this case you'll also need to modify a line in lyxNotebookUserSettings.py.
 
    3) Select the menu item
            Tools > Reconfigure
@@ -184,7 +187,8 @@ Press F12 in LyX to start the LyX Notebook program (Shift+F12 to kill it)
 Press F1 for a menu of all the commands and their current key bindings.
 See the documentation file lyxNotebookDocs.pdf for further information.
 """
-print("\n", text)
+print("="*70)
+print("\n" + text)
 easygui.textbox(msg=msg, text=text, title="LyX Notebook Setup")
 
 

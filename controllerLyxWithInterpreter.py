@@ -26,11 +26,11 @@ import re
 import sys, os, time, signal
 
 # local file imports
+import lyxNotebookUserSettings
 from interactWithLyxCells import InteractWithLyxCells, Cell
 from externalInterpreter import ExternalInterpreter
 import interpreterSpecs # specs for all the interpreters which are allowed
 import keymap # the current mapping of keys to Lyx Notebook functions
-import lyxNotebookUserSettings
 
 class IndentCalc(object):
    """A class that is used for Python cells, to calculate the indentation levels.

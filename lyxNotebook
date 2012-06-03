@@ -12,12 +12,23 @@ Copyright (C) 2012 Allen Barker
 This script runs the Lyx Notebook program.  It mainly checks to make sure
 that there is no other active Lyx Notebook process running, and if not then
 it launches an instance of the main ControllerLyxWithInterpreter class.
+It also dynamically sets the variable lyxNotebookUserSettings.lyxNotebookSourceDir.
 """
 
 from __future__ import print_function, division
 import os, sys
-from controllerLyxWithInterpreter import *
-import lyxNotebookUserSettings
+import lyxNotebookUserSettings # before controllerLyxWithInterpreter, dynamic vars set
+
+# Get the Lyx Notebook home directory.  Some interpreters may use this if they
+# store data in the auxiliaryFilesForInterpreters directory, so the value is
+# stored as an on-the-fly calculated variable in the lyxNotebookUserSettings
+# namespace.
+myCWD = os.getcwd()
+callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
+lyxNotebookUserSettings.lyxNotebookSourceDir = os.path.dirname(callingCommand)
+
+# do below import *after* the calculations above, since implicitly import interpreterSpecs
+from controllerLyxWithInterpreter import * 
 
 # set the lockfile location to be in the user's local Lyx directory
 userHomeLyxDirectory = lyxNotebookUserSettings.userHomeLyxDirectory
@@ -51,19 +62,14 @@ pidfile = open(lockfilePath, "w")
 pidfile.write(str(os.getpid()))
 pidfile.close()
 
-# Get the Lyx Notebook home directory; some interpreters may use this if they
-# store data in the auxiliaryFilesForInterpreters directory.
-myCWD = os.getcwd()
-callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
-lyxNotebookSourceDir = os.path.dirname(callingCommand)
-
 #
 # Start the main controller class.
 #
   
 print("\n===================================================\n")
 print("Starting the Lyx Notebook program...")
-print("Version from source directory", lyxNotebookSourceDir)
+print("Version from source directory:\n   ", 
+      lyxNotebookUserSettings.lyxNotebookSourceDir)
 
 controller = ControllerLyxWithInterpreter("lyxNotebookClient") 
 
