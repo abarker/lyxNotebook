@@ -12,7 +12,12 @@ Copyright (C) 2012 Allen Barker
 This script runs the Lyx Notebook program.  It mainly checks to make sure
 that there is no other active Lyx Notebook process running, and if not then
 it launches an instance of the main ControllerLyxWithInterpreter class.
-It also dynamically sets the variable lyxNotebookUserSettings.lyxNotebookSourceDir.
+
+This program should always be run from the Lyx Notebook source directory,
+so it can find the path to that directory.  The variable 
+lyxNotebookUserSettings.lyxNotebookSourceDir is dynamically set to the argv[0]
+directory of this command.  Use a short stub shell-script to call it from
+the source directory if you want a version in, say ~/bin.
 """
 
 from __future__ import print_function, division
