@@ -20,13 +20,9 @@ change directories to the Lyx Notebook source directory and run
 This program only works on Linux systems, and has only been tested on Fedora 15
 with Lyx 2.0.3.  Most of the testing has been with Python 2 code cells.  The
 EasyGUI package for Python is required; in Fedora the command to install it is
-
    sudo yum install python-easygui
-
 while in Debian or Ubuntu the command is
-
    sudo apt-get install python-easygui
-
 There may be portability problems to other Linux distributions, but probably
 not serious ones.  The program is licensed under the same GPL as Lyx.
 
