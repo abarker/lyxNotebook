@@ -72,7 +72,7 @@ pidfile.close()
 #
   
 print("\n===================================================\n")
-print("Starting the Lyx Notebook program...")
+print("Starting the LyX Notebook program...")
 print("Version from source directory:\n   ", 
       lyxNotebookUserSettings.lyxNotebookSourceDir)
 

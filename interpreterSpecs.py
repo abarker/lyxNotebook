@@ -133,6 +133,14 @@ python2.params = {
       }
 
 
+# TODO: can this preamble code be generic, or might some interpreter want to change
+# it?  All currently use it..... just define as generic and assign python to it
+# like the others
+
+# TODO: might prefer to have the frame command BEFORE the style command, so that
+# users can reset the frames in their own local language styles (note comma issues
+# should be automatically fixed now assuming no bugs)
+
 python2.preambleLatexCode= r"""
    % Latex code for <<insetSpecifier>> cells from interpreterSpec.py
    %
@@ -228,11 +236,9 @@ python2.preambleLatexCode= r"""
 
 """
 
-#
 # key=value pairs
-# last a list can end in comma or not, but cannot end in comment
-# --> with comma on all they can be rearranged more easily without errors
-#     (except beware comments at end! not checked for at all)
+# last in a list can end in comma or not, since this is checked-for and corrected,
+# but should not end in a pure comment line (with nothing else but a comment)
 
 python2.generalListingsCodeFormat = r"""
       % generalListingsCodeFormat
@@ -671,17 +677,43 @@ allSpecs.append(bash)
 
 def fixComma(keyValueLines, endInComma=True):
    """Returns the key=value list with a trailing comma either there or not."""
-   lines = keyValueLines.splitlines()
-   linesNoEmpty = [ line.rstrip() for line in lines ]
-   if len(linesNoEmpty)==0: return "% empty key-value list placeholder"
-   if linesNoEmpty[-1][-1] == ",":
-      if not endInComma: linesNoEmpty[-1] = linesNoEmpty[-1][0:-1]
+   lines = keyValueLines.strip("\n\t ").splitlines() # kill begin and end empty lines
+   if len(lines)==0: return "% empty key-value list placeholder"
+   # split off any comment at end of last line
+   lastNonCommentLineIndex = -1
+   for i in range(len(lines)-1, -1, -1):
+      currLine = lines[i].strip()
+      if len(currLine) == 0: continue
+      if currLine[0] != "%":
+         lastNonCommentLineIndex = i
+         break
+   if lastNonCommentLineIndex == -1:
+      return "\n".join(lines) # all lines are comments, re-join and return them
+   lastLine = lines[lastNonCommentLineIndex]
+   i = 0; splitPoint = len(lastLine)
+   while i < len(lastLine): # go through each char looking for comment part
+      if lastLine[i] == "\\":
+         i += 2 # skip any escaped percent signs
+         continue
+      if lastLine[i] == "%":
+         splitPoint = i # found first non-escaped percent
+         break
+      i += 1
+   mainLastLine = lastLine[0:splitPoint].rstrip()
+   commentLastLine = lastLine[splitPoint:]
+   if mainLastLine == "":
+      print("Error: last line in interpreter spec key=value list cannot be comment.")
+      sys.exit(-1)
+   if mainLastLine[-1] == ",":
+      if not endInComma: mainLastLine = mainLastLine[0:-1]
    else:
-      if endInComma: linesNoEmpty[-1] = linesNoEmpty[-1] + ","
-   return "\n".join(linesNoEmpty).strip("\n\t ") # kill begin and end whitespace
+      if endInComma: mainLastLine = mainLastLine + ","
+   lines[lastNonCommentLineIndex] = mainLastLine + " " + commentLastLine # rejoin
+   return "\n".join(lines)
 
 for spec in allSpecs:
    preamble = spec.preambleLatexCode
+   # make the metavar substitutions with replace
    preamble = preamble.replace("<<generalListingsCodeFormat>>", 
                                fixComma(spec.generalListingsCodeFormat,True))
    preamble = preamble.replace("<<nonColorListingsCodeFormat>>",

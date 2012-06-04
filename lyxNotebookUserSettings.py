@@ -18,6 +18,7 @@ maxLinesInOutputCell = 1000
 # terminal as the running LyX process.
 lyxCommandString = "lyx"
 #lyxCommandString = "lyx-2.1.0svn"
+#lyxCommandString = "lyx-2.0.4svn"
 
 # Default initial value for echoing mode in output cells.
 noEcho = True
@@ -48,10 +49,12 @@ separateInterpretersForEachBuffer = True
 # The LyX user home directory.
 userHomeLyxDirectory = "~/.lyx"
 #userHomeLyxDirectory = "~/.lyx-2.1.0svn"
+#userHomeLyxDirectory = "~/.lyx-2.0.4svn"
 
 # This should be the same as: Tools->Preferences->Paths->LyXServerPipe 
 lyxServerPipe = "~/.lyx/lyxpipe"
 #lyxServerPipe = "~/.lyx-2.1.0svn/lyxpipe"
+#lyxServerPipe = "~/.lyx-2.0.4svn/lyxpipe"
 
 # This should be the same as: Tools->Preferences->Paths->TemporaryDirectory
 lyxTemporaryDirectory = "/tmp"

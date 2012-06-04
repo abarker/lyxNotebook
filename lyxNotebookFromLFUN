@@ -105,7 +105,7 @@ if len(myLyxProcsWithWriteableTerminals) != 1:
          shell=True)
 else:
    terminal = "/dev/" + myLyxProcsWithWriteableTerminals[0][1]
-   print("Sending I/O to the Lyx terminal:", terminal)
+   print("Sending I/O to the terminal associated with the LyX process:", terminal)
    proc = subprocess.Popen(["%s >%s 2>&1" % (runPath,terminal)], shell=True)
 
 

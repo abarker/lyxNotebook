@@ -168,9 +168,16 @@ steps to finish the setup.  (You can keep this window open as a reminder.)
            Tools > Preferences > Editing > Shortcuts
       and enter the filename
            ~/.lyx/userCustomizableKeyBindings
-      in the "Bind file" box on the top right (enter it WITHOUT a .bind suffix).
-      Modify the above in the obvious way if ~/.lyx is not your home Lyx directory;
-      in this case you'll also need to modify a line in lyxNotebookUserSettings.py.
+      in the "Bind file" box on the top right; enter it WITHOUT any .bind suffix.
+      (Modify the above in the obvious way if ~/.lyx is not your home Lyx directory;
+      in this case you'll also need to modify a line in lyxNotebookUserSettings.py.)
+
+   3) While still in the preferences menu, check 
+           Tools > Preferences > Files
+      and make sure that the "LyXServer pipe" setting is ~/.lyx/lyxpipe (replacing
+      ~/.lyx with your home Lyx directory if it is different).  You can use some
+      other setting, but in that case you'll also need to modify a line in 
+      lyxNotebookUserSettings.py.
 
    3) Select the menu item
            Tools > Reconfigure

@@ -200,26 +200,26 @@ AddToPreamble
       prebreak=\bf\textbackslash,
       showstringspaces=false,
       % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
-      % columns=flexible, %
+      % columns=flexible, % 
       % columns=fullflexible, % good with monospace font, & more chars per line
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       linewidth=\linewidth, % boxes smaller, same right margin in indented env.
       breaklines=true,
       breakatwhitespace=true,
-      breakindent=1.5em,
-      breakautoindent=true,
+      breakindent=1.5em, 
+      breakautoindent=true, 
       % nonColorListingsCodeFormat
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookNoColorCodeFontFamily%
-                 \color{darkGray9},
+                 \color{darkGray9}, 
       stringstyle=\ttfamily, % use ttfamily for strings at least
       %commentstyle=\upshape, % don't use the default italic comments
       commentstyle=\slshape\color[rgb]{0.3,0.3,0.3}, % slanted gray
       %commentstyle=\itshape,
-      keywordstyle=[1]\bfseries,
+      keywordstyle=[1]\bfseries, 
       keywordstyle=[2]\bfseries,
-      keywordstyle=[3]\bfseries,
+      keywordstyle=[3]\bfseries, 
       frame=TbLR
    }
 
@@ -241,19 +241,19 @@ AddToPreamble
       prebreak=\bf\textbackslash,
       showstringspaces=false,
       % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
-      % columns=flexible, %
+      % columns=flexible, % 
       % columns=fullflexible, % good with monospace font, & more chars per line
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       linewidth=\linewidth, % boxes smaller, same right margin in indented env.
       breaklines=true,
       breakatwhitespace=true,
-      breakindent=1.5em,
-      breakautoindent=true,
+      breakindent=1.5em, 
+      breakautoindent=true, 
       % colorListingsCodeFormat
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookColorCodeFontFamily%
-                 \color{darkGray9},
+                 \color{darkGray9}, 
       rulecolor=\color{black}, % may be needed for line-broken color lines
       %identifierstyle=\color{darkGray9},
       stringstyle=\ttfamily\color{blue9},
@@ -262,9 +262,9 @@ AddToPreamble
       %commentstyle=\upshape\color{green9},
       %commentstyle=\slshape\color{darkerGreen9},
       commentstyle=\slshape\color[rgb]{0.0,0.4,0.0},
-      keywordstyle=[1]\bfseries\color{darkerRed9},
+      keywordstyle=[1]\bfseries\color{darkerRed9}, 
       keywordstyle=[2]\bfseries\color{pinkRed9},
-      keywordstyle=[3]\bfseries\color{yellowGold9},
+      keywordstyle=[3]\bfseries\color{yellowGold9}, 
       frame=TbLR
    }
 
@@ -303,17 +303,17 @@ AddToPreamble
       prebreak=\bf\textbackslash,
       % linewidth=\linewidth, % default seems to work better
       % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
-      % columns=flexible, %
+      % columns=flexible, % 
       % columns=fullflexible, % good with monospace font, & more chars per line
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       aboveskip=\doubleskipamount, % make abut the cell above, a calulated value
-      upquote=true,
+      upquote=true, 
       % nonColorListingsOutputFormat
       % set the font to a gray color
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookNoColorOutputFontFamily%
-                 \color[rgb]{0.2,0.2,0.2},
+                 \color[rgb]{0.2,0.2,0.2}, 
       frame=tblr
    }
 
@@ -334,17 +334,17 @@ AddToPreamble
       prebreak=\bf\textbackslash,
       % linewidth=\linewidth, % default seems to work better
       % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
-      % columns=flexible, %
+      % columns=flexible, % 
       % columns=fullflexible, % good with monospace font, & more chars per line
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       aboveskip=\doubleskipamount, % make abut the cell above, a calulated value
-      upquote=true,
+      upquote=true, 
       % colorListingsOutputFormat
       % set the font to a gray color
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}
                  \lyxNotebookColorOutputFontFamily
-                 \color[rgb]{0.2,0.2,0.2},
+                 \color[rgb]{0.2,0.2,0.2}, 
       frame=tblr
    }
 
