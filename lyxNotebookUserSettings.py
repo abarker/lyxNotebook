@@ -15,12 +15,12 @@ userHomeLyxDirectory = "~/.lyx"
 #userHomeLyxDirectory = "~/.lyx-2.1.0svn"
 #userHomeLyxDirectory = "~/.lyx-2.0.4svn"
 
-# This should be the same as: Tools->Preferences->Paths->LyXServerPipe 
+# This setting must match: Tools->Preferences->Paths->LyXServerPipe 
 lyxServerPipe = "~/.lyx/lyxpipe"
 #lyxServerPipe = "~/.lyx-2.1.0svn/lyxpipe"
 #lyxServerPipe = "~/.lyx-2.0.4svn/lyxpipe"
 
-# This should be the same as: Tools->Preferences->Paths->TemporaryDirectory
+# This setting should match: Tools->Preferences->Paths->TemporaryDirectory
 lyxTemporaryDirectory = "/tmp"
 
 
@@ -32,13 +32,18 @@ lyxTemporaryDirectory = "/tmp"
 # The maximum number of lines written to an output cell (before truncation).
 maxLinesInOutputCell = 1000 
 
-# The LyX process name in the "ps -eo command" output (basename only).
+# The LyX process name in the "ps -f" output (basename only).
 # Setting to a "wrong" value which no process uses will cause LyX Notebook 
-# to always open an xterm for output rather than sending output to the same 
+# to open an xterm for output rather than sending output to the same 
 # terminal as the running LyX process.
 lyxCommandString = "lyx"
 #lyxCommandString = "lyx-2.1.0svn"
 #lyxCommandString = "lyx-2.0.4svn"
+
+# Whether to always start a new terminal window for Lyx Notebook output.
+# This only applies when the program is run as lyxNotebookFromLFUN, such
+# as when it is run from inside Lyx.
+alwaysStartNewTerminal = False
 
 # Default initial value for echoing mode in output cells.
 noEcho = True

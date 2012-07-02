@@ -1429,7 +1429,7 @@ changing the Latex environment name to a lstnewenvironment.)
 
 -- Some way to temporarily turn off user interactions, such as mouse clicks
 which can change the cursor point in the middle of other operations.  That is,
-a way to make Lyx temporarily only listen to Lyx server commands and not
+a way to make Lyx temporarily only listen to Lyx server commands and not to
 user interactions.
 
 -- Some kind of "escaped passthru" might be nice, especially if things like math
@@ -1438,6 +1438,11 @@ insets could be set to invoke them (and the escape char could be chosen).
 -- Some way to bind server-notify to menu items might be useful, so that not
 as many keys would need to be bound (especially for lesser-used functions).
 But now the easyGUI menu does that.
+
+-- Some way to detect which branch you are in, or to get current branch info
+and specify branch-applicability in commands.  This might be useful, for
+example, to have a branch for code where vpython was available, and a
+branch where it wasn't.
 
 -- Embedded Python would also be very nice, if that ever gets included (has been 
 discussed on the Lyx lists several times).  At least some kind of conditional
