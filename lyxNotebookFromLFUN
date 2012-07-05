@@ -52,15 +52,29 @@ callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
 lyxNotebookSourceDir = os.path.dirname(callingCommand)
 runPath = os.path.join(lyxNotebookSourceDir, "lyxNotebook")
 
+# Utility function to get command output, for portability and future development.
+def getCommandOutput(commandAndArgList):
+   python2_7orLater = False # assume this for now for portability
+   if python2_7orLater:
+      # This is the "right" way, but only works in Python 2.7 and later.
+      return subprocess.check_output(commandAndArgList)
+   else: # older system
+      commandString = " ".join(commandAndArgList)
+      f = os.popen(commandString)
+      return f.read()
+   
 # Call the tty command to see if it returns a terminal.  Note that it will
 # fail if current "self" process was started via a Lyx LFUN call.  (The ps 
 # output can give a tty even in that case, but we need to differentiate
 # since to work correctly when called from inside Lyx the stdout and
 # stderr must be explicitly redirected to a terminal.)
+
 try:
-   ttyCommandOutput = subprocess.check_output(["tty"]).strip()
+   ttyCommandOutput = getCommandOutput(["tty"]).strip()
 except:
-   # if tty command fails, assume there is no associated tty
+   # If tty command fails, assume there is no associated tty and set
+   # output the same as the output of the tty command when no tty.
+   print("Exception in tty command, assuming 'not a tty' as the response.")
    ttyCommandOutput = "not a tty"
 
 #
@@ -81,7 +95,7 @@ if ttyCommandOutput != "not a tty" and not alwaysStartNewTerminal:
 # according to labels on the first line, for portability (to Cygwin).
 #
 
-processData = subprocess.check_output(["ps", "-f"])
+processData = getCommandOutput(["ps", "-f"])
 processData = processData.splitlines()
 
 columnLabels = processData[0].split() # split on whitespace
@@ -148,7 +162,7 @@ if myTTY != "?":
    if ttyIsWriteable(terminal):
       print("Sending output to the terminal associated with the "
          + "lyxNotebookFromLFUN\n    process (should also be the Lyx "
-         + "process' terminal):\n    " + terminal)
+         + "process' terminal): " + terminal)
    elif len(myLyxProcsWithWriteableTerminals) == 1: # unique Lyx terminal
       terminal = "/dev/" + myLyxProcsWithWriteableTerminals[0][ttyCol]
       print("Sending output to the terminal associated with the running\n"

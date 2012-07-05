@@ -1025,7 +1025,7 @@ class InteractWithLyxCells(object):
       recent one in the Lyx temp dir which matches: lyx*/*/*.tex"""
       # This function is not used anymore: it was mainly for server-goto-file-row
       # experiments which didn't turn out well.  If needed it could be made more
-      # portable similar to the insertMostRecentGraphicsFile code.
+      # portable in a way similar to the insertMostRecentGraphicsFile code.
 
       # (Note that the last ls option is the number 1, not the letter l.)
       lsCmd = "ls -ct1 "+self.lyxTemporaryDirectory+"/lyx*/*/"+retData[1][:-4]+".tex"

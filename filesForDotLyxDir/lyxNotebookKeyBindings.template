@@ -5,18 +5,15 @@
 # Lyx Notebook source directory by the setup.py program.  The result is 
 # written to the .bind file.
 #
-# If not using setup.py, edit the .template file to replace the absolute pathname in 
-# the line binding the F12 key with the correct path to lyxNotebookFromLFUN in 
-# your own Lyx Notebook directory.  Save as a .bind file (i.e. changing the suffix).
+# If not using setup.py, edit the .template file to replace the absolute pathname 
+# in the line binding the F12 key with the correct path to lyxNotebookFromLFUN 
+# in your own Lyx Notebook directory.  Save as a .bind file (i.e. changing the 
+# suffix).
 # 
 # The setup.py program automatically copies the generated .bind file to your local 
 # Lyx directory (usually ~/.lyx).  If not using setup.py the .bind file should be
 # copied there by hand.
 #
-
-# include one of the basic binding files (cua or emacs, here cua)
-# uncomment ONLY if you load this file directly as the active .bind file
-#\bind_file "cua"
 
 \bind "F1" "server-notify"
 \bind "S-F1" "server-notify"

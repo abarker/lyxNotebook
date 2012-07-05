@@ -10,12 +10,13 @@
 # So changes can be made to this file in the user's home Lyx directory.
 #
 
-# include one of the basic binding files (cua or emacs, here cua)
+# Include one of the basic binding files (cua or emacs, here cua).
 \bind_file "cua"
 #\bind_file "emacs"
 
-# include the Lyx Notebook key bindings
+# Include the Lyx Notebook key bindings.
+# This line can be commented-out to temporarily avoid binding the function keys.
 \bind_file "<<userHomeLyxDirectory>>/lyxNotebookKeyBindings"
 
-# make any additional bind definitions or include any other .bind files below
+# Make any additional bind definitions or include any other .bind files below.
 
