@@ -1,11 +1,11 @@
 
 """
 =========================================================================
-This file is part of LyX Notebook, which works with LyX (and is licensed 
-in the same way) but is an independent project.  License details (GPL V2) 
-can be found in the file COPYING.
+This file is part of LyX Notebook, which works with LyX but is an 
+independent project.  License details (MIT) can be found in the file 
+COPYING.
 
-Copyright (C) 2012 Allen Barker
+Copyright (c) 2012 Allen Barker
 =========================================================================
 
 Generate all the .module files from templates.

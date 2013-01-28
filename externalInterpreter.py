@@ -1,11 +1,11 @@
 
 """ 
 =========================================================================
-This file is part of LyX Notebook, which works with LyX (and is licensed 
-in the same way) but is an independent project.  License details (GPL V2) 
-can be found in the file COPYING.
+This file is part of LyX Notebook, which works with LyX but is an 
+independent project.  License details (MIT) can be found in the file 
+COPYING.
 
-Copyright (C) 2012 Allen Barker
+Copyright (c) 2012 Allen Barker
 =========================================================================
 
 This module provides the class ExternalInterpreter, which runs an external
@@ -60,6 +60,7 @@ class ExternalInterpreter(object):
       self.running = False
       self.beforeFirstRead = True
       self.beforeFirstReadOrWrite = True
+      self.readErrorFound = False
       if self.debug: print("running", self.progName)
 
       # try a pseudo-terminal fork
@@ -121,7 +122,11 @@ class ExternalInterpreter(object):
          # This print below is not strictly necessary, but matches the one in child.
          if self.debug: print("In Parent Process: PID=" + str(os.getpid()))
          # We MUST read from fd in order for the child to be spawned.
-         firstReadFromFd = os.read(self.fd, 10000)
+         try:
+            firstReadFromFd = os.read(self.fd, 10000)
+         except OSError:
+            self.reportReadError()
+            return
          if self.debug: print(firstReadFromFd)
          # This ^^ line above prints out the "In Child Process..." string written
          # by the child process.
@@ -156,9 +161,12 @@ class ExternalInterpreter(object):
       # produce a double echo effect... just how it works.  We don't need this
       # when readInterpreterInitMessage() always reads before a write, but it is
       # good to handle in general.
-      if self.beforeFirstRead:
+      if self.beforeFirstRead and not self.readErrorFound:
          # sys.stdout.flush()
-         os.read(self.fd,100000)
+         try:
+            os.read(self.fd,100000)
+         except OSError:
+            self.reportReadError()
 
    def read(self, maxBytes=100000, removeBackslashR = True):
       """Reads from the stdout of the child process, up until a new prompt appears.
@@ -177,7 +185,17 @@ class ExternalInterpreter(object):
          sys.stdout.flush()
          sys.stdin.flush() # probably not be needed
          # read at most maxBytes bytes from fd, return "" at EOF
-         readString += os.read(self.fd, maxBytes).decode("utf-8") # decode for Python3
+         try:
+            readString += os.read(self.fd, maxBytes).decode("utf-8") # decode for Python3
+         except OSError:
+            self.reportReadError()
+         if self.readErrorFound:
+            # return nothing for now, user must see message on screen
+            self.reportReadError() # print message again
+            errString = u"\nError in LyxNotebook reading interpreter, see error" \
+                         " messages.\n"
+            errString += self.mainPrompt # add prompt so string appears in output
+            return errString
          
          # We read until the interpreter returns a prompt, so we know that it is
          # finished with its evaluation.  
@@ -236,11 +254,20 @@ class ExternalInterpreter(object):
       os.waitpid(self.child_pid, 0)
       os.close(self.fd)
       self.running = False
+      return
 
    def __del__(self):
       if self.running:
          self.kill(True, True)
+      return
 
+   def reportReadError(self):
+      self.readErrorFound = True
+      print("Error in LyxNotebook reading the output from interpreter"
+            "\nstarted with this command string:\n   ", self.runCommand,
+            "\nNo output can be read.  Are you sure the path to the"
+            "\ninterpreter's executable is correct?", file=sys.stderr)
+      return
 
 #
 # ====================== module tests =========================================

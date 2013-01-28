@@ -1,11 +1,11 @@
 
 """
 =========================================================================
-This file is part of LyX Notebook, which works with LyX (and is licensed 
-in the same way) but is an independent project.  License details (GPL V2) 
-can be found in the file COPYING.
+This file is part of LyX Notebook, which works with LyX but is an 
+independent project.  License details (MIT) can be found in the file 
+COPYING.
 
-Copyright (C) 2012 Allen Barker
+Copyright (c) 2012 Allen Barker
 =========================================================================
 
 This module contains the implementation of the class InteractWithLyxCells which
@@ -1416,13 +1416,15 @@ would be) useful.
    get-current-inset-type            -- the name of the inset type, i.e. Listings
    goto-next-inset <type>            -- go to next inset of that type
    inset-begin and inset-end mod     -- versions that are idempotent and stay inside
+   get-lyx-version                   -- the version of Lyx in case it matters
+                                          (like if new lfuns become available)
 
 -- Some way to dynamically set parameters on flex-insert items; maybe like the
 listings environment with "Settings" menu, even if just like the extra items
 box on the "Advanced" page with "More Parameters."  Some way to pass them as
 arguments to the flex-insert command would also be good.  (Even just
 dynamically-settable labels on Lyx Listings insets could be useful, but we
-still wouldn't have a way to inset-forall to only certain subtypes.  It would
+still wouldn't have a way to inset-forall to only certain subtypes.  That would
 also need the colon-separated naming convention to be extended.  Pre- and post-
 processing could, however, be done: by redefining the Listings inset and
 changing the Latex environment name to a lstnewenvironment.)
@@ -1434,6 +1436,7 @@ user interactions.
 
 -- Some kind of "escaped passthru" might be nice, especially if things like math
 insets could be set to invoke them (and the escape char could be chosen).
+For example, allow color and style commands only.
 
 -- Some way to bind server-notify to menu items might be useful, so that not
 as many keys would need to be bound (especially for lesser-used functions).

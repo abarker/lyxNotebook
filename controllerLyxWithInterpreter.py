@@ -1,10 +1,10 @@
 """
 =========================================================================
-This file is part of LyX Notebook, which works with LyX (and is licensed 
-in the same way) but is an independent project.  License details (GPL V2) 
-can be found in the file COPYING.
+This file is part of LyX Notebook, which works with LyX but is an 
+independent project.  License details (MIT) can be found in the file 
+COPYING.
 
-Copyright (C) 2012 Allen Barker
+Copyright (c) 2012 Allen Barker
 =========================================================================
 
 This is the main module of the Lyx Notebook program; the lyxNotebook.py script
@@ -22,6 +22,7 @@ back, and then pushes the results to Lyx.
 
 from __future__ import print_function, division
 import easygui as eg
+#import easygui_096 as eg # use the version packaged with LyxNotebook
 import re
 import sys, os, time, signal
 
@@ -43,9 +44,9 @@ class IndentCalc(object):
    if a colon is found on a line but not in a comment, string, or within any
    parens, curly braces, or brackets.  This is to handle one-liners like 
       "if x==4: return"
-   The calculated indententation values are no longer strictly correct literally, 
-   but they still works in the "down to zero" calculation, which is what is 
-   important.
+   After handling colons the calculated indententation values are no longer
+   strictly correct literally, but they still works in the "down to zero"
+   calculation, which is what is important.
    
    An instance of this object should be passed each physical line, one by one.  
    It then makes calculations concerning the logical line structure.  There 

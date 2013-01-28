@@ -1,11 +1,11 @@
 #! /usr/bin/python
 """
 =========================================================================
-This file is part of LyX Notebook, which works with LyX (and is licensed 
-in the same way) but is an independent project.  License details (GPL V2) 
-can be found in the file COPYING.
+This file is part of LyX Notebook, which works with LyX but is an 
+independent project.  License details (MIT) can be found in the file 
+COPYING.
 
-Copyright (C) 2012 Allen Barker
+Copyright (c) 2012 Allen Barker
 =========================================================================
 
 This program automates the setup process.
@@ -173,7 +173,7 @@ steps to finish the setup.  (You can keep this window open as a reminder.)
       in this case you'll also need to modify a line in lyxNotebookUserSettings.py.)
 
    3) While still in the preferences menu, check 
-           Tools > Preferences > Files
+           Tools > Preferences > Paths
       and make sure that the "LyXServer pipe" setting is ~/.lyx/lyxpipe (replacing
       ~/.lyx with your home Lyx directory if it is different).  You can use some
       other setting, but in that case you'll also need to modify a line in 
