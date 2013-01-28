@@ -21,8 +21,8 @@ back, and then pushes the results to Lyx.
 """
 
 from __future__ import print_function, division
-import easygui as eg
-#import easygui_096 as eg # use the version packaged with LyxNotebook
+#import easygui as eg # use system easygui
+import easygui_096 as eg # use the version packaged with LyxNotebook
 import re
 import sys, os, time, signal
 
