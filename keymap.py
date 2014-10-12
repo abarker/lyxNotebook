@@ -5,7 +5,7 @@ arbitrarily set by changing them from this file (though, of course, collisions
 with other key mappings and convenience should be considered).  
 
 Any key which is bound to a Lyx Notebook function should also be bound to the
-Lyx LFUN "server-notify" in the Lyx .bind file (which the setup program creates
+Lyx LFUN "server-notify" in the Lyx .bind file (which the install program creates
 as lyxNotebookKeyBindings.bind in the user's Lyx home directory)!
 
 To modify a key mapping in this file, simply change the string (or the None value)

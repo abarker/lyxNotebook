@@ -8,7 +8,7 @@ COPYING.
 Copyright (c) 2012 Allen Barker
 =========================================================================
 
-This program automates the setup process.
+This program automates the install and setup process.
 
 The user's home Lyx directory is read from lyxNotebookUserSettings.py (the
 directory is assumed by default to be ~/.lyx, but that file can be modified).
@@ -16,7 +16,7 @@ directory is assumed by default to be ~/.lyx, but that file can be modified).
 The bind files userCustomizableKeyBindings.bind and lyxNotebookKeyBindings.bind
 are generated from the corresponding .template files. 
 The resulting .bind files are copied to the user's home Lyx directory.
-The setup.py program will ask before overwriting either of these files.
+The install.py program will ask before overwriting either of these files.
 
 The main bind file is userCustomizableKeyBindings.bind, which should be set as
 the active LyX bind file.  A \\bind_file command in that file then loads
@@ -42,12 +42,12 @@ userHomeLyxDirectory = lyxNotebookUserSettings.userHomeLyxDirectory
 userHomeLyxDirectoryExpanded = path.expanduser(userHomeLyxDirectory)
 
 print("="*70)
-print("\nStarting the setup of LyX Notebook...\n")
+print("\nStarting the install and setup of LyX Notebook...\n")
 
 # find the Lyx Notebook source directory from the invoking pathname and cwd
 invokingCommand = path.expanduser(sys.argv[0])
 cwd = os.getcwd()
-absPathToSetupProg = path.join(cwd, invokingCommand)
+absPathToSetupProg = path.join(cwd, invokingCommand) # TODO see utilities.py
 
 sourceDir = path.dirname(path.normpath(absPathToSetupProg))
 print("The absolute path of the Lyx Notebook source directory is:\n   ", sourceDir)

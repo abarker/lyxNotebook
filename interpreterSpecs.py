@@ -25,20 +25,20 @@ progName : An arbitrary descriptive string for the interpreter.  It is what
    will be printed out to describe the interpreter.  Uniqueness is not required.
    For example, by default Python 2 and Python 3 are both simply called Python.
    This string is used as the small label printed to the right of code cells.
-   Changing this requires running setup.py again.
+   Changing this requires running install.py again.
 
 insetSpecifier : This is a string describing the interpreter which must be 
    unique, and must contain only LETTER characters (no numbers).  This is
    because this string becomes part of the generated inset names, as well as a
    part of generated function names in Latex (Latex does not allow numbers in
-   commands and \def strings).  Changing this requires running setup.py again.  
+   commands and \def strings).  Changing this requires running install.py again.  
 
 listingsLanguage : the "language=xxxxx" setting for the Listings program.  It
    can be set to the empty string to use no predefined language formatting.
-   Changing this requires running setup.py again.
+   Changing this requires running install.py again.
 
 Changing any field other than one of the three above only requires restarting
-Lyx Notebook.  The above three require setup.py be run again to re-generate
+Lyx Notebook.  The above three require install.py be run again to re-generate
 the module files.
 
 runCommand : The command which is to be run; must be in PATH or a full pathname.
