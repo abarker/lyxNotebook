@@ -15,7 +15,7 @@ userHomeLyxDirectory = "~/.lyx"
 #userHomeLyxDirectory = "~/.lyx-2.1.0svn"
 #userHomeLyxDirectory = "~/.lyx-2.0.4svn"
 
-# This setting must match: Tools->Preferences->Paths->LyXServerPipe 
+# This setting must match: Tools->Preferences->Paths->LyXServerPipe
 lyxServerPipe = "~/.lyx/lyxpipe"
 #lyxServerPipe = "~/.lyx-2.1.0svn/lyxpipe"
 #lyxServerPipe = "~/.lyx-2.0.4svn/lyxpipe"
@@ -30,11 +30,11 @@ lyxTemporaryDirectory = "/tmp"
 
 
 # The maximum number of lines written to an output cell (before truncation).
-maxLinesInOutputCell = 1000 
+maxLinesInOutputCell = 1000
 
 # The LyX process name in the "ps -f" output (basename only).
-# Setting to a "wrong" value which no process uses will cause LyX Notebook 
-# to open an xterm for output rather than sending output to the same 
+# Setting to a "wrong" value which no process uses will cause LyX Notebook
+# to open an xterm for output rather than sending output to the same
 # terminal as the running LyX process.
 lyxCommandString = "lyx"
 #lyxCommandString = "lyx-2.1.0svn"

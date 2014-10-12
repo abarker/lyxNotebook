@@ -1,8 +1,8 @@
 #! /usr/bin/python
 """
 =========================================================================
-This file is part of LyX Notebook, which works with LyX but is an 
-independent project.  License details (MIT) can be found in the file 
+This file is part of LyX Notebook, which works with LyX but is an
+independent project.  License details (MIT) can be found in the file
 COPYING.
 
 Copyright (c) 2012 Allen Barker
@@ -13,14 +13,15 @@ that there is no other active Lyx Notebook process running, and if not then
 it launches an instance of the main ControllerLyxWithInterpreter class.
 
 This program should always be run from the Lyx Notebook source directory,
-so it can find the path to that directory.  The variable 
+so it can find the path to that directory.  The variable
 lyxNotebookUserSettings.lyxNotebookSourceDir is dynamically set to the argv[0]
 directory of this command.  Use a short stub shell-script to call it from
 the source directory if you want a version in, say ~/bin.
 """
 
 from __future__ import print_function, division
-import os, sys
+import os
+import sys
 import lyxNotebookUserSettings # before controllerLyxWithInterpreter, dynamic vars set
 
 # Get the Lyx Notebook home directory.  Some interpreters may use this if they
@@ -35,12 +36,12 @@ callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
 lyxNotebookUserSettings.lyxNotebookSourceDir = os.path.dirname(callingCommand)
 
 # do below import *after* the calculations above, since implicitly import interpreterSpecs
-from controllerLyxWithInterpreter import * 
+from controllerLyxWithInterpreter import *
 
 # set the lockfile location to be in the user's local Lyx directory
 userHomeLyxDirectory = lyxNotebookUserSettings.userHomeLyxDirectory
 lockfilePath = os.path.expanduser(
-      os.path.join(userHomeLyxDirectory,"lyxNotebook.lockfile"))
+    os.path.join(userHomeLyxDirectory, "lyxNotebook.lockfile"))
 
 #
 # Make sure this script is not already running in an existing process.
@@ -56,13 +57,13 @@ if os.path.exists(lockfilePath):
     oldPID = pidfile.readline()
     # check if the PID from the lock file matches the current process PID
     if os.path.exists(os.path.join("/proc", oldPID)):
-       print("You already have an instance of LyX Notebook running.")
-       print("It is running as process", oldPID + ".  Exiting.")
-       time.sleep(4) # for when a new terminal opened, so message can be read
-       sys.exit(1)
+        print("You already have an instance of LyX Notebook running.")
+        print("It is running as process", oldPID + ".  Exiting.")
+        time.sleep(4) # for when a new terminal opened, so message can be read
+        sys.exit(1)
     else:
-       # lock file exists but the program is not running... remove it
-       os.remove(lockfilePath)
+        # lock file exists but the program is not running... remove it
+        os.remove(lockfilePath)
 
 # put the current PID in the lock file
 pidfile = open(lockfilePath, "w")
@@ -72,11 +73,11 @@ pidfile.close()
 #
 # Start the main controller class.
 #
-  
+
 print("\n===================================================\n")
 print("Starting the LyX Notebook program...")
-print("Version from source directory:\n   ", 
+print("Version from source directory:\n   ",
       lyxNotebookUserSettings.lyxNotebookSourceDir)
 
-controller = ControllerLyxWithInterpreter("lyxNotebookClient") 
+controller = ControllerLyxWithInterpreter("lyxNotebookClient")
 

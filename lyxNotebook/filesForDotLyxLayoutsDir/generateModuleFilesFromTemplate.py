@@ -1,8 +1,8 @@
 
 """
 =========================================================================
-This file is part of LyX Notebook, which works with LyX but is an 
-independent project.  License details (MIT) can be found in the file 
+This file is part of LyX Notebook, which works with LyX but is an
+independent project.  License details (MIT) can be found in the file
 COPYING.
 
 Copyright (c) 2012 Allen Barker
@@ -22,12 +22,12 @@ from interpreterSpecs import *
 
 # =============================================================
 # Define the basic template for the header of the .module file.
-# There is 1) a common beginning part in each module, 2) a part 
+# There is 1) a common beginning part in each module, 2) a part
 # which is looped over <<basicCellType>>, 3) and a closing section.
 # =============================================================
 
 moduleHeaderTemplateCommon = \
-r"""#\DeclareLyXModule{Lyx Notebook <<insetSpecifier>>}
+    r"""#\DeclareLyXModule{Lyx Notebook <<insetSpecifier>>}
 #DescriptionBegin
 #The <<insetSpecifier>> cells for Lyx Notebook.
 #DescriptionEnd
@@ -74,7 +74,7 @@ AddToPreamble
 
 """
 moduleHeaderTemplateBasicCellTypeDependent = \
-r"""
+    r"""
    %
    % Header stuff for the <<insetSpecifier>> <<basicCellType>> cells.
    %
@@ -101,7 +101,7 @@ r"""
       }%
       {}%
    }%
-   
+
    % Build up the general printing off/on commands by adding commands for the
    % inset specifier <<insetSpecifier>> and basic cell type <<basicCellType>>
    % (Note expandafter is used to avoid recursion problems; using e.g.
@@ -112,7 +112,7 @@ r"""
    \expandafter\def\expandafter\lyxNotebookPrintOn\expandafter{\lyxNotebookPrintOn\lyxNotebookPrintOn<<basicCellType>><<insetSpecifier>>}
 """
 moduleHeaderTemplateEnd = \
-r"""
+    r"""
 
 EndPreamble
 """
@@ -122,7 +122,7 @@ EndPreamble
 # ======================================================
 
 standardTemplate = \
-r"""
+    r"""
 
 InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
         # Flex custom layouts work with flex-insert, but exact case matters, e.g.,
@@ -223,12 +223,12 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
             \lyxNotebookLstset<<basicCellType>><<insetSpecifier>>%
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         % Put a rotated, bold, ttfamily "<<progName>>" 
+         % Put a rotated, bold, ttfamily "<<progName>>"
          % always in the right margin.
          % -----------------------------------------------------------------------
          \ifthenelse{\equal{\lyxNotebookNoCellLabels}{false}}{%
             %
-            % The \needspace command keeps the marginnote together with the listing 
+            % The \needspace command keeps the marginnote together with the listing
             % even on pagebreaks.
             %
             % The \leavevmode (or an empty \mbox{}) keeps the marginnote aligned
@@ -237,7 +237,7 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
             % probably needed, but it seems to work somewhat.  As a last
             % resort one could temporarily set \raggedbottom.
             %
-            % The use of two \marginnote commands (each with an empty slot) is to 
+            % The use of two \marginnote commands (each with an empty slot) is to
             % keep the margin note to the right, even when twosided styles are used.
             %
             \mbox{}%
@@ -249,7 +249,7 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
             %\marginpar[\rotatebox{-90}{\bfseries\ttfamily\tiny <<progName>>}]{rrev}}
             %\marginpar[lplain]{\rotatebox{-90}{\bfseries\ttfamily\tiny <<progName>>}}
             \nopagebreak%
-         } % end of do label-printing 
+         } % end of do label-printing
          {} % do nothing when lyxNotebookNoCellLabels is true
          % -----------------------------------------------------------------------
       }% end of lstnewenvironment starting code block
@@ -268,7 +268,7 @@ End
 # ===========================================
 
 outputTemplate = \
-r"""
+    r"""
 
 InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
         # Flex custom layouts work with flex-insert, but exact case matters, e.g.,
@@ -334,7 +334,7 @@ InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
       \addtolength{\doubleskipamount}{2pt}
 
       \lstnewenvironment{lyxNotebookCellOutput<<insetSpecifier>>}{
-         \nopagebreak % try to keep on the same page as standard cell above it 
+         \nopagebreak % try to keep on the same page as standard cell above it
          % -----------------------------------------------------------------------
          % Do color-related lstsets, according to user choice of color or not.
          % -----------------------------------------------------------------------
@@ -344,7 +344,7 @@ InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
             % --------------------------------------------------------------------
             \lstset{style=lyxNotebookNoColorOutput<<insetSpecifier>>}
          } % end then section of ifthenelse
-         { 
+         {
             % -----------------------------------------------------------------------
             % Begin else section of ifthenelse, color formatting.
             % -----------------------------------------------------------------------
@@ -387,7 +387,7 @@ End
 # ==================================================================================
 
 listingsWithSmallFont = \
-r"""#\DeclareLyXModule{Listings with Small Font}
+    r"""#\DeclareLyXModule{Listings with Small Font}
 #DescriptionBegin
 #Changes the built-in LyX listings insets to use a small font in the LyX display.
 #Nothing about how the code is formatted for printing is changed.  Distributed
@@ -426,76 +426,74 @@ End
 
 # first do the Listings redefinition, since it just needs to be written out
 with open("lyxNotebookListingsWithSmallFont.module", "w") as f:
-   f.write(listingsWithSmallFont)
+    f.write(listingsWithSmallFont)
 
 # now do all the other modules, one for each interpreter specification
 for spec in allSpecs:
-   preambleLatexCode = spec.preambleLatexCode
-   insetSpecifier = spec.params["insetSpecifier"]
-   progName = spec.params["progName"]
-   lstLanguage = spec.params["listingsLanguage"]
+    preambleLatexCode = spec.preambleLatexCode
+    insetSpecifier = spec.params["insetSpecifier"]
+    progName = spec.params["progName"]
+    lstLanguage = spec.params["listingsLanguage"]
 
-   print("running for insetSpecifier=" + insetSpecifier
-         + ",  progName=" + progName + ",  listingsLanguage=" + lstLanguage)
+    print("running for insetSpecifier=" + insetSpecifier
+          + ",  progName=" + progName + ",  listingsLanguage=" + lstLanguage)
 
-   headCommon = moduleHeaderTemplateCommon
-   headDependent = moduleHeaderTemplateBasicCellTypeDependent
-   init = standardTemplate
-   standard = standardTemplate
-   output = outputTemplate
+    headCommon = moduleHeaderTemplateCommon
+    headDependent = moduleHeaderTemplateBasicCellTypeDependent
+    init = standardTemplate
+    standard = standardTemplate
+    output = outputTemplate
 
-   # replace meta-vars in the common header section
-   headCommon = headCommon.replace("<<tripleQuote>>","\"\"\"")
-   headCommon = headCommon.replace("<<insetSpecifier>>",insetSpecifier)
-   headCommon = headCommon.replace("<<progName>>",progName)
-   headCommon = headCommon.replace("<<lstLanguage>>",lstLanguage)
+    # replace meta-vars in the common header section
+    headCommon = headCommon.replace("<<tripleQuote>>", "\"\"\"")
+    headCommon = headCommon.replace("<<insetSpecifier>>", insetSpecifier)
+    headCommon = headCommon.replace("<<progName>>", progName)
+    headCommon = headCommon.replace("<<lstLanguage>>", lstLanguage)
 
-   head = headCommon
+    head = headCommon
 
-   # replace meta-vars in dependent header, one copy for each basicCellType
-   # NOTE that we could have just treated the sections as <<...>> vars in headCommon
-   for basicCellType in ["Init", "Standard", "Output"]:
-      headTmp = headDependent
-      headTmp = headTmp.replace("<<tripleQuote>>","\"\"\"")
-      headTmp = headTmp.replace("<<insetSpecifier>>",insetSpecifier)
-      headTmp = headTmp.replace("<<progName>>",progName)
-      headTmp = headTmp.replace("<<lstLanguage>>",lstLanguage)
-      headTmp = headTmp.replace("<<basicCellType>>",basicCellType)
-      head += headTmp
+    # replace meta-vars in dependent header, one copy for each basicCellType
+    # NOTE that we could have just treated the sections as <<...>> vars in headCommon
+    for basicCellType in ["Init", "Standard", "Output"]:
+        headTmp = headDependent
+        headTmp = headTmp.replace("<<tripleQuote>>", "\"\"\"")
+        headTmp = headTmp.replace("<<insetSpecifier>>", insetSpecifier)
+        headTmp = headTmp.replace("<<progName>>", progName)
+        headTmp = headTmp.replace("<<lstLanguage>>", lstLanguage)
+        headTmp = headTmp.replace("<<basicCellType>>", basicCellType)
+        head += headTmp
 
-   # replace certain meta-vars in preambleLatexCode
-   preambleLatexCode = preambleLatexCode.replace("<<tripleQuote>>","\"\"\"")
-   preambleLatexCode = preambleLatexCode.replace("<<insetSpecifier>>",insetSpecifier)
-   preambleLatexCode = preambleLatexCode.replace("<<progName>>",progName)
-   preambleLatexCode = preambleLatexCode.replace("<<lstLanguage>>",lstLanguage)
+    # replace certain meta-vars in preambleLatexCode
+    preambleLatexCode = preambleLatexCode.replace("<<tripleQuote>>", "\"\"\"")
+    preambleLatexCode = preambleLatexCode.replace("<<insetSpecifier>>", insetSpecifier)
+    preambleLatexCode = preambleLatexCode.replace("<<progName>>", progName)
+    preambleLatexCode = preambleLatexCode.replace("<<lstLanguage>>", lstLanguage)
 
-   # now we have the full .module file header (stuff before any InsetLayout commands)
-   head += preambleLatexCode + moduleHeaderTemplateEnd
+    # now we have the full .module file header (stuff before any InsetLayout commands)
+    head += preambleLatexCode + moduleHeaderTemplateEnd
 
-   # replace meta-vars in standard template
-   standard = standard.replace("<<tripleQuote>>","\"\"\"")
-   standard = standard.replace("<<insetSpecifier>>",insetSpecifier)
-   standard = standard.replace("<<progName>>",progName)
-   standard = standard.replace("<<labelModifier>>","") # just Code, no special label
-   standard = standard.replace("<<lstLanguage>>",lstLanguage)
-   standard = standard.replace("<<basicCellType>>","Standard")
-   
-   # replace meta-vars in init template
-   # init cells are currently identical to standard cells except for the frame spec
-   init = init.replace("<<tripleQuote>>","\"\"\"")
-   init = init.replace("<<insetSpecifier>>",insetSpecifier)
-   init = init.replace("<<progName>>",progName)
-   init = init.replace("<<labelModifier>>","Init") # use "Init Code" on inset label
-   init = init.replace("<<lstLanguage>>",lstLanguage)
-   init = init.replace("<<basicCellType>>","Init")
-   
-   # replace meta-vars in output template
-   output = output.replace("<<insetSpecifier>>",insetSpecifier)
-   output = output.replace("<<progName>>",progName)
-   output = output.replace("<<basicCellType>>","Output")
-   
-   # write concat of all templates to correct output file
-   with open("lyxNotebookCell"+insetSpecifier+".module", "w") as f:
-      f.write(head + init + standard + output)
-   
+    # replace meta-vars in standard template
+    standard = standard.replace("<<tripleQuote>>", "\"\"\"")
+    standard = standard.replace("<<insetSpecifier>>", insetSpecifier)
+    standard = standard.replace("<<progName>>", progName)
+    standard = standard.replace("<<labelModifier>>", "") # just Code, no special label
+    standard = standard.replace("<<lstLanguage>>", lstLanguage)
+    standard = standard.replace("<<basicCellType>>", "Standard")
 
+    # replace meta-vars in init template
+    # init cells are currently identical to standard cells except for the frame spec
+    init = init.replace("<<tripleQuote>>", "\"\"\"")
+    init = init.replace("<<insetSpecifier>>", insetSpecifier)
+    init = init.replace("<<progName>>", progName)
+    init = init.replace("<<labelModifier>>", "Init") # use "Init Code" on inset label
+    init = init.replace("<<lstLanguage>>", lstLanguage)
+    init = init.replace("<<basicCellType>>", "Init")
+
+    # replace meta-vars in output template
+    output = output.replace("<<insetSpecifier>>", insetSpecifier)
+    output = output.replace("<<progName>>", progName)
+    output = output.replace("<<basicCellType>>", "Output")
+
+    # write concat of all templates to correct output file
+    with open("lyxNotebookCell"+insetSpecifier+".module", "w") as f:
+        f.write(head + init + standard + output)

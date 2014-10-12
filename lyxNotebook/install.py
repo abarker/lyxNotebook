@@ -1,8 +1,8 @@
 #! /usr/bin/python
 """
 =========================================================================
-This file is part of LyX Notebook, which works with LyX but is an 
-independent project.  License details (MIT) can be found in the file 
+This file is part of LyX Notebook, which works with LyX but is an
+independent project.  License details (MIT) can be found in the file
 COPYING.
 
 Copyright (c) 2012 Allen Barker
@@ -14,7 +14,7 @@ The user's home Lyx directory is read from lyxNotebookUserSettings.py (the
 directory is assumed by default to be ~/.lyx, but that file can be modified).
 
 The bind files userCustomizableKeyBindings.bind and lyxNotebookKeyBindings.bind
-are generated from the corresponding .template files. 
+are generated from the corresponding .template files.
 The resulting .bind files are copied to the user's home Lyx directory.
 The install.py program will ask before overwriting either of these files.
 
@@ -33,7 +33,10 @@ to the insetSpecifier interpreterSpec for an interpreter.)
 """
 
 from __future__ import print_function, division
-import sys, os, shutil, glob
+import sys
+import os
+import shutil
+import glob
 from os import path
 import easygui
 import lyxNotebookUserSettings
@@ -53,7 +56,7 @@ sourceDir = path.dirname(path.normpath(absPathToSetupProg))
 print("The absolute path of the Lyx Notebook source directory is:\n   ", sourceDir)
 
 sourceDirWithTilde = path.join("~", path.relpath(sourceDir, path.expanduser("~")))
-print("\nThe path of the Lyx Notebook source directory relative to home is:\n   ", 
+print("\nThe path of the Lyx Notebook source directory relative to home is:\n   ",
       sourceDirWithTilde, "\n")
 
 #
@@ -62,36 +65,36 @@ print("\nThe path of the Lyx Notebook source directory relative to home is:\n   
 
 # process the user-modifiable bind file to load the path of the Lyx Notebook bindings
 bindTemplatePathname = path.join(
-      sourceDir, "filesForDotLyxDir", "userCustomizableKeyBindings.template")
+    sourceDir, "filesForDotLyxDir", "userCustomizableKeyBindings.template")
 bindTemplate = open(bindTemplatePathname, "r")
 bindContentsStr = bindTemplate.read()
 bindTemplate.close()
-bindContentsStr = bindContentsStr.replace("<<userHomeLyxDirectory>>", 
-      lyxNotebookUserSettings.userHomeLyxDirectory) # not expanded
+bindContentsStr = bindContentsStr.replace("<<userHomeLyxDirectory>>",
+                         lyxNotebookUserSettings.userHomeLyxDirectory) # not expanded
 
 # write out the final user-modifiable .bind file
 bindFilePathname = path.join(
-      sourceDir, "filesForDotLyxDir", "userCustomizableKeyBindings.bind")
+    sourceDir, "filesForDotLyxDir", "userCustomizableKeyBindings.bind")
 bindFile = open(bindFilePathname, "w")
 bindFile.write(bindContentsStr)
 bindFile.close()
-print("Generated the key-binding file\n   ", 
+print("Generated the key-binding file\n   ",
       bindFilePathname, "\nfrom the corresponding .template file.")
 
 # copy the user-modifiable .bind file to the userHomeLyxDirectory
 bindFileDest = path.join(
-      userHomeLyxDirectoryExpanded, "userCustomizableKeyBindings.bind")
+    userHomeLyxDirectoryExpanded, "userCustomizableKeyBindings.bind")
 yesno = 1
 if os.path.exists(bindFileDest):
-   msg = "File\n   " + bindFileDest + "\nalready exists.  Overwrite?"
-   yesno = easygui.ynbox(msg, "LyX Notebook Setup")
+    msg = "File\n   " + bindFileDest + "\nalready exists.  Overwrite?"
+    yesno = easygui.ynbox(msg, "LyX Notebook Setup")
 if yesno == 1:
-   shutil.copyfile(bindFilePathname, bindFileDest)
-   print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
-      bindFileDest, "\n")
+    shutil.copyfile(bindFilePathname, bindFileDest)
+    print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
+          bindFileDest, "\n")
 else:
-   print("\nDid not overwrite existing key-binding in the LyX home directory:\n   ", 
-         bindFileDest, "\n")
+    print("\nDid not overwrite existing key-binding in the LyX home directory:\n   ",
+          bindFileDest, "\n")
 os.remove(bindFilePathname) # delete local copy to avoid confusion
 
 #
@@ -101,36 +104,36 @@ os.remove(bindFilePathname) # delete local copy to avoid confusion
 
 # process the Lyx Notebook bind file to contain the path of the user's source directory
 bindTemplatePathname = path.join(
-      sourceDir, "filesForDotLyxDir", "lyxNotebookKeyBindings.template")
+    sourceDir, "filesForDotLyxDir", "lyxNotebookKeyBindings.template")
 bindTemplate = open(bindTemplatePathname, "r")
 bindContentsStr = bindTemplate.read()
 bindTemplate.close()
-bindContentsStr = bindContentsStr.replace("<<absPathToLyxNotebookSourceDir>>", 
-      sourceDir) # must be absolute path
+bindContentsStr = bindContentsStr.replace("<<absPathToLyxNotebookSourceDir>>",
+                                          sourceDir) # must be absolute path
 
 # write out the final Lyx Notebook .bind file
 bindFilePathname = path.join(
-      sourceDir, "filesForDotLyxDir", "lyxNotebookKeyBindings.bind")
+    sourceDir, "filesForDotLyxDir", "lyxNotebookKeyBindings.bind")
 bindFile = open(bindFilePathname, "w")
 bindFile.write(bindContentsStr)
 bindFile.close()
-print("Generated the key-binding file\n   ", 
+print("Generated the key-binding file\n   ",
       bindFilePathname, "\nfrom the corresponding .template file.")
 
 # copy the Lyx Notebook .bind file to the userHomeLyxDirectory
 bindFileDest = path.join(
-      userHomeLyxDirectoryExpanded, "lyxNotebookKeyBindings.bind")
+    userHomeLyxDirectoryExpanded, "lyxNotebookKeyBindings.bind")
 yesno = 1
 if os.path.exists(bindFileDest):
-   msg = "File\n   " + bindFileDest + "\nalready exists.  Overwrite?"
-   yesno = easygui.ynbox(msg, "LyX Notebook Setup")
+    msg = "File\n   " + bindFileDest + "\nalready exists.  Overwrite?"
+    yesno = easygui.ynbox(msg, "LyX Notebook Setup")
 if yesno == 1:
-   shutil.copyfile(bindFilePathname, bindFileDest)
-   print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
-      bindFileDest, "\n")
+    shutil.copyfile(bindFilePathname, bindFileDest)
+    print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
+          bindFileDest, "\n")
 else:
-   print("\nDid not overwrite existing key-binding in the LyX home directory:\n   ", 
-         bindFileDest, "\n")
+    print("\nDid not overwrite existing key-binding in the LyX home directory:\n   ",
+          bindFileDest, "\n")
 os.remove(bindFilePathname) # delete local copy to avoid confusion
 
 #
@@ -145,23 +148,23 @@ os.chdir(modulesDirectory)
 print("Regenerating all the .module files:")
 dotModuleFiles = glob.glob("*.module")
 for oldModuleFile in dotModuleFiles: # delete the old .module files
-   os.remove(oldModuleFile)
-   installed = os.path.join(userHomeLyxDirectoryExpanded, "layouts", oldModuleFile)
-   if os.path.exists(installed): os.remove(installed)
+    os.remove(oldModuleFile)
+    installed = os.path.join(userHomeLyxDirectoryExpanded, "layouts", oldModuleFile)
+    if os.path.exists(installed): os.remove(installed)
 os.system("python generateModuleFilesFromTemplate.py")
 
 # copy all the .module files to the layouts directory
 print("\nCopying the regenerated .module files to the LyX layouts directory.")
 dotModuleFiles = glob.glob("*.module")
 for newModuleFile in dotModuleFiles:
-   pathInLayoutsDir = path.join(
-         userHomeLyxDirectoryExpanded, "layouts", newModuleFile)
-   shutil.copyfile(newModuleFile, pathInLayoutsDir)
+    pathInLayoutsDir = path.join(
+        userHomeLyxDirectoryExpanded, "layouts", newModuleFile)
+    shutil.copyfile(newModuleFile, pathInLayoutsDir)
 
 msg = "Finished the first phase of the setup."
 text = """Finished the first phase of the LyX Notebook setup.  Next do the following
 steps to finish the setup.  (You can keep this window open as a reminder.)
-   
+
    1) Open LyX.
 
    2) Goto the menu
@@ -172,11 +175,11 @@ steps to finish the setup.  (You can keep this window open as a reminder.)
       (Modify the above in the obvious way if ~/.lyx is not your home Lyx directory;
       in this case you'll also need to modify a line in lyxNotebookUserSettings.py.)
 
-   3) While still in the preferences menu, check 
+   3) While still in the preferences menu, check
            Tools > Preferences > Paths
       and make sure that the "LyXServer pipe" setting is ~/.lyx/lyxpipe (replacing
       ~/.lyx with your home Lyx directory if it is different).  You can use some
-      other setting, but in that case you'll also need to modify a line in 
+      other setting, but in that case you'll also need to modify a line in
       lyxNotebookUserSettings.py.
 
    3) Select the menu item
@@ -187,7 +190,7 @@ steps to finish the setup.  (You can keep this window open as a reminder.)
 LyX Notebook should now be usable.  For each document you still need to go to
      Document > Settings > Modules
 and add the module for each cell-language which you wish to use in the
-document.  The cells themselves can then be found on the menu: 
+document.  The cells themselves can then be found on the menu:
      Insert > Custom Insets
 
 Press F12 in LyX to start the LyX Notebook program (Shift+F12 to kill it)
@@ -197,5 +200,3 @@ See the documentation file lyxNotebookDocs.pdf for further information.
 print("="*70)
 print("\n" + text)
 easygui.textbox(msg=msg, text=text, title="LyX Notebook Setup")
-
-
