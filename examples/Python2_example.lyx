@@ -140,12 +140,12 @@ for i in ["cat", "dog"]:
 
 \begin_layout Plain Layout
 
-zZ3Qq   for j in ["pencil", "pen"]:
+    for j in ["pencil", "pen"]:
 \end_layout
 
 \begin_layout Plain Layout
 
-      print i, j
+        print i, j
 \end_layout
 
 \end_inset
