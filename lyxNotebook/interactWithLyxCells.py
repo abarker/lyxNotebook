@@ -604,7 +604,8 @@ class InteractWithLyxCells(object):
         #for i in range(0,len(self.magicCookie)): delString += "char-delete-forward;"
         # TODO would it be possible to just globally delete the cookie from the
         # whole file?  Could do that before any operations and then afterwards to
-        # avoid errors due to cookies left after errors.
+        # avoid errors due to cookies left after errors.  LyX 2.0 now has
+        # advanced search; look into that and any useful lfuns.
         return self.processLfun("inset-forall",
                    cellType+" command-sequence char-right;"+self.delCookieForwardString)
 
@@ -783,7 +784,6 @@ class InteractWithLyxCells(object):
          bufferFileName,
          autoSaveFileName, fullPath) = self.getUpdatedLyxDirectoryData()
         if useLatexExport:
-            print("debug in Latex section of getAllCellText")
             # always export to local Latex file, and wait only briefly
             # TODO can use fullPath now instead of re-join
             absLocalFilePath = os.path.join(bufferDirName, self.localLatexFilename)
@@ -1094,9 +1094,20 @@ class InteractWithLyxCells(object):
 
         allCells = self.getAllCellText(useLatexExport=useLatexExport)
         self.deleteMagicCookieInsideCurrent(assertCursorAtCookieEnd=True)
+        foundCookie = False
         for cell in allCells:
-            if cell.hasCookieInside: return cell
-        return Cell()
+            if cell.hasCookieInside:
+                if foundCookie:
+                    print("\n\nWARNING: multiple cells have cookies inside them."
+                          "\nNot performing the operation.  Globally delete the"
+                          "\ncookie string " + self.magicCookie + " from the"
+                          " document and try again.\n", file=sys.stderr)
+                    return None
+                foundCookie = True
+                returnCell = cell
+        # return Cell() # Was causing bugs in ordinary Listings cells, now return None.
+        if foundCookie: return returnCell
+        else: return None
 
     def replaceCurrentOutputCellText(self, lineList, createIfNecessary=True,
                gotoBeginAfter=False, assertInsideCell=False, insetSpecifier="Python"):
