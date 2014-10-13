@@ -13,8 +13,8 @@ the code cells in the Latex-formatted printable output.
 See the file doc/lyxNotebookDocs.pdf for an overview, details of the install
 procedure, descriptions of all the available commands, and customization
 options.  There are example Lyx files in the examples directory.  To install,
-change directories to the Lyx Notebook source directory (in its final location),
-go to the subdirectory lyxNotebook, and run:
+change directories to the Lyx Notebook source directory (in its final
+location), go to the subdirectory lyxNotebook, and run:
 
    ./install.py &
 
