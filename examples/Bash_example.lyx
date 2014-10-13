@@ -1,5 +1,5 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
 \begin_document
 \begin_header
 \textclass article
@@ -15,13 +15,13 @@ lyxNotebookCellBash
 \font_roman lmodern
 \font_sans lmss
 \font_typewriter lmtt
+\font_math auto
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -32,15 +32,24 @@ lyxNotebookCellBash
 \use_hyperref false
 \papersize default
 \use_geometry false
-\use_amsmath 1
-\use_esint 1
-\use_mhchem 1
-\use_mathdots 1
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
 \cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
+\justification true
 \use_refstyle 1
 \index Index
 \shortcut idx
@@ -102,32 +111,27 @@ total 20K
 
 \begin_layout Plain Layout
 
--rw-rw-r--.
- 1 alb alb 2.2K Jun  2 20:19 #Bash_example.lyx#
+-rw-rw-r-- 1 alb alb 2.5K Oct 13 19:11 Bash_example.lyx
 \end_layout
 
 \begin_layout Plain Layout
 
--rw-rw-r--.
- 1 alb alb 2.3K Jun  2 04:49 Bash_example.lyx
+-rw-rw-r-- 1 alb alb 2.2K Jun  2  2012 Bash_example.lyx~
 \end_layout
 
 \begin_layout Plain Layout
 
--rw-rw-r--.
- 1 alb alb 1.4K Jun  2 02:07 Bash_example.lyx~
+-rw-rw-r-- 1 alb alb 3.4K Oct 13 19:10 Python2_example.lyx
 \end_layout
 
 \begin_layout Plain Layout
 
--rw-rw-r--.
- 1 alb alb 3.1K May 27 18:32 Python2_example.lyx
+-rw-rw-r-- 1 alb alb 3.1K May 27  2012 Python2_example.lyx~
 \end_layout
 
 \begin_layout Plain Layout
 
--rw-rw-r--.
- 1 alb alb 3.8K May 31 23:27 R_example.lyx
+-rw-rw-r-- 1 alb alb 3.8K May 31  2012 R_example.lyx
 \end_layout
 
 \end_inset

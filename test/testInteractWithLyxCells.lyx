@@ -1,0 +1,2253 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+
+
+% The below line causes an error if colors is already loaded without dvips option.
+% Is it really necessary in Lyx anyway?
+%\usepackage[dvips]{color} % set up color package for dvips (vs. pdfLatex default)
+
+%\def\lyxNotebookNoColor{true}
+\def\lyxNotebookNoColorCodeFontFamily{\ttfamily}
+\def\lyxNotebookNoColorOutputFontFamily{\ttfamily}
+%\def\lyxNotebookColorCodeFontFamily{\sffamily}
+
+%\def\lyxNotebookNoCellLabels{true}
+
+%\newcommand{\lyxNotebookLstsetAllAll}{\lstset{frame=TBLR}}
+%\newcommand{\lyxNotebookLstsetAllPythonTwo}{\lstset{frame=TBLR}}
+%\newcommand{\lyxNotebookLstsetStandardPythonTwo}{\lstset{frame=TBLR}}
+
+%\newcommand{\lyxNotebookLstsetOutputPythonTwo}{\lstset{aboveskip=\medskipamount}}
+
+%\newcommand{\lyxNotebookLstsetOutputPythonTwo}{\lstset{print=false,frame=}}
+% \newcommand{\lyxNotebookLstsetAllPythonTwo}{\lstset{print=false,frame=}}
+
+%\usepackage{graphicx} % test rotate
+
+%\def\lyxNotebookNoPrint{true}
+
+%\usepackage{verbatim}
+%\let\lyxNotebookCellInitPythonTwo=\comment              
+%\let\endlyxNotebookCellInitPythonTwo=\endcomment
+%\let\lyxNotebookCellStandardPythonTwo=\comment              
+%\let\endlyxNotebookCellStandardPythonTwo=\endcomment
+%\let\lyxNotebookCellOutputPythonTwo=\comment              
+%\let\endlyxNotebookCellOutputPythonTwo=\endcomment
+
+% note the cell type must appear in document to turn off printing of it!
+%\lyxNotebookPrintOffInitPythonTwo
+%\lyxNotebookPrintOffStandardPythonTwo
+%\lyxNotebookPrintOffOutputPythonTwo
+
+%\lyxNotebookPrintOff
+%\lyxNotebookPrintOnStandardPythonTwo
+%\lyxNotebookPrintOffStandardPythonTwo
+
+\def\lyxNotebookFontSize{\small}
+
+%\newcommand{\lyxNotebookLstsetAllAll}{\lstset{emph={_,+},emphstyle=\underbar}}
+
+%\newcommand{\lyxNotebookLstsetAllAll}{\lstset{otherkeywords={0,1,2,3,4,5,6,7,8,9,.0,.1,.2,.3,.4,.5,.6,.7,.8,.9},emphstyle=\color{red}}}
+
+%\newcommand{\lyxNotebookLstsetAllAll}{\lstset{classoffset=1,keywordstyle=\underline,otherkeywords={0,1,2,3,4,5},keywordstyle=\underline},classoffset=0,{\\n}{{{\underline{\\n}}}}2}
+
+\newcommand{\lyxNotebookLstsetAllAll}{\lstset{
+   literate=%
+      {\_}{{{\bfseries\textunderscore}}}1
+}}
+
+\raggedbottom
+%\def\lyxNotebookNeedsspaceOutputValue{19\baselineskip}
+\end_preamble
+\use_default_options true
+\begin_modules
+lyxNotebookCellPython
+lyxNotebookCellR
+lyxNotebookCellSage
+lyxNotebookCellScala
+lyxNotebookCellPythonTwo
+lyxNotebookCellBash
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman lmodern
+\font_sans lmss
+\font_typewriter beramono
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 84
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\branch nonprinting cells
+\selected 1
+\filename_suffix 0
+\color #e3fae5
+\end_branch
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.5in
+\topmargin 1in
+\rightmargin 1.5in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 2
+\paperpagestyle headings
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Interact With Lyx Cells
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This is a Lyx file with examples to test the interactions with the program
+ in 
+\family typewriter
+interactWithLyxCells.py
+\family default
+, which defines the class 
+\family typewriter
+InteractWithLyxCells
+\family default
+.
+ It is just a bunch of cases that caused bugs or might cause bugs, along
+ with some scrap testing of Latex.
+\end_layout
+
+\begin_layout Section
+Scrap
+\end_layout
+
+\begin_layout Standard
+These are some tests of putting labels next to code cells.
+ Here is a test of rotate, just in case it turns out to be useful:
+\end_layout
+
+\begin_layout Standard
+Negative 90: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+rotatebox{-90}{
+\backslash
+tiny Python}
+\end_layout
+
+\end_inset
+
+ and 90: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+rotatebox{90}{
+\backslash
+tiny Python}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And here we use a 
+\backslash
+hfill: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+hfill
+\end_layout
+
+\end_inset
+
+ in a line.
+\end_layout
+
+\begin_layout Standard
+What chars does no passthru mess with? TeX and LaTeX? What others? !@#$%^&*()_+|
+}{[]
+\backslash
+;
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+';;;'
+\backslash
+ Only the single quote seems to do something...
+\end_layout
+
+\begin_layout Standard
+Now consider that marginpar can take left and right args for odd and even
+ pages: 
+\backslash
+marginpar[left text]{right text} 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+marginpar[
+\backslash
+hfill
+\backslash
+tiny margin note]{
+\backslash
+tiny margin note 
+\backslash
+hfill}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See also 
+\backslash
+reversemarginpar for marginpar on opposite side from usual, and marginnote
+ package for non-float margin noted.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+marginnote[
+\backslash
+hfill
+\backslash
+rotatebox{-90}{
+\backslash
+tiny python}]{
+\backslash
+rotatebox{-90}{
+\backslash
+tiny python}
+\backslash
+hfill}[5em]
+\end_layout
+
+\end_inset
+
+These look great, but will they fail for one-line insets and closed insets?
+ No, because they only appear when the page is printed, and all boxes have
+ full width (the label just might overhang).
+\end_layout
+
+\begin_layout Standard
+Could we include a marginnote and a reversemarginpar marginnote, each with
+ an matching empty/full slot, in order to get the label always on the right
+ side?
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+reversemarginpar 
+\backslash
+marginnote{
+\backslash
+tiny reversed!}}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+marginnote{
+\backslash
+tiny notReversed!}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here is an example.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+reversemarginpar 
+\backslash
+marginnote[]{
+\backslash
+rotatebox{-90}{
+\backslash
+tiny python}}[0.6em]}
+\backslash
+marginnote[]{
+\backslash
+rotatebox{-90}{
+\backslash
+vspace*{5em}
+\backslash
+fbox{
+\backslash
+tiny $
+\backslash
+mathrm{
+\backslash
+stackrel{Python}{init}}$}}}[0.6em]
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{lstlisting}[frame=LRTB]
+\end_layout
+
+\begin_layout Plain Layout
+
+here is a one-line listings
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{lstlisting}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Example Cells
+\end_layout
+
+\begin_layout Standard
+Here is an empty code cell:
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here are some example cells.
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+import math as m
+\end_layout
+
+\begin_layout Plain Layout
+
+# here is a print     statement
+\end_layout
+
+\begin_layout Plain Layout
+
+# warning: spaces      only saved in fixed h_h 
+\end_layout
+
+\begin_layout Plain Layout
+
+#1234567890123456789012345678901234567890123456789012345678901234567890123456789
+012345678901234567890
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+z = 5 - 5 - 4 + 4 / 4 % 4 * 2
+\end_layout
+
+\begin_layout Plain Layout
+
+class egg:
+\end_layout
+
+\begin_layout Plain Layout
+
+   pass
+\end_layout
+
+\begin_layout Plain Layout
+
+egg.butter5 = 5
+\end_layout
+
+\begin_layout Plain Layout
+
+x=5
+\end_layout
+
+\begin_layout Plain Layout
+
+x
+\end_layout
+
+\begin_layout Plain Layout
+
+"""A triple quote comment!
+\end_layout
+
+\begin_layout Plain Layout
+
+           across lines
+\end_layout
+
+\begin_layout Plain Layout
+
+wow
+\end_layout
+
+\begin_layout Plain Layout
+
+"""
+\end_layout
+
+\begin_layout Plain Layout
+
+print "another print 5
+\backslash
+n"          # we cannot line up
+\end_layout
+
+\begin_layout Plain Layout
+
+print "print after blank line" # comments unless fixed
+\end_layout
+
+\begin_layout Plain Layout
+
+print
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\begin_layout Plain Layout
+'A triple quote comment!
+\backslash
+n           across lines
+\backslash
+nwow
+\backslash
+n'
+\end_layout
+
+\begin_layout Plain Layout
+another print 5
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+print after blank line
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+Some text after in same para.
+\end_layout
+
+\begin_layout Section
+Other Cell Types
+\end_layout
+
+\begin_layout Standard
+Here is an ordinary listing: 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+print "this is just an ORDINARY listing
+\end_layout
+
+\begin_layout Plain Layout
+
+x=5
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+print x
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Ok, end of that listing.
+\end_layout
+
+\begin_layout Section
+More WrapListings Cells
+\end_layout
+
+\begin_layout Standard
+Repeated here 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tiny Python}{
+\backslash
+tiny $
+\backslash
+mathrm{Python}$}{
+\backslash
+tiny
+\backslash
+ttfamily Python}{
+\backslash
+tiny
+\backslash
+bfseries
+\backslash
+ttfamily Python}
+\end_layout
+
+\end_inset
+
+ the marginnote:
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+reversemarginpar 
+\backslash
+marginnote[]{
+\backslash
+rotatebox{-90}{
+\backslash
+bfseries
+\backslash
+ttfamily
+\backslash
+tiny Python}}[0.6em]}
+\backslash
+marginnote[]{
+\backslash
+rotatebox{-90}{
+\backslash
+bfseries
+\backslash
+ttfamily
+\backslash
+tiny Python}}[0.6em]
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{lstlisting}[frame=lrtb]
+\end_layout
+
+\begin_layout Plain Layout
+
+here is a one-line listings
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{lstlisting}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now compare with a normal marginnote 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+marginnote{
+\backslash
+tiny{normal}}
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+Here is a cell
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+x=5
+\end_layout
+
+\begin_layout Plain Layout
+
+   # an indented comment that shouldn't affect indent level!
+\end_layout
+
+\begin_layout Plain Layout
+
+print ">>> 
+\backslash
+negg" # can we cause problems by printing a prompt?
+\end_layout
+
+\begin_layout Plain Layout
+
+print x*x
+\end_layout
+
+\begin_layout Plain Layout
+
+lst = ["a",
+\end_layout
+
+\begin_layout Plain Layout
+
+"b",
+\end_layout
+
+\begin_layout Plain Layout
+
+          "c"]
+\end_layout
+
+\begin_layout Plain Layout
+
+print(lst)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+if (
+\end_layout
+
+\begin_layout Plain Layout
+
+5 == 5):
+\end_layout
+
+\begin_layout Plain Layout
+
+   print "paren line continuation"
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# now test continuation lines
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   range
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+(3):
+\end_layout
+
+\begin_layout Plain Layout
+
+   print i,
+\end_layout
+
+\begin_layout Plain Layout
+
+print "done"
+\end_layout
+
+\begin_layout Plain Layout
+
+if x==x 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   : print("continued colon line")
+\end_layout
+
+\begin_layout Plain Layout
+
+# BUG below!!!!!!! output line has a space in it!
+\end_layout
+
+\begin_layout Plain Layout
+
+print # can we print a blank line at the end of an output cell? Yes, but
+ doesn't print Latex.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+>>> 
+\end_layout
+
+\begin_layout Plain Layout
+
+egg
+\end_layout
+
+\begin_layout Plain Layout
+
+25
+\end_layout
+
+\begin_layout Plain Layout
+
+['a', 'b', 'c']
+\end_layout
+
+\begin_layout Plain Layout
+
+paren line continuation
+\end_layout
+
+\begin_layout Plain Layout
+
+0 1 2
+\end_layout
+
+\begin_layout Plain Layout
+
+done
+\end_layout
+
+\begin_layout Plain Layout
+
+continued colon line
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Some text after in different para.
+ This is just some random text to test how the left margins look when they
+ are in the context of an actual text paragraph.
+ So this is not really saying anything, it is just taking up a paragraph
+ of space.
+ Now here is another code cell: 
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+# Another Python cell
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+import string as strg
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+strg = "i am a 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+string"
+\end_layout
+
+\begin_layout Plain Layout
+
+strg
+\end_layout
+
+\begin_layout Plain Layout
+
+x = 3.444
+\end_layout
+
+\begin_layout Plain Layout
+
+while True:
+\end_layout
+
+\begin_layout Plain Layout
+
+   x += x-4
+\end_layout
+
+\begin_layout Plain Layout
+
+   break
+\end_layout
+
+\begin_layout Plain Layout
+
+print "done"
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+'i am a string'
+\end_layout
+
+\begin_layout Plain Layout
+
+done
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here is a line of text.
+\end_layout
+
+\begin_layout Standard
+Here is a test of multiple indentation.
+ 
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+for i in range(3):
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   for j in range(3):
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+      print (i,j)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+(0, 0)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0, 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0, 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+(1, 0)
+\end_layout
+
+\begin_layout Plain Layout
+
+(1, 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+(1, 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+(2, 0)
+\end_layout
+
+\begin_layout Plain Layout
+
+(2, 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+(2, 2)
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+Some Plots
+\end_layout
+
+\begin_layout Standard
+Here is a figure.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename testGraphicFile.eps
+	width 5in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+A figure.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that we might have to right-click reload to update these plots, but
+ at least when .eps files are used the updates seem to happen automatically!
+ We could then copy this anywhere within the document, or even copy it to
+ a different buffer (as long as the pathname to the plot file will be found).
+ 
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+from matplotlib import pyplot
+\end_layout
+
+\begin_layout Plain Layout
+
+# The labels would look better in TeX; see later!
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+x = range(0,100) 
+\end_layout
+
+\begin_layout Plain Layout
+
+y = [ i*i+1000 for i in x ]
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.plot(x, y, '-') 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.title(r"
+\backslash
+huge Plot of $y = x*x+1000$") 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.xlabel("x") 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.ylabel("y") 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.savefig("testGraphicFile.eps") 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.show()
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+[<matplotlib.lines.Line2D object at 0x7f2929dad750>]
+\end_layout
+
+\begin_layout Plain Layout
+
+<matplotlib.text.Text object at 0x7f2929e004d0>
+\end_layout
+
+\begin_layout Plain Layout
+
+<matplotlib.text.Text object at 0x7f292999ca10>
+\end_layout
+
+\begin_layout Plain Layout
+
+<matplotlib.text.Text object at 0x7f2934654450>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now we try another plot, this time attempting to make multiple plots in
+ matplotlib, rather than always operating on the implicit global plot.
+ 
+\end_layout
+
+\begin_layout Standard
+NOTE bug below in long line with 
+\begin_inset Quotes eld
+\end_inset
+
+default dpi
+\begin_inset Quotes erd
+\end_inset
+
+!!! Why? Lyx server limitation? Some other problem? Need to pre-break lines?
+\end_layout
+
+\begin_layout Standard
+Note also that the text on graphics is bad, both in Lyx and in final view.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+usedistiller
+\begin_inset Quotes erd
+\end_inset
+
+ line below FIXED the final view problem (though preview still low-res text).
+ See the high-res PNG version below, which looks better in Lyx.
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+import math # for math.cos, etc.
+\end_layout
+
+\begin_layout Plain Layout
+
+from __future__ import division # cos below is square otherwise!
+\end_layout
+
+\begin_layout Plain Layout
+
+import matplotlib.pyplot as plt
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Note that matplotlib pyplot works on a global plot.
+\end_layout
+
+\begin_layout Plain Layout
+
+# The figure(n) or figure("name") command sets the
+\end_layout
+
+\begin_layout Plain Layout
+
+# current figure -- creating it if necessary.
+  So
+\end_layout
+
+\begin_layout Plain Layout
+
+# these commands may need to be repeated when working
+\end_layout
+
+\begin_layout Plain Layout
+
+# on multiple plots.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# plt.rcParams['text.usetex']=True # matches text in Latex article!
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.rc('text', usetex=True)  # or another way to do the same...
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.rc('font', family='serif') # set font if desired...
+\end_layout
+
+\begin_layout Plain Layout
+
+# plt.rc('ps', usedistiller='xpdf') # this FIXES the ugly PS text!!!
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.rc('ps', usedistiller='ghostscript') # this FIXES the ugly PS text too!!!
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+fig1 = plt.figure(1, figsize=(6,4)) # can also pass a string to name
+\end_layout
+
+\begin_layout Plain Layout
+
+x = range(-100,100)
+\end_layout
+
+\begin_layout Plain Layout
+
+y1 = [ math.cos(i/20)+1 for i in x ]
+\end_layout
+
+\begin_layout Plain Layout
+
+y2 = [ max(i*i,4) for i in x ] #                                       
+       any line does it?
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.plot(x,y1,figure=fig1) 
+\end_layout
+
+\begin_layout Plain Layout
+
+fig2 = plt.figure(2, figsize=(6,4)) # must come here, above with earlier!
+ too   long?
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.plot(x,y2,figure=fig2)
+\end_layout
+
+\begin_layout Plain Layout
+
+fig1.show()
+\end_layout
+
+\begin_layout Plain Layout
+
+fig2.show()
+\end_layout
+
+\begin_layout Plain Layout
+
+# fig1.savefig("testGraphicFile2.png", dpi = 300, format = "png") # doesn't
+ look bad on preview....
+\end_layout
+
+\begin_layout Plain Layout
+
+fig1.savefig("testGraphicFile2.eps", dpi = 200, format = "eps") # default
+ dpi=100 why does it do that
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+[<matplotlib.lines.Line2D object at 0x7f2929a7b390>]
+\end_layout
+
+\begin_layout Plain Layout
+
+[<matplotlib.lines.Line2D object at 0x7f2929dcbf10>]
+\end_layout
+
+\end_inset
+
+ Oh, I also made a float for the plot output (input into a figure float
+ using S-F10).
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename testGraphicFile2.eps
+	width 5in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Cosine wave.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Sage
+\end_layout
+
+\begin_layout Standard
+Now we can test a Sage cell.
+\begin_inset Flex LyxNotebookCell:Standard:Sage
+status open
+
+\begin_layout Plain Layout
+
+# comment
+\end_layout
+
+\begin_layout Plain Layout
+
+print "sage cell"
+\end_layout
+
+\begin_layout Plain Layout
+
+x= 5
+\end_layout
+
+\begin_layout Plain Layout
+
+print x
+\end_layout
+
+\begin_layout Plain Layout
+
+if 4==4:
+\end_layout
+
+\begin_layout Plain Layout
+
+   for i in [1,2]:
+\end_layout
+
+\begin_layout Plain Layout
+
+      print "true"
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:Sage
+status open
+
+\begin_layout Plain Layout
+
+sage cell
+\end_layout
+
+\begin_layout Plain Layout
+
+5
+\end_layout
+
+\begin_layout Plain Layout
+
+true
+\end_layout
+
+\begin_layout Plain Layout
+
+true
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Test of PDF and Other Output Formats
+\end_layout
+
+\begin_layout Standard
+Note that default 
+\backslash
+flushbottom is adjusting the boxes, but not adjusting the margin notes,
+ i.e., the space is 
+\begin_inset Quotes eld
+\end_inset
+
+between
+\begin_inset Quotes erd
+\end_inset
+
+ the two.
+ How to turn off, short of full 
+\backslash
+raggedbottom on paper?
+\end_layout
+
+\begin_layout Standard
+Note that PDF seems to preview reasonably, and it looks good on the final
+ PS or PDF file.
+ 
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+from matplotlib import pyplot
+\end_layout
+
+\begin_layout Plain Layout
+
+# The labels would look better in TeX; see later!
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+x = range(0,100) 
+\end_layout
+
+\begin_layout Plain Layout
+
+y = [ i*i+1000 for i in x ]
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.plot(x, y, '-') 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.title("Plot of $y = x*x+1000$") 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.xlabel("x") 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.ylabel("y") 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.savefig("testGraphicFile.pdf", dpi=200) 
+\end_layout
+
+\begin_layout Plain Layout
+
+pyplot.show()
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+[<matplotlib.lines.Line2D object at 0x7f292a4b9510>]
+\end_layout
+
+\begin_layout Plain Layout
+
+<matplotlib.text.Text object at 0x7f292a5055d0>
+\end_layout
+
+\begin_layout Plain Layout
+
+<matplotlib.text.Text object at 0x7f2929e34850>
+\end_layout
+
+\begin_layout Plain Layout
+
+<matplotlib.text.Text object at 0x7f2929703ad0>
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename testGraphicFile.pdf
+	width 5in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Line Wraps
+\end_layout
+
+\begin_layout Standard
+Test line wrapping 
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+here is a box with lines so long that they need to be wrapped to see what
+ will happen
+\end_layout
+
+\begin_layout Plain Layout
+
+if this were code how would it look that remains to be seen let us indent
+ now and
+\end_layout
+
+\begin_layout Plain Layout
+
+see what happens to the autoindent feature when it is typeset after breaking
+ a long line
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+  File "<stdin>", line 1
+\end_layout
+
+\begin_layout Plain Layout
+
+    here is a box with lines so long that they need to be wrapped to see
+ what will happen
+\end_layout
+
+\begin_layout Plain Layout
+
+                ^
+\end_layout
+
+\begin_layout Plain Layout
+
+SyntaxError: invalid syntax
+\end_layout
+
+\begin_layout Plain Layout
+
+  File "<stdin>", line 1
+\end_layout
+
+\begin_layout Plain Layout
+
+    if this were code how would it look that remains to be seen let us indent
+ now and
+\end_layout
+
+\begin_layout Plain Layout
+
+               ^
+\end_layout
+
+\begin_layout Plain Layout
+
+SyntaxError: invalid syntax
+\end_layout
+
+\begin_layout Plain Layout
+
+  File "<stdin>", line 1
+\end_layout
+
+\begin_layout Plain Layout
+
+    see what happens to the autoindent feature when it is typeset after
+ breaking a long line
+\end_layout
+
+\begin_layout Plain Layout
+
+           ^
+\end_layout
+
+\begin_layout Plain Layout
+
+SyntaxError: invalid syntax
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Cells in Different Environments
+\end_layout
+
+\begin_layout Standard
+First, consider the enumerate type of environment.
+ These should all work, so long as the environment-type is not returned
+ as 
+\begin_inset Quotes eld
+\end_inset
+
+Plain Layout
+\begin_inset Quotes erd
+\end_inset
+
+ from the server-get-layout LFUN.
+\end_layout
+
+\begin_layout Enumerate
+What happens in enumerate?
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+# A Cell in an Enumerate
+\end_layout
+
+\begin_layout Plain Layout
+
+print "hello"
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+hello
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The execution works, the printing works, but the frame around does not look
+ good due to overhanging; when linewidth=
+\backslash
+textwidth.
+ If, instead, we set linewidth to 
+\backslash
+linewidth it works! But does it cause an error in going to the next cell???
+ Yes, it seems to, because when the above para is in an enumerate it FAILS.
+\end_layout
+
+\begin_layout Standard
+Now, what about floats.
+ Will these cause problems? It may be a bad idea, since it breaks the sequential
+ nature of cells, but what happens?Seems to print just fine.
+ But the layout inside the cell is 
+\begin_inset Quotes eld
+\end_inset
+
+Plain Layout
+\begin_inset Quotes erd
+\end_inset
+
+ according to the server-get-layout LFUN, so the evaluations will fail unless
+ cell is placed inside another non-plain environment (not tested).
+\end_layout
+
+\begin_layout Section
+Scala
+\end_layout
+
+\begin_layout Standard
+Here is a Scala init cell.
+ We include :silent here because it toggles; we will only run init cells
+ once (and perhaps re-run standard cells).
+\begin_inset Flex LyxNotebookCell:Init:Scala
+status open
+
+\begin_layout Plain Layout
+
+println("Initializing Scala")
+\end_layout
+
+\begin_layout Plain Layout
+
+// toggle result printing
+\end_layout
+
+\begin_layout Plain Layout
+
+:silent
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:Scala
+status open
+
+\begin_layout Plain Layout
+
+Initializing Scala
+\end_layout
+
+\begin_layout Plain Layout
+
+Switched off result printing.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now some Scala code cells.
+\begin_inset Flex LyxNotebookCell:Standard:Scala
+status open
+
+\begin_layout Plain Layout
+
+val twoInts = (3,9)
+\end_layout
+
+\begin_layout Plain Layout
+
+val twoStrings = ("hello", "world")
+\end_layout
+
+\begin_layout Plain Layout
+
+val twoInts = (3,9)
+\end_layout
+
+\begin_layout Plain Layout
+
+var runTimes = 0
+\end_layout
+
+\begin_layout Plain Layout
+
+if (runTimes == 0)
+\end_layout
+
+\begin_layout Plain Layout
+
+   println(runTimes)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:Scala
+status open
+
+\begin_layout Plain Layout
+
+0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+R
+\end_layout
+
+\begin_layout Standard
+Here is some R code from Wikipedia article on R.
+\begin_inset Branch nonprinting cells
+status open
+
+\begin_layout Standard
+\begin_inset Flex LyxNotebookCell:Standard:R
+status open
+
+\begin_layout Plain Layout
+
+x <- c(1,2,3,4,5,6)   
+\end_layout
+
+\begin_layout Plain Layout
+
+# Create ordered collection (vector)
+\end_layout
+
+\begin_layout Plain Layout
+
+y <- x^2 # Square the elements of x
+\end_layout
+
+\begin_layout Plain Layout
+
+print(y) # print (vector) y
+\end_layout
+
+\begin_layout Plain Layout
+
+print(mean(y))
+\end_layout
+
+\begin_layout Plain Layout
+
+print(var(y))
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:R
+status open
+
+\begin_layout Plain Layout
+
+[1]  1  4  9 16 25 36
+\end_layout
+
+\begin_layout Plain Layout
+
+[1] 15.16667
+\end_layout
+
+\begin_layout Plain Layout
+
+[1] 178.9667
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Bash
+\end_layout
+
+\begin_layout Standard
+Now Bash cells are supported.
+\begin_inset Flex LyxNotebookCell:Standard:Bash
+status open
+
+\begin_layout Plain Layout
+
+# bash cell
+\end_layout
+
+\begin_layout Plain Layout
+
+ls
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:Bash
+status open
+
+\begin_layout Plain Layout
+
+testGraphicFile2.eps  testInteractWithLyxCells.lyx
+\end_layout
+
+\begin_layout Plain Layout
+
+testGraphicFile.eps   testInteractWithLyxCells.lyx~
+\end_layout
+
+\begin_layout Plain Layout
+
+testGraphicFile.pdf
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Branches
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch nonprinting cells
+status open
+
+\begin_layout Standard
+OK, this text is here!
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Language Definitions for Listings
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "style=lyxNotebookColorStandardPython"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# here is an ordinary listings
+\end_layout
+
+\begin_layout Plain Layout
+
+print "howdy there"
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in [1,2,3]:
+\end_layout
+
+\begin_layout Plain Layout
+
+   print i
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Appendix
+\end_layout
+
+\begin_layout Standard
+Here is a cell in the appendix.
+ 
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+import time
+\end_layout
+
+\begin_layout Plain Layout
+
+print "this is a really long line in a string will it no longer cause an
+ error in python because of it"
+\end_layout
+
+\begin_layout Plain Layout
+
+time.sleep(2) # ordinary sleep doesn't matter
+\end_layout
+
+\begin_layout Plain Layout
+
+print "y"
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+this is a really long line in a string will it no longer cause an error
+ in python because of it
+\end_layout
+
+\begin_layout Plain Layout
+
+y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Warning: Need some text (actually: space, char, EOF, non-Plain inset) after
+ every cell in order to create output cell!
+\end_layout
+
+\begin_layout Standard
+Here is a bug test.
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+import time
+\end_layout
+
+\begin_layout Plain Layout
+
+def printAndHang():
+\end_layout
+
+\begin_layout Plain Layout
+
+   print "
+\backslash
+n>x>> ", # only the prompt str hangs it
+\end_layout
+
+\begin_layout Plain Layout
+
+   time.sleep(2)  # and it must sleep afterward
+\end_layout
+
+\begin_layout Plain Layout
+
+   print "won't print right if actual prompt printed above"
+\end_layout
+
+\begin_layout Plain Layout
+
+printAndHang() # the error would mess up output and indent calcs
+\end_layout
+
+\begin_layout Plain Layout
+
+# hello
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+>x>>  won't print right if actual prompt printed above
+\end_layout
+
+\end_inset
+
+ x
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+# export to latex fails on empty last line! same output as without it!
+\end_layout
+
+\begin_layout Plain Layout
+
+# two blank lines at end produces one in Latex .tex file
+\end_layout
+
+\begin_layout Plain Layout
+
+print "EOF
+\backslash
+n"
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+EOF
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
