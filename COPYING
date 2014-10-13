@@ -21,4 +21,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
- 
+
+=============================================================================
+
+This software is currently distributed with a copy of EasyGUI, in
+lyxNotebook/easygui_0.96.  See also the distribution terms for that software
+(if it is to be included).  That code was released under the permissive
+"modified BSD license."
+

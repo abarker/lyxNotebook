@@ -10,7 +10,7 @@ sent to the output cell.  The program keeps interpreter processes running,
 maintaining their state.  The Listings package is used to highlight the code in
 the code cells in the Latex-formatted printable output.
 
-See the file lyxNotebookDocs.pdf for an overview, details of the install
+See the file doc/lyxNotebookDocs.pdf for an overview, details of the install
 procedure, descriptions of all the available commands, and customization
 options.  There are example Lyx files in the examples directory.  To install,
 change directories to the Lyx Notebook source directory and run
