@@ -70,7 +70,7 @@ AddToPreamble
       }%
       {}%
    }%
-   
+
    % Build up the general printing off/on commands by adding commands for the
    % inset specifier Bash and basic cell type Init
    % (Note expandafter is used to avoid recursion problems; using e.g.
@@ -106,7 +106,7 @@ AddToPreamble
       }%
       {}%
    }%
-   
+
    % Build up the general printing off/on commands by adding commands for the
    % inset specifier Bash and basic cell type Standard
    % (Note expandafter is used to avoid recursion problems; using e.g.
@@ -142,7 +142,7 @@ AddToPreamble
       }%
       {}%
    }%
-   
+
    % Build up the general printing off/on commands by adding commands for the
    % inset specifier Bash and basic cell type Output
    % (Note expandafter is used to avoid recursion problems; using e.g.
@@ -164,7 +164,7 @@ AddToPreamble
    \def\lyxNotebookNoColorCodeFontFamily{\sffamily}
    \def\lyxNotebookNoColorOutputFontFamily{\sffamily}
    \def\lyxNotebookLabelFormat{\ttfamily\tiny\bfseries}
-   
+
    % define some colors to use
    \definecolor{gray9}{gray}{0.5}
    \definecolor{darkGray9}{gray}{0.05} % almost black, for normal text with colors
@@ -179,10 +179,10 @@ AddToPreamble
    \definecolor{turquoise9}{rgb}{0.0,0.6,1.0}
    \definecolor{bluishPurple9}{rgb}{0.2,0.0,1.0}
    \definecolor{purple9}{rgb}{0.4,0.0,1.0}
-   
+
    %
    % Now define the Listings styles for Lyx Notebook Bash,
-   % setting the language to bash (which will be replaced by the 
+   % setting the language to bash (which will be replaced by the
    % listingsLanguage field of the general spec.  Note the default frame
    % conventions are defined here (since the general code format for Init
    % and Standard cells doesn't differ).
@@ -200,24 +200,24 @@ AddToPreamble
       prebreak=\bf\textbackslash,
       showstringspaces=false,
       % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
-      % columns=flexible, % 
+      % columns=flexible, %
       % columns=fullflexible, % good with monospace font, & more chars per line
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       linewidth=\linewidth, % boxes smaller, same right margin in indented env.
       breaklines=true,
       breakatwhitespace=true,
-      breakindent=1.5em, 
+      breakindent=1.5em,
       breakautoindent=true, 
       % nonColorListingsCodeFormat
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookNoColorCodeFontFamily%
-                 \color{darkGray9}, 
+                 \color{darkGray9},
       stringstyle=\ttfamily, % use ttfamily for strings at least
       %commentstyle=\upshape, % don't use the default italic comments
       commentstyle=\slshape\color[rgb]{0.3,0.3,0.3}, % slanted gray
       %commentstyle=\itshape,
-      keywordstyle=[1]\bfseries, 
+      keywordstyle=[1]\bfseries,
       keywordstyle=[2]\bfseries,
       keywordstyle=[3]\bfseries, 
       frame=TbLR
@@ -241,19 +241,19 @@ AddToPreamble
       prebreak=\bf\textbackslash,
       showstringspaces=false,
       % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
-      % columns=flexible, % 
+      % columns=flexible, %
       % columns=fullflexible, % good with monospace font, & more chars per line
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       linewidth=\linewidth, % boxes smaller, same right margin in indented env.
       breaklines=true,
       breakatwhitespace=true,
-      breakindent=1.5em, 
+      breakindent=1.5em,
       breakautoindent=true, 
       % colorListingsCodeFormat
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookColorCodeFontFamily%
-                 \color{darkGray9}, 
+                 \color{darkGray9},
       rulecolor=\color{black}, % may be needed for line-broken color lines
       %identifierstyle=\color{darkGray9},
       stringstyle=\ttfamily\color{blue9},
@@ -262,7 +262,7 @@ AddToPreamble
       %commentstyle=\upshape\color{green9},
       %commentstyle=\slshape\color{darkerGreen9},
       commentstyle=\slshape\color[rgb]{0.0,0.4,0.0},
-      keywordstyle=[1]\bfseries\color{darkerRed9}, 
+      keywordstyle=[1]\bfseries\color{darkerRed9},
       keywordstyle=[2]\bfseries\color{pinkRed9},
       keywordstyle=[3]\bfseries\color{yellowGold9}, 
       frame=TbLR
@@ -303,7 +303,7 @@ AddToPreamble
       prebreak=\bf\textbackslash,
       % linewidth=\linewidth, % default seems to work better
       % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
-      % columns=flexible, % 
+      % columns=flexible, %
       % columns=fullflexible, % good with monospace font, & more chars per line
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       aboveskip=\doubleskipamount, % make abut the cell above, a calulated value
@@ -334,7 +334,7 @@ AddToPreamble
       prebreak=\bf\textbackslash,
       % linewidth=\linewidth, % default seems to work better
       % numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt,
-      % columns=flexible, % 
+      % columns=flexible, %
       % columns=fullflexible, % good with monospace font, & more chars per line
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       aboveskip=\doubleskipamount, % make abut the cell above, a calulated value
@@ -452,12 +452,12 @@ InsetLayout Flex:LyxNotebookCell:Init:Bash
             \lyxNotebookLstsetInitBash%
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         % Put a rotated, bold, ttfamily "Bash" 
+         % Put a rotated, bold, ttfamily "Bash"
          % always in the right margin.
          % -----------------------------------------------------------------------
          \ifthenelse{\equal{\lyxNotebookNoCellLabels}{false}}{%
             %
-            % The \needspace command keeps the marginnote together with the listing 
+            % The \needspace command keeps the marginnote together with the listing
             % even on pagebreaks.
             %
             % The \leavevmode (or an empty \mbox{}) keeps the marginnote aligned
@@ -466,7 +466,7 @@ InsetLayout Flex:LyxNotebookCell:Init:Bash
             % probably needed, but it seems to work somewhat.  As a last
             % resort one could temporarily set \raggedbottom.
             %
-            % The use of two \marginnote commands (each with an empty slot) is to 
+            % The use of two \marginnote commands (each with an empty slot) is to
             % keep the margin note to the right, even when twosided styles are used.
             %
             \mbox{}%
@@ -478,7 +478,7 @@ InsetLayout Flex:LyxNotebookCell:Init:Bash
             %\marginpar[\rotatebox{-90}{\bfseries\ttfamily\tiny Bash}]{rrev}}
             %\marginpar[lplain]{\rotatebox{-90}{\bfseries\ttfamily\tiny Bash}}
             \nopagebreak%
-         } % end of do label-printing 
+         } % end of do label-printing
          {} % do nothing when lyxNotebookNoCellLabels is true
          % -----------------------------------------------------------------------
       }% end of lstnewenvironment starting code block
@@ -591,12 +591,12 @@ InsetLayout Flex:LyxNotebookCell:Standard:Bash
             \lyxNotebookLstsetStandardBash%
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         % Put a rotated, bold, ttfamily "Bash" 
+         % Put a rotated, bold, ttfamily "Bash"
          % always in the right margin.
          % -----------------------------------------------------------------------
          \ifthenelse{\equal{\lyxNotebookNoCellLabels}{false}}{%
             %
-            % The \needspace command keeps the marginnote together with the listing 
+            % The \needspace command keeps the marginnote together with the listing
             % even on pagebreaks.
             %
             % The \leavevmode (or an empty \mbox{}) keeps the marginnote aligned
@@ -605,7 +605,7 @@ InsetLayout Flex:LyxNotebookCell:Standard:Bash
             % probably needed, but it seems to work somewhat.  As a last
             % resort one could temporarily set \raggedbottom.
             %
-            % The use of two \marginnote commands (each with an empty slot) is to 
+            % The use of two \marginnote commands (each with an empty slot) is to
             % keep the margin note to the right, even when twosided styles are used.
             %
             \mbox{}%
@@ -617,7 +617,7 @@ InsetLayout Flex:LyxNotebookCell:Standard:Bash
             %\marginpar[\rotatebox{-90}{\bfseries\ttfamily\tiny Bash}]{rrev}}
             %\marginpar[lplain]{\rotatebox{-90}{\bfseries\ttfamily\tiny Bash}}
             \nopagebreak%
-         } % end of do label-printing 
+         } % end of do label-printing
          {} % do nothing when lyxNotebookNoCellLabels is true
          % -----------------------------------------------------------------------
       }% end of lstnewenvironment starting code block
@@ -695,7 +695,7 @@ InsetLayout Flex:LyxNotebookCell:Output:Bash
       \addtolength{\doubleskipamount}{2pt}
 
       \lstnewenvironment{lyxNotebookCellOutputBash}{
-         \nopagebreak % try to keep on the same page as standard cell above it 
+         \nopagebreak % try to keep on the same page as standard cell above it
          % -----------------------------------------------------------------------
          % Do color-related lstsets, according to user choice of color or not.
          % -----------------------------------------------------------------------
@@ -705,7 +705,7 @@ InsetLayout Flex:LyxNotebookCell:Output:Bash
             % --------------------------------------------------------------------
             \lstset{style=lyxNotebookNoColorOutputBash}
          } % end then section of ifthenelse
-         { 
+         {
             % -----------------------------------------------------------------------
             % Begin else section of ifthenelse, color formatting.
             % -----------------------------------------------------------------------
