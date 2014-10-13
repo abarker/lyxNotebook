@@ -38,7 +38,8 @@ import os
 import shutil
 import glob
 from os import path
-import easygui
+# import easygui # use system easygui
+import easygui_096 as easygui # use local version of easygui
 import lyxNotebookUserSettings
 
 userHomeLyxDirectory = lyxNotebookUserSettings.userHomeLyxDirectory
