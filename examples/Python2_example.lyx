@@ -145,7 +145,7 @@ for i in ["cat", "dog"]:
 
 \begin_layout Plain Layout
 
-        print i, j
+zZ3Qq        print i, j
 \end_layout
 
 \end_inset
@@ -153,6 +153,29 @@ for i in ["cat", "dog"]:
 
 \begin_inset Flex LyxNotebookCell:Output:PythonTwo
 status open
+
+\begin_layout Plain Layout
+
+>>> for i in ["cat", "dog"]:
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+     for j in ["pencil", "pen"]:
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+         print i, j
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+ 
+\end_layout
 
 \begin_layout Plain Layout
 
@@ -172,6 +195,16 @@ dog pencil
 \begin_layout Plain Layout
 
 dog pen
+\end_layout
+
+\begin_layout Plain Layout
+
+>>> pass
+\end_layout
+
+\begin_layout Plain Layout
+
+>>> 
 \end_layout
 
 \end_inset

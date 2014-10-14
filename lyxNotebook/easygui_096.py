@@ -1,4 +1,15 @@
 """
+
+Modifications by Allen Barker, 2014-10-14.
+
+- Added a function _get_screen_sizes to replace the calls to winfo_screenheight
+  and winfo_screenwidth which do not work correctly on multiple monitor setups.
+- Added a new kwarg sort_choices to choicebox and multichoicebox to allow users
+  to turn off sorting and duplicate-removal of the choice items.  The default
+  is currently True.
+
+========================
+
 @version: 0.96(2010-08-29)
 
 @note:
@@ -975,6 +986,7 @@ def denyWindowManagerClose():
 def multchoicebox(msg="Pick as many items as you like."
     , title=" "
     , choices=()
+    , sort_choices=True
     , **kwargs
     ):
     """
@@ -986,12 +998,13 @@ def multchoicebox(msg="Pick as many items as you like."
     @arg msg: the msg to be displayed.
     @arg title: the window title
     @arg choices: a list or tuple of the choices to be displayed
+    @arg sort_choices: whether to sort the choices and remove duplicates, defaults to True
     """
     if len(choices) == 0: choices = ["Program logic error - no choices were specified."]
 
     global __choiceboxMultipleSelect
     __choiceboxMultipleSelect = 1
-    return __choicebox(msg, title, choices)
+    return __choicebox(msg, title, choices, sort_choices=sort_choices)
 
 
 #-----------------------------------------------------------------------
@@ -1000,6 +1013,7 @@ def multchoicebox(msg="Pick as many items as you like."
 def choicebox(msg="Pick something."
     , title=" "
     , choices=()
+    , sort_choices=False
     ):
     """
     Present the user with a list of choices.
@@ -1009,12 +1023,35 @@ def choicebox(msg="Pick something."
     @arg msg: the msg to be displayed.
     @arg title: the window title
     @arg choices: a list or tuple of the choices to be displayed
+    @arg sort_choices: whether to sort the choices and remove duplicates, defaults to True
     """
     if len(choices) == 0: choices = ["Program logic error - no choices were specified."]
 
     global __choiceboxMultipleSelect
     __choiceboxMultipleSelect = 0
-    return __choicebox(msg,title,choices)
+    return __choicebox(msg, title, choices, sort_choices=sort_choices)
+
+
+def _get_screen_size():
+    """
+    The winfo_screenheight and winfo.screenwidth methods don't work well
+    when multiple monitors are used (the returned values stretch across
+    the monitors).  This function is a workaround.  It creates a temporary,
+    full-screen window and gets the size of that window, and returns it.
+    """
+    t = Tk() # new, temporary window
+    t.attributes('-fullscreen', True) # alb
+    #t.attributes('-zoomed', True) # could also use '-fullscreen'
+    t.update()
+    t.attributes("-alpha", 00) # transparent, if implemented
+    screen_height = t.winfo_height()
+    screen_width = t.winfo_width()
+    # The withdraw method will "Withdraw this widget from the screen such that it
+    # is unmapped and forgotten by the window manager."  Hopefully the garbage
+    # collector will then free any memory for t after we leave scope.
+    t.withdraw()
+    #t.destroy() # This displays the full-screen window briefly and looks bad.
+    return screen_width, screen_height
 
 
 #-----------------------------------------------------------------------
@@ -1023,6 +1060,7 @@ def choicebox(msg="Pick something."
 def __choicebox(msg
     , title
     , choices
+    , sort_choices
     ):
     """
     internal routine to support choicebox() and multchoicebox()
@@ -1045,7 +1083,7 @@ def __choicebox(msg
         choices[index] = str(choices[index])
 
     lines_to_show = min(len(choices), 20)
-    lines_to_show = 20
+    lines_to_show = 20 # alb why is this hardcoded after above line???
 
     if title == None: title = ""
 
@@ -1055,8 +1093,9 @@ def __choicebox(msg
 
     boxRoot = Tk()
     boxRoot.protocol('WM_DELETE_WINDOW', denyWindowManagerClose )
-    screen_width  = boxRoot.winfo_screenwidth()
-    screen_height = boxRoot.winfo_screenheight()
+    #screen_width  = boxRoot.winfo_screenwidth() # now call fun, alb
+    #screen_height = boxRoot.winfo_screenheight() # now call fun, alb
+    screen_width, screen_height = _get_screen_size()
     root_width    = int((screen_width * 0.8))
     root_height   = int((screen_height * 0.5))
     root_xpos     = int((screen_width * 0.1))
@@ -1129,21 +1168,21 @@ def __choicebox(msg
     # put the choices into the choiceboxWidget
     #---------------------------------------------------
     for index in range(len(choices)):
-        choices[index] = str(choices[index])
+        choices[index] = str(choices[index]) # alb seems redundant from above...
 
-    if runningPython3:
-        choices.sort(key=str.lower)
-    else:
-        choices.sort( lambda x,y: cmp(x.lower(),    y.lower())) # case-insensitive sort
+    if sort_choices:
+        if runningPython3:
+            choices.sort(key=str.lower)
+        else:
+            choices.sort(lambda x,y: cmp(x.lower(), y.lower())) # case-insensitive sort
 
     lastInserted = None
     choiceboxChoices = []
     for choice in choices:
-        if choice == lastInserted: pass
-        else:
-            choiceboxWidget.insert(END, choice)
-            choiceboxChoices.append(choice)
-            lastInserted = choice
+        if sort_choices and choice == lastInserted: continue
+        choiceboxWidget.insert(END, choice)
+        choiceboxChoices.append(choice)
+        lastInserted = choice
 
     boxRoot.bind('<Any-Key>', KeyboardListener)
 
@@ -1373,8 +1412,9 @@ def textbox(msg=""
 
     boxRoot.protocol('WM_DELETE_WINDOW', denyWindowManagerClose )
 
-    screen_width = boxRoot.winfo_screenwidth()
-    screen_height = boxRoot.winfo_screenheight()
+    #screen_width = boxRoot.winfo_screenwidth()
+    #screen_height = boxRoot.winfo_screenheight()
+    screen_width, screen_height = _get_screen_size() # replace above two lines
     root_width = int((screen_width * 0.8))
     root_height = int((screen_height * 0.5))
     root_xpos = int((screen_width * 0.1))

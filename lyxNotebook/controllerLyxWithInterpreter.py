@@ -351,21 +351,18 @@ class ControllerLyxWithInterpreter(object):
 
             if keyAction == "pop up submenu": # handle the pop-up menu option first
                 choices = []
-                count = 0
                 for (key, command) in keymap.allCommandsAndKeymap:
-                    count += 1 # easyGUI is limited in display; count keeps list ordered
                     if key is not None:
                         key = key.replace("Shift+", "S-") # this is to align columns
                         key += "_"*(8-len(key))
                     else:
                         key = "_"*8
-                    countStr = str(count).zfill(2) + "_"*5
-                    choices.append(countStr + key + "_"*5 + " " + command)
+                    choices.append(key + "_"*5 + " " + command)
                 choiceStr = eg.choicebox(
                     msg="Choose an action or click 'cancel'...",
                     title="LyX Notebook Submenu",
-                    choices=choices
-                )
+                    choices=choices,
+                    sort_choices=False)
                 if choiceStr is None: continue
                 choiceStr = choiceStr.split("_ ")[-1]
                 keyAction = choiceStr
