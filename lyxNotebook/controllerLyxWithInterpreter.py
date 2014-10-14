@@ -819,7 +819,6 @@ class ControllerLyxWithInterpreter(object):
         None for a non-code cell."""
 
         basicType, insetSpecifierLang = codeCellText.getCellType()
-        print("\ndebug basicType and insetSpecifierLang:", basicType, insetSpecifierLang, "\n")
         if basicType == "Output": # if not a code cell
             codeCellText.evaluationOutput = None
             return None

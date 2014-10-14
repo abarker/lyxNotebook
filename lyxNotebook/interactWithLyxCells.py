@@ -842,6 +842,7 @@ class InteractWithLyxCells(object):
                 cellList[-1].endLineNumber = latexFile.number
                 insideCell = False
             elif insideCell:
+                # TODO: detect multiple cookies inside a cell (here and below routine)
                 if line.find(self.magicCookie) == 0: # cell cookies must begin lines, too
                     cellList[-1].hasCookieInside = True
                     line = line.replace(self.magicCookie, "", 1) # replace one occurence
@@ -869,8 +870,6 @@ class InteractWithLyxCells(object):
         insideCell = False
         insideCellLayout = False
         setNextCellCookieLineBefore = -1
-        #lyxFile = open(filename, "r") # TODO: assigned but never used, since class TerminatedFile?
-        #foundEndDocument = False # TODO assigned but not used, since class TerminatedFile???
         while True:
             line = inFile.readline();
             if line == "": break
@@ -905,6 +904,7 @@ class InteractWithLyxCells(object):
                     if nextLine.rstrip() == r"\end_layout": break
                 insideCellLayout = False
                 line = "".join(cellLineComponents[1:-1]) + "\n" # components to one line
+                # TODO: detect multiple cookies inside a cell (here and above routine)
                 if line.find(self.magicCookie) == 0: # cell cookies must begin lines, too
                     cellList[-1].hasCookieInside = True
                     line = line.replace(self.magicCookie, "", 1) # replace one occurence
