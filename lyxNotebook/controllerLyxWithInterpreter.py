@@ -354,15 +354,17 @@ class ControllerLyxWithInterpreter(object):
                 for (key, command) in keymap.allCommandsAndKeymap:
                     if key is not None:
                         key = key.replace("Shift+", "S-") # this is to align columns
-                        key += "_"*(8-len(key))
+                        key += " "*(5-len(key))
                     else:
-                        key = "_"*8
-                    choices.append(key + "_"*5 + " " + command)
+                        key = " "*5
+                    choices.append(key + " " + command)
                 choiceStr = eg.choicebox(
                     msg="Choose an action or click 'cancel'...",
                     title="LyX Notebook Submenu",
                     choices=choices,
-                    sort_choices=False)
+                    sort_choices=False,
+                    monospace_font=True,
+                    lines_to_show=len(choices))
                 if choiceStr is None: continue
                 choiceStr = choiceStr.split("_ ")[-1]
                 keyAction = choiceStr

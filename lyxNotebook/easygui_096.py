@@ -7,6 +7,16 @@ Modifications by Allen Barker, 2014-10-14.
 - Added a new kwarg sort_choices to choicebox and multichoicebox to allow users
   to turn off sorting and duplicate-removal of the choice items.  The default
   is currently True.
+- Added a new kwarg monospace_font to choicebox and multichoicebox to allow
+  users to choose a monospaced font (which makes it easier to line things up if
+  needed).
+- Added a new kwarg lines_to_show to choicebox and multichoicebox to allow
+  users to choose the number of lines to attempt to show without scrollbars
+  (scrollbars will appear anyway if the window would not fit on the screen).
+- Tried adding a lines_to_show to textbox, but if it is set too large the OK
+  button disappears and the window freezes.  Seems to work when setting the
+  height to the len of the splitlines of the text plus one, but too many lines
+  and freeze.  So consider again later, maybe.
 
 ========================
 
@@ -987,6 +997,8 @@ def multchoicebox(msg="Pick as many items as you like."
     , title=" "
     , choices=()
     , sort_choices=True
+    , monospace_font=False
+    , lines_to_show=None
     , **kwargs
     ):
     """
@@ -999,12 +1011,15 @@ def multchoicebox(msg="Pick as many items as you like."
     @arg title: the window title
     @arg choices: a list or tuple of the choices to be displayed
     @arg sort_choices: whether to sort the choices and remove duplicates, defaults to True
+    @arg monospace_font: whether to use a monospaced font, defaults to False
+    @arg lines_to_show: num of lines to show before scrolling required
     """
     if len(choices) == 0: choices = ["Program logic error - no choices were specified."]
 
     global __choiceboxMultipleSelect
     __choiceboxMultipleSelect = 1
-    return __choicebox(msg, title, choices, sort_choices=sort_choices)
+    return __choicebox(msg, title, choices, sort_choices=sort_choices,
+            monospace_font=monospace_font, lines_to_show=lines_to_show)
 
 
 #-----------------------------------------------------------------------
@@ -1013,7 +1028,9 @@ def multchoicebox(msg="Pick as many items as you like."
 def choicebox(msg="Pick something."
     , title=" "
     , choices=()
-    , sort_choices=False
+    , sort_choices=True
+    , monospace_font=False
+    , lines_to_show=None
     ):
     """
     Present the user with a list of choices.
@@ -1024,26 +1041,32 @@ def choicebox(msg="Pick something."
     @arg title: the window title
     @arg choices: a list or tuple of the choices to be displayed
     @arg sort_choices: whether to sort the choices and remove duplicates, defaults to True
+    @arg monospace_font: whether to use a monospaced font, defaults to False
+    @arg lines_to_show: num of lines to show before scrolling required
     """
     if len(choices) == 0: choices = ["Program logic error - no choices were specified."]
 
     global __choiceboxMultipleSelect
     __choiceboxMultipleSelect = 0
-    return __choicebox(msg, title, choices, sort_choices=sort_choices)
+    return __choicebox(msg, title, choices, sort_choices=sort_choices,
+            monospace_font=monospace_font, lines_to_show=lines_to_show)
 
 
+#-----------------------------------------------------------------------
+# _get_screen_size
+#-----------------------------------------------------------------------
 def _get_screen_size():
     """
+    A utility function used by __choicebox and textbox.
     The winfo_screenheight and winfo.screenwidth methods don't work well
     when multiple monitors are used (the returned values stretch across
     the monitors).  This function is a workaround.  It creates a temporary,
-    full-screen window and gets the size of that window, and returns it.
+    full-screen window, gets the size of that window, and returns it.
     """
     t = Tk() # new, temporary window
-    t.attributes('-fullscreen', True) # alb
-    #t.attributes('-zoomed', True) # could also use '-fullscreen'
+    t.attributes('-fullscreen', True) # could also use '-zoomed'
     t.update()
-    t.attributes("-alpha", 00) # transparent, if implemented
+    t.attributes("-alpha", 00) # transparent, if transparency implemented
     screen_height = t.winfo_height()
     screen_width = t.winfo_width()
     # The withdraw method will "Withdraw this widget from the screen such that it
@@ -1061,6 +1084,8 @@ def __choicebox(msg
     , title
     , choices
     , sort_choices
+    , monospace_font
+    , lines_to_show
     ):
     """
     internal routine to support choicebox() and multchoicebox()
@@ -1082,8 +1107,11 @@ def __choicebox(msg
     for index in range(len(choices)):
         choices[index] = str(choices[index])
 
-    lines_to_show = min(len(choices), 20)
-    lines_to_show = 20 # alb why is this hardcoded after above line???
+    if not lines_to_show:
+        lines_to_show = min(len(choices), 20)
+        # alb why was below hardcoded after the above line? Maybe just make
+        # a default argument value instead of setting at all?
+        lines_to_show = 20
 
     if title == None: title = ""
 
@@ -1143,7 +1171,13 @@ def __choicebox(msg
     if __choiceboxMultipleSelect:
         choiceboxWidget.configure(selectmode=MULTIPLE)
 
-    choiceboxWidget.configure(font=(PROPORTIONAL_FONT_FAMILY,PROPORTIONAL_FONT_SIZE))
+    if monospace_font:
+       choiceboxWidget.configure(font=(MONOSPACE_FONT_FAMILY, MONOSPACE_FONT_SIZE))
+       # TODO alb: in this case we can calculate the width and height, maybe
+       # MONOSPACE_FONT_SIZE, set to 9 above, is propto pixels directly?
+       # See textbox which sets the width as character_width variable...
+    else:
+       choiceboxWidget.configure(font=(PROPORTIONAL_FONT_FAMILY,PROPORTIONAL_FONT_SIZE))
 
     # add a vertical scrollbar to the frame
     rightScrollbar = Scrollbar(choiceboxFrame, orient=VERTICAL, command=choiceboxWidget.yview)
@@ -1412,9 +1446,9 @@ def textbox(msg=""
 
     boxRoot.protocol('WM_DELETE_WINDOW', denyWindowManagerClose )
 
-    #screen_width = boxRoot.winfo_screenwidth()
-    #screen_height = boxRoot.winfo_screenheight()
-    screen_width, screen_height = _get_screen_size() # replace above two lines
+    #screen_width = boxRoot.winfo_screenwidth() # now call fun, alb
+    #screen_height = boxRoot.winfo_screenheight() # now call fun, alb
+    screen_width, screen_height = _get_screen_size() # replaces above two lines
     root_width = int((screen_width * 0.8))
     root_height = int((screen_height * 0.5))
     root_xpos = int((screen_width * 0.1))
