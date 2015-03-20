@@ -16,7 +16,8 @@ Modifications by Allen Barker, 2014-10-14.
 - Tried adding a lines_to_show to textbox, but if it is set too large the OK
   button disappears and the window freezes.  Seems to work when setting the
   height to the len of the splitlines of the text plus one, but too many lines
-  and freeze.  So consider again later, maybe.
+  and freeze.  So consider again later, maybe.  What about just adding the
+  lines one by one after END, like in __choicebox?
 
 ========================
 

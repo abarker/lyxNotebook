@@ -540,10 +540,12 @@ print
 status open
 
 \begin_layout Plain Layout
+
 5
 \end_layout
 
 \begin_layout Plain Layout
+
 'A triple quote comment!
 \backslash
 n           across lines
@@ -554,6 +556,7 @@ n'
 \end_layout
 
 \begin_layout Plain Layout
+
 another print 5
 \end_layout
 
@@ -562,6 +565,7 @@ another print 5
 \end_layout
 
 \begin_layout Plain Layout
+
 print after blank line
 \end_layout
 
@@ -1201,22 +1205,22 @@ status open
 
 \begin_layout Plain Layout
 
-[<matplotlib.lines.Line2D object at 0x7f2929dad750>]
+[<matplotlib.lines.Line2D object at 0x7f1a29a91610>]
 \end_layout
 
 \begin_layout Plain Layout
 
-<matplotlib.text.Text object at 0x7f2929e004d0>
+<matplotlib.text.Text object at 0x7f1a29a5a6d0>
 \end_layout
 
 \begin_layout Plain Layout
 
-<matplotlib.text.Text object at 0x7f292999ca10>
+<matplotlib.text.Text object at 0x7f1a29b77890>
 \end_layout
 
 \begin_layout Plain Layout
 
-<matplotlib.text.Text object at 0x7f2934654450>
+<matplotlib.text.Text object at 0x7f1a29bb0b10>
 \end_layout
 
 \end_inset

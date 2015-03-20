@@ -44,6 +44,7 @@ import datetime
 import getpass
 import random
 import string # just for generating random filenames
+import easygui_096 as eg
 import lyxNotebookUserSettings
 
 
@@ -1098,10 +1099,12 @@ class InteractWithLyxCells(object):
         for cell in allCells:
             if cell.hasCookieInside:
                 if foundCookie:
-                    print("\n\nWARNING: multiple cells have cookies inside them."
+                    err_msg = ("\n\nWARNING: multiple cells have cookies inside them."
                           "\nNot performing the operation.  Globally delete the"
                           "\ncookie string " + self.magicCookie + " from the"
-                          " document and try again.\n", file=sys.stderr)
+                          " document and try again.\n")
+                    print(err_msg, file=sys.stderr)
+                    eg.msgbox(msg=err_msg, title="LyX Notebook", ok_button="OK")
                     return None
                 foundCookie = True
                 returnCell = cell
