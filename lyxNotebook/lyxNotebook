@@ -35,10 +35,10 @@ myCWD = os.getcwd()
 callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
 lyxNotebookUserSettings.lyxNotebookSourceDir = os.path.dirname(callingCommand)
 
-# do below import *after* the calculations above, since implicitly import interpreterSpecs
+# Do below import *after* the calculations above, since implicitly import interpreterSpecs
 from controllerLyxWithInterpreter import *
 
-# set the lockfile location to be in the user's local Lyx directory
+# Set the lockfile location to be in the user's local Lyx directory.
 userHomeLyxDirectory = lyxNotebookUserSettings.userHomeLyxDirectory
 lockfilePath = os.path.expanduser(
     os.path.join(userHomeLyxDirectory, "lyxNotebook.lockfile"))
@@ -49,23 +49,23 @@ lockfilePath = os.path.expanduser(
 # http://shoaibmir.wordpress.com/2009/12/14/pid-lock-file-in-python/
 #
 
-# first check if a lock file already exists
+# First check if a lock file already exists.
 if os.path.exists(lockfilePath):
-    # if the lockfile is already there then check the PID number in the lock file
+    # If the lockfile is already there then check the PID number in the lock file.
     pidfile = open(lockfilePath, "r")
     pidfile.seek(0)
     oldPID = pidfile.readline()
-    # check if the PID from the lock file matches the current process PID
+    # Check if the PID from the lock file matches the current process PID.
     if os.path.exists(os.path.join("/proc", oldPID)):
         print("You already have an instance of LyX Notebook running.")
         print("It is running as process", oldPID + ".  Exiting.")
-        time.sleep(4) # for when a new terminal opened, so message can be read
+        time.sleep(4) # For when a new terminal opened, so message can be read.
         sys.exit(1)
     else:
-        # lock file exists but the program is not running... remove it
+        # Lock file exists but the program is not running... remove it.
         os.remove(lockfilePath)
 
-# put the current PID in the lock file
+# Put the current PID in the lock file.
 pidfile = open(lockfilePath, "w")
 pidfile.write(str(os.getpid()))
 pidfile.close()
