@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 """
 =========================================================================
 This file is part of LyX Notebook, which works with LyX but is an
@@ -36,6 +36,14 @@ http://www.koders.com/cpp/fidB982EF8F5299023FC858C1BB857347440F3A5302.aspx?s=vec
 
 """
 
+# TODO it is probably doable to delete all magic cookies inside cells
+# using lfuns.  First, detect extraneous ones.  Then, 1) goto beginning
+# and 2) do word-find-forward <magicCookie> 3) test if inside a cell
+# 4) if so, do char-delete-forward which should delete the full highlighted
+# (char-delete-backward does the same).  5) repeat the whole process until
+# it works, unless there is some way to detect failure in word-find-forward
+# in which case you can just do that part again until it fails.
+
 from __future__ import print_function, division
 import sys
 import os
@@ -47,6 +55,8 @@ import string # just for generating random filenames
 import easygui_096 as eg
 import lyxNotebookUserSettings
 
+# This file is repeatedly written temporarily to current dir, then deleted.
+tmp_saved_lyx_file_name = "tmp_save_file_lyx_notebook_xxxxx.lyxnotebook"
 
 class Cell(list):
 
@@ -773,19 +783,18 @@ class InteractWithLyxCells(object):
         """Returns a list of Cell data structures containing the text for each
         cell in the current buffer.  Always updates the file before reading it.
         It can read either from a locally exported .tex Latex file (with
-        useLatexExport=True) or from the current .lyx auto-save file (after a
-        buffer-auto-save operation).  If there is no auto-save file after an
-        auto-save operation the buffer's file itself is used (it is assumed to
-        have no changes but a buffer-save is tried just in case).  The default is
-        to use the auto-save buffer method."""
+        useLatexExport=True) or from a Lyx-format file saved temporarily to
+        the current directory.  The Lyx-format version is currently preferred,
+        and the older Latex version may now need minor fixes."""
 
-        # note getUpdatedLyxDirectoryData 1) changes current dir to buffer's dir,
-        # and 2) writes fresh auto-save file if possible
+        # Note getUpdatedLyxDirectoryData changes current dir to buffer's dir.
         (bufferDirName,
          bufferFileName,
-         autoSaveFileName, fullPath) = self.getUpdatedLyxDirectoryData()
+         autoSaveFileName,
+         fullPath) = self.getUpdatedLyxDirectoryData()
+
         if useLatexExport:
-            # always export to local Latex file, and wait only briefly
+            # Export to local Latex file, and wait only briefly
             # TODO can use fullPath now instead of re-join
             absLocalFilePath = os.path.join(bufferDirName, self.localLatexFilename)
             if os.path.exists(absLocalFilePath): os.remove(absLocalFilePath)
@@ -801,6 +810,15 @@ class InteractWithLyxCells(object):
             if os.path.exists(self.localLatexFilename):
                 os.remove(self.localLatexFilename)
         else:
+            # Export temporarily to a local file.
+            full_tmp_name = os.path.join(bufferDirName, tmp_saved_lyx_file_name)
+            self.processLfun("buffer-export-custom",  
+                             "lyx mv $$FName " + full_tmp_name, warnERROR=True)
+            time.sleep(0.05) # let write get a slight head start before any reading
+            allCells = self.getAllCellTextFromLyxFile(full_tmp_name)
+            if os.path.exists(tmp_saved_lyx_file_name): os.remove(tmp_saved_lyx_file_name)
+            """
+            # old below, delete soon
             if autoSaveFileName != "": # there is an auto-save file
                 time.sleep(0.05) # let write get a slight head start before any reading
                 allCells = self.getAllCellTextFromLyxFile(autoSaveFileName)
@@ -808,6 +826,7 @@ class InteractWithLyxCells(object):
                 self.processLfun("buffer-write", warnERROR=False)
                 time.sleep(0.05) # let write get a slight head start before any reading
                 allCells = self.getAllCellTextFromLyxFile(bufferFileName)
+            """
         return allCells
 
     def getAllCellTextFromLatex(self, filename):
@@ -1011,7 +1030,7 @@ class InteractWithLyxCells(object):
         outFile.close()
         return
 
-    def getUpdatedLyxDirectoryData(self, autoSaveUpdate=True):
+    def getUpdatedLyxDirectoryData(self, autoSaveUpdate=False):
         """
         This function returns a tuple of the form:
            (<currentBufferFileDirectory>,<currentBufferFilename>,
@@ -1092,7 +1111,6 @@ class InteractWithLyxCells(object):
         if not self.insideCell(): return None # return None if not in a cell
         self.insertMagicCookieInsideCurrent(assertInsideCell=True,
                                             onCurrentLine=True)
-
         allCells = self.getAllCellText(useLatexExport=useLatexExport)
         self.deleteMagicCookieInsideCurrent(assertCursorAtCookieEnd=True)
         foundCookie = False
@@ -1245,7 +1263,8 @@ class InteractWithLyxCells(object):
         # update the Latex and get the name of the file it was exported to
         (currentBufferFileDirectory,
          currentBufferFilename,
-         autoSaveFilename, fullPath) = self.getUpdatedLyxDirectoryData()
+         autoSaveFilename,
+         fullPath) = self.getUpdatedLyxDirectoryData()
 
         # get all the cells and open the file with name filename
         allCells = self.getAllCellText()
@@ -1317,11 +1336,11 @@ class InteractWithLyxCells(object):
 
         # old implementation in comment-string below works, not as portable, Unix-based
         """
-      # Note the last char in options to ls is the number 1, not the letter l.
-      lsCmd = r"ls -ct1 *.{" + graphicFormats + "} 2>/dev/null"
-      f = os.popen(lsCmd)
-      mostRecent = f.readline().strip() # get first listed, strip off whitespace (\n)
-      """
+        # Note the last char in options to ls is the number 1, not the letter l.
+        lsCmd = r"ls -ct1 *.{" + graphicFormats + "} 2>/dev/null"
+        f = os.popen(lsCmd)
+        mostRecent = f.readline().strip() # get first listed, strip off whitespace (\n)
+        """
 
         if mostRecent == "":
             print("No graphics files found in current directory!")

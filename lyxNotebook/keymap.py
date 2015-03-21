@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 
 This file only contains the keymap for Lyx Notebook.  The keys can be

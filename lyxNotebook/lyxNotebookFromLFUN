@@ -37,7 +37,10 @@ import subprocess
 # import time
 import os
 import sys
+import platform
 import lyxNotebookUserSettings
+
+python_version = platform.python_version_tuple()
 
 # The lyxCommandString should match whatever Lyx runs as when the command "ps -f"
 # is run.  If this process is not found then an xterm will be opened (so setting
@@ -57,9 +60,9 @@ runPath = os.path.join(lyxNotebookSourceDir, "lyxNotebook")
 
 # Utility function to get command output, for portability and future development.
 
-
 def getCommandOutput(commandAndArgList):
-    python2_7orLater = False # assume this for now for portability
+    if python_version[0] > 2 or python_version[1] > 6:
+        python2_7orLater = True
     if python2_7orLater:
         # This is the "right" way, but only works in Python 2.7 and later.
         return subprocess.check_output(commandAndArgList)
@@ -141,7 +144,6 @@ myLyxProcsWithTerminals = [p for p in myLyxProcs if p[ttyCol] != "?"]
 
 # Try opening ttys to select only a user-accessible one
 # (su to another user inside a terminal causes a fail, for example)
-
 
 def ttyIsWriteable(ttyName):
     try:

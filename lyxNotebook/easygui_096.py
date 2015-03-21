@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 
 Modifications by Allen Barker, 2014-10-14.
