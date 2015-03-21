@@ -61,7 +61,7 @@ runPath = os.path.join(lyxNotebookSourceDir, "lyxNotebook")
 # Utility function to get command output, for portability and future development.
 
 def getCommandOutput(commandAndArgList):
-    if python_version[0] > 2 or python_version[1] > 6:
+    if int(python_version[0]) > 2 or int(python_version[1]) > 6:
         python2_7orLater = True
     if python2_7orLater:
         # This is the "right" way, but only works in Python 2.7 and later.
