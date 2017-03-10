@@ -160,10 +160,8 @@ for oldModuleFile in dotModuleFiles: # delete the old .module files
 #os.system("python generateModuleFilesFromTemplate.py")
 # TODO Below is a temporary refactoring step to clean up the whole setup and
 # not use os.system.
-sys.path.insert(0, ".") # We did a chdir above to the dir.
 from generateModuleFilesFromTemplate import generate_files_from_templates
 generate_files_from_templates()
-del sys.path[0]
 
 # Copy all the .module files to the layouts directory.
 print("\nCopying the regenerated .module files to the LyX layouts directory.")
