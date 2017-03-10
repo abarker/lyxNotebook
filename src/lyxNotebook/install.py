@@ -1,6 +1,7 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 """
+
 =========================================================================
 This file is part of LyX Notebook, which works with LyX but is an
 independent project.  License details (MIT) can be found in the file
@@ -50,7 +51,7 @@ userHomeLyxDirectoryExpanded = path.expanduser(userHomeLyxDirectory)
 print("="*70)
 print("\nStarting the install and setup of LyX Notebook...\n")
 
-# find the Lyx Notebook source directory from the invoking pathname and cwd
+# Find the Lyx Notebook source directory from the invoking pathname and cwd.
 invokingCommand = path.expanduser(sys.argv[0])
 cwd = os.getcwd()
 absPathToSetupProg = path.join(cwd, invokingCommand) # TODO see utilities.py
@@ -63,10 +64,10 @@ print("\nThe path of the Lyx Notebook source directory relative to home is:\n   
       sourceDirWithTilde, "\n")
 
 #
-# User-modifiable key-binding file (TODO: better as a fun or 3)
+# User-modifiable key-binding file (TODO: better as a fun or 3).
 #
 
-# process the user-modifiable bind file to load the path of the Lyx Notebook bindings
+# Process the user-modifiable bind file to load the path of the Lyx Notebook bindings.
 bindTemplatePathname = path.join(
     sourceDir, "filesForDotLyxDir", "userCustomizableKeyBindings.template")
 bindTemplate = open(bindTemplatePathname, "r")
@@ -75,7 +76,7 @@ bindTemplate.close()
 bindContentsStr = bindContentsStr.replace("<<userHomeLyxDirectory>>",
                          lyxNotebook_user_settings.userHomeLyxDirectory) # not expanded
 
-# write out the final user-modifiable .bind file
+# Write out the final user-modifiable .bind file.
 bindFilePathname = path.join(
     sourceDir, "filesForDotLyxDir", "userCustomizableKeyBindings.bind")
 bindFile = open(bindFilePathname, "w")
@@ -84,7 +85,7 @@ bindFile.close()
 print("Generated the key-binding file\n   ",
       bindFilePathname, "\nfrom the corresponding .template file.")
 
-# copy the user-modifiable .bind file to the userHomeLyxDirectory
+# Copy the user-modifiable .bind file to the userHomeLyxDirectory.
 bindFileDest = path.join(
     userHomeLyxDirectoryExpanded, "userCustomizableKeyBindings.bind")
 yesno = 1
@@ -105,7 +106,7 @@ os.remove(bindFilePathname) # delete local copy to avoid confusion
 # Note that the LFUN to run prog *requires* a full pathname, not a relative one.
 #
 
-# process the Lyx Notebook bind file to contain the path of the user's source directory
+# Process the Lyx Notebook bind file to contain the path of the user's source directory.
 bindTemplatePathname = path.join(
     sourceDir, "filesForDotLyxDir", "lyxNotebookKeyBindings.template")
 bindTemplate = open(bindTemplatePathname, "r")
@@ -114,7 +115,7 @@ bindTemplate.close()
 bindContentsStr = bindContentsStr.replace("<<absPathToLyxNotebookSourceDir>>",
                                           sourceDir) # must be absolute path
 
-# write out the final Lyx Notebook .bind file
+# Write out the final Lyx Notebook .bind file.
 bindFilePathname = path.join(
     sourceDir, "filesForDotLyxDir", "lyxNotebookKeyBindings.bind")
 bindFile = open(bindFilePathname, "w")
@@ -123,7 +124,7 @@ bindFile.close()
 print("Generated the key-binding file\n   ",
       bindFilePathname, "\nfrom the corresponding .template file.")
 
-# copy the Lyx Notebook .bind file to the userHomeLyxDirectory
+# Copy the Lyx Notebook .bind file to the userHomeLyxDirectory.
 bindFileDest = path.join(
     userHomeLyxDirectoryExpanded, "lyxNotebookKeyBindings.bind")
 yesno = 1
@@ -143,20 +144,28 @@ os.remove(bindFilePathname) # delete local copy to avoid confusion
 # The .module files
 #
 
-# go to the directory for .module files
+# Go to the directory for .module files.
 modulesDirectory = path.join(sourceDir, "filesForDotLyxLayoutsDir")
 os.chdir(modulesDirectory)
 
-# regenerate all the .module files, in case the user changed interpreter_specs.py
+# First remove any old .module files in that directory.
 print("Regenerating all the .module files:")
 dotModuleFiles = glob.glob("*.module")
 for oldModuleFile in dotModuleFiles: # delete the old .module files
     os.remove(oldModuleFile)
     installed = os.path.join(userHomeLyxDirectoryExpanded, "layouts", oldModuleFile)
     if os.path.exists(installed): os.remove(installed)
-os.system("python generateModuleFilesFromTemplate.py")
 
-# copy all the .module files to the layouts directory
+# Regenerate all the .module files, in case the user changed interpreter_specs.py.
+#os.system("python generateModuleFilesFromTemplate.py")
+# TODO Below is a temporary refactoring step to clean up the whole setup and
+# not use os.system.
+sys.path.insert(0, ".") # We did a chdir above to the dir.
+from generateModuleFilesFromTemplate import generate_files_from_templates
+generate_files_from_templates()
+del sys.path[0]
+
+# Copy all the .module files to the layouts directory.
 print("\nCopying the regenerated .module files to the LyX layouts directory.")
 dotModuleFiles = glob.glob("*.module")
 for newModuleFile in dotModuleFiles:
@@ -199,7 +208,10 @@ document.  The cells themselves can then be found on the menu:
 Press F12 in LyX to start the LyX Notebook program (Shift+F12 to kill it)
 Press F1 for a menu of all the commands and their current key bindings.
 See the documentation file lyxNotebookDocs.pdf for further information.
+
 """
+
 print("="*70)
 print("\n" + text)
 easygui.textbox(msg=msg, text=text, title="LyX Notebook Setup")
+

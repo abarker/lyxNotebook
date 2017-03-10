@@ -10,6 +10,13 @@ Copyright (c) 2012 Allen Barker
 
 Generate all the `.module` files from templates.
 
+This file is basically a standalone script.  It is run from `install.py` as an
+`os.system` call.  It only imports from `interpreter_specs`.
+
+All file reads and writes are from the Python current working directory.
+This module expects that the CWD will be the `filesForDotLyxLayoutsDir`
+directory!
+
 """
 
 from __future__ import print_function, division
@@ -427,77 +434,81 @@ End
 # ==========================================================================
 #
 
-# first do the Listings redefinition, since it just needs to be written out
-with open("lyxNotebookListingsWithSmallFont.module", "w") as f:
-    f.write(listings_with_small_font)
+def generate_files_from_templates():
 
-# now do all the other modules, one for each interpreter specification
-for spec in allSpecs:
-    preambleLatexCode = spec.preambleLatexCode
-    insetSpecifier = spec.params["insetSpecifier"]
-    progName = spec.params["progName"]
-    lstLanguage = spec.params["listingsLanguage"]
+    # first do the Listings redefinition, since it just needs to be written out
+    with open("lyxNotebookListingsWithSmallFont.module", "w") as f:
+        f.write(listings_with_small_font)
 
-    print("running for insetSpecifier=" + insetSpecifier
-          + ",  progName=" + progName + ",  listingsLanguage=" + lstLanguage)
+    # now do all the other modules, one for each interpreter specification
+    for spec in allSpecs:
+        preambleLatexCode = spec.preambleLatexCode
+        insetSpecifier = spec.params["insetSpecifier"]
+        progName = spec.params["progName"]
+        lstLanguage = spec.params["listingsLanguage"]
 
-    headCommon = module_header_template_common
-    headDependent = module_header_template_basic_cell_type_dependent
-    init = standard_template
-    standard = standard_template
-    output = output_template
+        print("running for insetSpecifier=" + insetSpecifier
+              + ",  progName=" + progName + ",  listingsLanguage=" + lstLanguage)
 
-    # replace meta-vars in the common header section
-    headCommon = headCommon.replace("<<tripleQuote>>", "\"\"\"")
-    headCommon = headCommon.replace("<<insetSpecifier>>", insetSpecifier)
-    headCommon = headCommon.replace("<<progName>>", progName)
-    headCommon = headCommon.replace("<<lstLanguage>>", lstLanguage)
+        headCommon = module_header_template_common
+        headDependent = module_header_template_basic_cell_type_dependent
+        init = standard_template
+        standard = standard_template
+        output = output_template
 
-    head = headCommon
+        # replace meta-vars in the common header section
+        headCommon = headCommon.replace("<<tripleQuote>>", "\"\"\"")
+        headCommon = headCommon.replace("<<insetSpecifier>>", insetSpecifier)
+        headCommon = headCommon.replace("<<progName>>", progName)
+        headCommon = headCommon.replace("<<lstLanguage>>", lstLanguage)
 
-    # replace meta-vars in dependent header, one copy for each basicCellType
-    # NOTE that we could have just treated the sections as <<...>> vars in headCommon
-    for basicCellType in ["Init", "Standard", "Output"]:
-        headTmp = headDependent
-        headTmp = headTmp.replace("<<tripleQuote>>", "\"\"\"")
-        headTmp = headTmp.replace("<<insetSpecifier>>", insetSpecifier)
-        headTmp = headTmp.replace("<<progName>>", progName)
-        headTmp = headTmp.replace("<<lstLanguage>>", lstLanguage)
-        headTmp = headTmp.replace("<<basicCellType>>", basicCellType)
-        head += headTmp
+        head = headCommon
 
-    # replace certain meta-vars in preambleLatexCode
-    preambleLatexCode = preambleLatexCode.replace("<<tripleQuote>>", "\"\"\"")
-    preambleLatexCode = preambleLatexCode.replace("<<insetSpecifier>>", insetSpecifier)
-    preambleLatexCode = preambleLatexCode.replace("<<progName>>", progName)
-    preambleLatexCode = preambleLatexCode.replace("<<lstLanguage>>", lstLanguage)
+        # replace meta-vars in dependent header, one copy for each basicCellType
+        # NOTE that we could have just treated the sections as <<...>> vars in headCommon
+        for basicCellType in ["Init", "Standard", "Output"]:
+            headTmp = headDependent
+            headTmp = headTmp.replace("<<tripleQuote>>", "\"\"\"")
+            headTmp = headTmp.replace("<<insetSpecifier>>", insetSpecifier)
+            headTmp = headTmp.replace("<<progName>>", progName)
+            headTmp = headTmp.replace("<<lstLanguage>>", lstLanguage)
+            headTmp = headTmp.replace("<<basicCellType>>", basicCellType)
+            head += headTmp
 
-    # now we have the full .module file header (stuff before any InsetLayout commands)
-    head += preambleLatexCode + module_header_template_end
+        # replace certain meta-vars in preambleLatexCode
+        preambleLatexCode = preambleLatexCode.replace("<<tripleQuote>>", "\"\"\"")
+        preambleLatexCode = preambleLatexCode.replace("<<insetSpecifier>>", insetSpecifier)
+        preambleLatexCode = preambleLatexCode.replace("<<progName>>", progName)
+        preambleLatexCode = preambleLatexCode.replace("<<lstLanguage>>", lstLanguage)
 
-    # replace meta-vars in standard template
-    standard = standard.replace("<<tripleQuote>>", "\"\"\"")
-    standard = standard.replace("<<insetSpecifier>>", insetSpecifier)
-    standard = standard.replace("<<progName>>", progName)
-    standard = standard.replace("<<labelModifier>>", "") # just Code, no special label
-    standard = standard.replace("<<lstLanguage>>", lstLanguage)
-    standard = standard.replace("<<basicCellType>>", "Standard")
+        # now we have the full .module file header (stuff before any InsetLayout commands)
+        head += preambleLatexCode + module_header_template_end
 
-    # replace meta-vars in init template
-    # init cells are currently identical to standard cells except for the frame spec
-    init = init.replace("<<tripleQuote>>", "\"\"\"")
-    init = init.replace("<<insetSpecifier>>", insetSpecifier)
-    init = init.replace("<<progName>>", progName)
-    init = init.replace("<<labelModifier>>", "Init") # use "Init Code" on inset label
-    init = init.replace("<<lstLanguage>>", lstLanguage)
-    init = init.replace("<<basicCellType>>", "Init")
+        # replace meta-vars in standard template
+        standard = standard.replace("<<tripleQuote>>", "\"\"\"")
+        standard = standard.replace("<<insetSpecifier>>", insetSpecifier)
+        standard = standard.replace("<<progName>>", progName)
+        standard = standard.replace("<<labelModifier>>", "") # just Code, no special label
+        standard = standard.replace("<<lstLanguage>>", lstLanguage)
+        standard = standard.replace("<<basicCellType>>", "Standard")
 
-    # replace meta-vars in output template
-    output = output.replace("<<insetSpecifier>>", insetSpecifier)
-    output = output.replace("<<progName>>", progName)
-    output = output.replace("<<basicCellType>>", "Output")
+        # replace meta-vars in init template
+        # init cells are currently identical to standard cells except for the frame spec
+        init = init.replace("<<tripleQuote>>", "\"\"\"")
+        init = init.replace("<<insetSpecifier>>", insetSpecifier)
+        init = init.replace("<<progName>>", progName)
+        init = init.replace("<<labelModifier>>", "Init") # use "Init Code" on inset label
+        init = init.replace("<<lstLanguage>>", lstLanguage)
+        init = init.replace("<<basicCellType>>", "Init")
 
-    # write concat of all templates to correct output file
-    with open("lyxNotebookCell"+insetSpecifier+".module", "w") as f:
-        f.write(head + init + standard + output)
+        # replace meta-vars in output template
+        output = output.replace("<<insetSpecifier>>", insetSpecifier)
+        output = output.replace("<<progName>>", progName)
+        output = output.replace("<<basicCellType>>", "Output")
+
+        # write concat of all templates to correct output file
+        with open("lyxNotebookCell"+insetSpecifier+".module", "w") as f:
+            f.write(head + init + standard + output)
+
+generate_files_from_templates()
 
