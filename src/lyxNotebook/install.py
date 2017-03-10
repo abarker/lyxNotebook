@@ -157,10 +157,7 @@ for oldModuleFile in dotModuleFiles: # delete the old .module files
     if os.path.exists(installed): os.remove(installed)
 
 # Regenerate all the .module files, in case the user changed interpreter_specs.py.
-#os.system("python generateModuleFilesFromTemplate.py")
-# TODO Below is a temporary refactoring step to clean up the whole setup and
-# not use os.system.
-from generateModuleFilesFromTemplate import generate_files_from_templates
+from generate_module_files_from_template import generate_files_from_templates
 generate_files_from_templates()
 
 # Copy all the .module files to the layouts directory.
@@ -171,6 +168,7 @@ for newModuleFile in dotModuleFiles:
         userHomeLyxDirectoryExpanded, "layouts", newModuleFile)
     shutil.copyfile(newModuleFile, pathInLayoutsDir)
 
+# Finished the first phase.
 msg = "Finished the first phase of the setup."
 text = """Finished the first phase of the LyX Notebook setup.  Next do the following
 steps to finish the setup.  (You can keep this window open as a reminder.)

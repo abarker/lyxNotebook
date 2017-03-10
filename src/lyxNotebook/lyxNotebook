@@ -38,7 +38,7 @@ callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
 lyxNotebook_user_settings.lyxNotebookSourceDir = os.path.dirname(callingCommand)
 
 # Do below import *after* the calculations above, since implicitly import interpreter_specs
-from controller_lyx_with_interpreter import *
+from controller_lyx_with_interpreter import ControllerLyxWithInterpreter
 
 # Set the lockfile location to be in the user's local Lyx directory.
 userHomeLyxDirectory = lyxNotebook_user_settings.userHomeLyxDirectory
