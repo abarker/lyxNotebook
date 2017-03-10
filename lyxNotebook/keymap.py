@@ -6,11 +6,11 @@ arbitrarily set by changing them from this file (though, of course, collisions
 with other key mappings and convenience should be considered).
 
 Any key which is bound to a Lyx Notebook function should also be bound to the
-Lyx LFUN "server-notify" in the Lyx .bind file (which the install program creates
-as lyxNotebookKeyBindings.bind in the user's Lyx home directory)!
+Lyx LFUN "server-notify" in the Lyx `.bind` file (which the install program creates
+as `lyxNotebookKeyBindings.bind` in the user's Lyx home directory)!
 
 To modify a key mapping in this file, simply change the string (or the None value)
-in the first component of a 2-tuple in the list "allCommandsAndKeymap" below.
+in the first component of a 2-tuple in the list `allCommandsAndKeymap` below.
 The associated command strings in the second component of the 2-tuples should
 not be changed at all, or bugs will occur.
 
@@ -26,7 +26,7 @@ To avoid collisions with the "usual" mappings, see, e.g.,
    http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
 for which keys are used by the OS.  Beware alt-F4 in KDE, close window.  The
 default LyX bindings can be found in whatever .bind file is being used, such
-as cua.bind in the Lyx system (try "locate cua.bind" on the command line).
+as `cua.bind` in the Lyx system (try "locate cua.bind" on the command line).
 
 Note that the F9 and F10 keys are unavailable in KDE: they are the window walk
 forward/backward keys.

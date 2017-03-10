@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
+
 User-modifiable settings for the Lyx Notebook program.
+
 """
 
 

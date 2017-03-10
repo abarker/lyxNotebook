@@ -8,23 +8,23 @@ COPYING.
 Copyright (c) 2012 Allen Barker
 =========================================================================
 
-This module contains the implementation of the class InteractWithLyxCells which
+This module contains the implementation of the class `InteractWithLyxCells` which
 is responsible for all interactions with the running Lyx process (via the Lyx
 server).  It contains various methods for operating on cells in Lyx documents:
 getting their text, operating on them, replacing them, etc.
 
-For info on Lyx server in general, see
+For info on Lyx server in general, see::
    http://wiki.lyx.org/LyX/LyXServer
 
 Note that the Lyx server accepts commands on the input pipe as ASCII text, in
-the format:
+the format::
        LYXCMD:clientname:function:argument
-It sends back replies which have the format
+It sends back replies which have the format::
        INFO:clientname:function:data
-unless there is an error, in which case the format is
+unless there is an error, in which case the format is::
        ERROR:clientname:function:error message
 
-The server-notify events which are sent out from Lyx only have two fields:
+The server-notify events which are sent out from Lyx only have two fields::
        NOTIFY:<key pressed>
 
 
@@ -53,7 +53,7 @@ import getpass
 import random
 import string # just for generating random filenames
 import easygui_096 as eg
-import lyxNotebookUserSettings
+import lyxNotebook_user_settings
 
 # This file is repeatedly written temporarily to current dir, then deleted.
 tmp_saved_lyx_file_name = "tmp_save_file_lyx_notebook_xxxxx.lyxnotebook"
@@ -63,6 +63,9 @@ class Cell(list):
     """Simple container class derived from a list.  It is meant to hold lines
     of text corresponding to the contents of a cell.  The line numbers are
     relative to Latex files (when the cell text is extracted from such files)."""
+    # TODO: maybe go back to list as internal, using composition.  Inheriting
+    # from list isn't a great idea.  General list operations return lists,
+    # not Cell subclasses.
 
     def __init__(self):
         # TODO call __init__ method from base class list, or don't inherit from list
@@ -194,9 +197,9 @@ class InteractWithLyxCells(object):
         userName = getpass.getuser()
         self.localLatexFilename = "zzzTmpTmp_"+userName+"_LyxNotebook_TmpTmp.tex"
 
-        lyxServerPipe = lyxNotebookUserSettings.lyxServerPipe
+        lyxServerPipe = lyxNotebook_user_settings.lyxServerPipe
         self.lyxServerPipe = os.path.abspath(os.path.expanduser(lyxServerPipe))
-        lyxTemporaryDirectory = lyxNotebookUserSettings.lyxTemporaryDirectory
+        lyxTemporaryDirectory = lyxNotebook_user_settings.lyxTemporaryDirectory
         self.lyxTemporaryDirectory = os.path.abspath(
             os.path.expanduser(lyxTemporaryDirectory))
 
@@ -219,7 +222,7 @@ class InteractWithLyxCells(object):
         if not self.lyxNamedPipesExist():
             print("No LyX process running (nonexistent lyxpipe file).")
             print("Start up LyX and try again.  If LyX is running, check the")
-            print("lyxpipe settings in LyX and in lyxNotebookUserSettings.py.")
+            print("lyxpipe settings in LyX and in lyxNotebook_user_settings.py.")
             print()
             time.sleep(4) # pause a few seconds so xterm window displays are readable
             sys.exit(1)
@@ -238,7 +241,7 @@ class InteractWithLyxCells(object):
 
         # Magic cookies CANNOT contain ";" or the command-sequence LFUN will fail,
         # and the program has only been tested with alphanumeric cookies.
-        self.magicCookie = lyxNotebookUserSettings.magicCookieString
+        self.magicCookie = lyxNotebook_user_settings.magicCookieString
 
         # not all of these LFUN strings are currently used, but they may be at some time
         self.delCookieForwardString = ""
@@ -812,7 +815,7 @@ class InteractWithLyxCells(object):
         else:
             # Export temporarily to a local file.
             full_tmp_name = os.path.join(bufferDirName, tmp_saved_lyx_file_name)
-            self.processLfun("buffer-export-custom",  
+            self.processLfun("buffer-export-custom",
                              "lyx mv $$FName " + full_tmp_name, warnERROR=True)
             time.sleep(0.05) # let write get a slight head start before any reading
             allCells = self.getAllCellTextFromLyxFile(full_tmp_name)
@@ -830,10 +833,11 @@ class InteractWithLyxCells(object):
         return allCells
 
     def getAllCellTextFromLatex(self, filename):
-        """Read all the special cell text from the Latex file "filename."  Return a
-        list of Cell class instances, where each cell is a list of lines (and
-        some additional data) corresponding to the lines of a cell in the document
-        (in the order that they appear in the document).
+        """Read all the special cell text from the Latex file "filename."
+        Return a list of Cell class instances, where each instance for a cell
+        is a list of lines (and some additional data) corresponding to the
+        lines of a cell in the document (in the order that they appear in the
+        document).
 
         To update the data and then call this function, use getAllCellText() with
         flag useLatexExport=True.
@@ -863,6 +867,9 @@ class InteractWithLyxCells(object):
                 insideCell = False
             elif insideCell:
                 # TODO: detect multiple cookies inside a cell (here and below routine)
+                # Can delete any multiples with or without raising error message.
+                # See the TODO in below routine (which is now used instead of this one
+                # by default).
                 if line.find(self.magicCookie) == 0: # cell cookies must begin lines, too
                     cellList[-1].hasCookieInside = True
                     line = line.replace(self.magicCookie, "", 1) # replace one occurence

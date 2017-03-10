@@ -11,26 +11,27 @@ Copyright (c) 2012 Allen Barker
 
 This program automates the install and setup process.
 
-The user's home Lyx directory is read from lyxNotebookUserSettings.py (the
-directory is assumed by default to be ~/.lyx, but that file can be modified).
+The user's home Lyx directory is read from `lyxNotebook_user_settings.py` (the
+directory is assumed by default to be `~/.lyx`, but that file can be modified).
 
-The bind files userCustomizableKeyBindings.bind and lyxNotebookKeyBindings.bind
-are generated from the corresponding .template files.
-The resulting .bind files are copied to the user's home Lyx directory.
-The install.py program will ask before overwriting either of these files.
+The bind files `userCustomizableKeyBindings.bind` and `lyxNotebookKeyBindings.bind`
+are generated from the corresponding `.template` files.
+The resulting `.bind` files are copied to the user's home Lyx directory.
+The `install.py` program will ask before overwriting either of these files.
 
-The main bind file is userCustomizableKeyBindings.bind, which should be set as
-the active LyX bind file.  A \\bind_file command in that file then loads
-lyxNotebookKeyBindings.bind.  That line can be commented-out whenever the user
-does not want the function key bindings overwritten.  Similarly, the user can
-load-in his or her own personal .bind file, or just add personal bindings
+The main bind file is `userCustomizableKeyBindings.bind`, which should be set
+as the active LyX bind file.  A `\\bind_file` command in that file then loads
+`lyxNotebookKeyBindings.bind`.  That line can be commented-out whenever the
+user does not want the function key bindings overwritten.  Similarly, the user
+can load-in his or her own personal `.bind` file, or just add personal bindings
 directly in the file itself.
 
-The .module files are always copied to the layouts directory in the user's home
-Lyx directory.  The names of the module files are assumed to be unique enough
-to avoid any conflicts with existing files.  (Old files may need to be removed
-by hand, however, if the .module files are regenerated after changes are made
-to the insetSpecifier interpreterSpec for an interpreter.)
+The `.module` files are always copied to the layouts directory in the user's
+home Lyx directory.  The names of the module files are assumed to be unique
+enough to avoid any conflicts with existing files.  (Old files may need to be
+removed by hand, however, if the `.module` files are regenerated after changes
+are made to the insetSpecifier interpreterSpec for an interpreter.)
+
 """
 
 from __future__ import print_function, division
@@ -39,11 +40,11 @@ import os
 import shutil
 import glob
 from os import path
-# import easygui # use system easygui
-import easygui_096 as easygui # use local version of easygui
-import lyxNotebookUserSettings
+# import easygui
+import easygui_096 as easygui # Use a locally modified version of easygui.
+import lyxNotebook_user_settings
 
-userHomeLyxDirectory = lyxNotebookUserSettings.userHomeLyxDirectory
+userHomeLyxDirectory = lyxNotebook_user_settings.userHomeLyxDirectory
 userHomeLyxDirectoryExpanded = path.expanduser(userHomeLyxDirectory)
 
 print("="*70)
@@ -72,7 +73,7 @@ bindTemplate = open(bindTemplatePathname, "r")
 bindContentsStr = bindTemplate.read()
 bindTemplate.close()
 bindContentsStr = bindContentsStr.replace("<<userHomeLyxDirectory>>",
-                         lyxNotebookUserSettings.userHomeLyxDirectory) # not expanded
+                         lyxNotebook_user_settings.userHomeLyxDirectory) # not expanded
 
 # write out the final user-modifiable .bind file
 bindFilePathname = path.join(
@@ -146,7 +147,7 @@ os.remove(bindFilePathname) # delete local copy to avoid confusion
 modulesDirectory = path.join(sourceDir, "filesForDotLyxLayoutsDir")
 os.chdir(modulesDirectory)
 
-# regenerate all the .module files, in case the user changed interpreterSpecs.py
+# regenerate all the .module files, in case the user changed interpreter_specs.py
 print("Regenerating all the .module files:")
 dotModuleFiles = glob.glob("*.module")
 for oldModuleFile in dotModuleFiles: # delete the old .module files
@@ -175,14 +176,14 @@ steps to finish the setup.  (You can keep this window open as a reminder.)
            ~/.lyx/userCustomizableKeyBindings
       in the "Bind file" box on the top right; enter it WITHOUT any .bind suffix.
       (Modify the above in the obvious way if ~/.lyx is not your home Lyx directory;
-      in this case you'll also need to modify a line in lyxNotebookUserSettings.py.)
+      in this case you'll also need to modify a line in lyxNotebook_user_settings.py.)
 
    3) While still in the preferences menu, check
            Tools > Preferences > Paths
       and make sure that the "LyXServer pipe" setting is ~/.lyx/lyxpipe (replacing
       ~/.lyx with your home Lyx directory if it is different).  You can use some
       other setting, but in that case you'll also need to modify a line in
-      lyxNotebookUserSettings.py.
+      lyxNotebook_user_settings.py.
 
    3) Select the menu item
            Tools > Reconfigure

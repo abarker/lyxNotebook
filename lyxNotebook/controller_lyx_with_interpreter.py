@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+
 =========================================================================
 This file is part of LyX Notebook, which works with LyX but is an
 independent project.  License details (MIT) can be found in the file
@@ -8,42 +9,43 @@ COPYING.
 Copyright (c) 2012 Allen Barker
 =========================================================================
 
-This is the main module of the Lyx Notebook program; the lyxNotebook.py script
+This is the main module of the Lyx Notebook program; the `lyxNotebook.py` script
 just does basic startup stuff like making sure a Lyx Notebook process is not
 already running.
 
 This module contains the implementation of the high-level controller class
-ControllerLyxWithInterpreter.  This class mediates between the Lyx program and
-one or more interpreters for interpreting code.  It gets basic commands from
-Lyx, executes them, and pushes the appropriate actions back to Lyx.  Some of
-these actions involve running code in an interpreter.  In these cases, the
+`ControllerLyxWithInterpreter`.  This class mediates between the Lyx program
+and one or more interpreters for interpreting code.  It gets basic commands
+from Lyx, executes them, and pushes the appropriate actions back to Lyx.  Some
+of these actions involve running code in an interpreter.  In these cases, the
 controller sends the code to the appropriate interpreter, gets the results
 back, and then pushes the results to Lyx.
+
 """
 
 from __future__ import print_function, division
-#import easygui as eg # use system easygui
-import easygui_096 as eg # use the version packaged with LyxNotebook
+#import easygui as eg
+import easygui_096 as eg # Use a local, modified version.
 import re
 import sys
 import os
 import time
 import signal
 
-# local file imports
-import lyxNotebookUserSettings
-from interactWithLyxCells import InteractWithLyxCells, Cell
-from externalInterpreter import ExternalInterpreter
-import interpreterSpecs # specs for all the interpreters which are allowed
-import keymap # the current mapping of keys to Lyx Notebook functions
+# Local file imports.
+import lyxNotebook_user_settings
+from interact_with_lyx_cells import InteractWithLyxCells, Cell
+from external_interpreter import ExternalInterpreter
+import interpreter_specs # Specs for all the interpreters which are allowed.
+import keymap # The current mapping of keys to Lyx Notebook functions.
 
 
 class IndentCalc(object):
-
-    """A class that is used for Python cells, to calculate the indentation levels.
-    This is used so that users can write code like in a file, without the extra
-    blank lines which are often required in the interpreter.  A blank line is
-    sent automatically when the code indentation level reaches zero, going downward.
+    """A class that is used for Python cells, to calculate the indentation
+    levels.  This is used so that users can write code like in a file, without
+    the extra blank lines which are often required in the interpreter.  A blank
+    line is sent automatically when the code indentation level reaches zero,
+    going downward.
 
     The class must calculate explicit and implicit line continuations, since this
     affects the indentation calculation.   The indentation is also incremented
@@ -195,7 +197,6 @@ class IndentCalc(object):
 
 
 class InterpreterProcess(object):
-
     """An instance of this class represents a data record for a running
     interpreter process.  Contains an ExternalInterpreter instance for that
     process, but also has an IndentCalc instance, and keeps track of the most
@@ -209,17 +210,16 @@ class InterpreterProcess(object):
 
 
 class InterpreterProcessCollection(object):
-
     """A class to hold multiple InterpreterProcess instances.  There will
     probably only be a single instance, but multiple instances should not cause
     problems.  Basically a dict mapping (bufferName,insetSpecifier) tuples to
     InterpreterProcess class instances.  Starts processes when necessary."""
 
     def __init__(self, currentBuffer):
-        if lyxNotebookUserSettings.separateInterpretersForEachBuffer is False:
+        if lyxNotebook_user_settings.separateInterpretersForEachBuffer is False:
             currentBuffer = "___dummy___" # force all to use same buffer if not set
         self.interpreterSpecList = [specName.params
-                                    for specName in interpreterSpecs.allSpecs]
+                                    for specName in interpreter_specs.allSpecs]
         self.numSpecs = len(self.interpreterSpecList)
         self.insetSpecifierToInterpreterSpecDict = {}
         self.allInsetSpecifiers = []
@@ -244,7 +244,7 @@ class InterpreterProcessCollection(object):
         """Reset the interpreter for insetSpecifier cells for buffer bufferName.
         Restarts the whole process.  If insetSpecifier is the empty string then
         reset for all inset specifiers."""
-        if lyxNotebookUserSettings.separateInterpretersForEachBuffer is False:
+        if lyxNotebook_user_settings.separateInterpretersForEachBuffer is False:
             bufferName = "___dummy___" # force all to use same buffer if not set
         insetSpecifierList = [insetSpecifier]
         if insetSpecifier == "": # do all if empty string
@@ -258,12 +258,12 @@ class InterpreterProcessCollection(object):
 
     def getInterpreterProcess(self, bufferName, insetSpecifier):
         """Get interpreter process, creating/starting one if one not there already."""
-        if lyxNotebookUserSettings.separateInterpretersForEachBuffer is False:
+        if lyxNotebook_user_settings.separateInterpretersForEachBuffer is False:
             bufferName = "___dummy___" # force all to use same buffer if not set
         key = (bufferName, insetSpecifier)
         if not key in self.mainDict:
             msg = "Starting interpreter for " + insetSpecifier
-            if lyxNotebookUserSettings.separateInterpretersForEachBuffer is True:
+            if lyxNotebook_user_settings.separateInterpretersForEachBuffer is True:
                 msg += ", for buffer:\n   " + bufferName
             print(msg)
             self.mainDict[key] = InterpreterProcess(
@@ -285,17 +285,16 @@ class InterpreterProcessCollection(object):
 
 
 class ControllerLyxWithInterpreter(object):
-
     """This class is the high-level controller class which deals with user
     interactions and which manages the Lyx process and the interpreter processes.
-    The interpreter specifications are read from the module interpreterSpecs.  The
-    list interpreterSpecs.allSpecs in that module is assumed to contains all the
+    The interpreter specifications are read from the module interpreter_specs.  The
+    list interpreter_specs.allSpecs in that module is assumed to contains all the
     specs."""
 
     def __init__(self, clientname):
 
-        self.noEcho = lyxNotebookUserSettings.noEcho
-        self.bufferReplaceOnBatchEval = lyxNotebookUserSettings.bufferReplaceOnBatchEval
+        self.noEcho = lyxNotebook_user_settings.noEcho
+        self.bufferReplaceOnBatchEval = lyxNotebook_user_settings.bufferReplaceOnBatchEval
 
         # Set up interactions with Lyx.
         self.clientname = clientname
@@ -853,8 +852,8 @@ class ControllerLyxWithInterpreter(object):
             #print("debug result of line:", [interpResult])
             output = output + interpResult # get the result, per line
 
-        if len(output) > lyxNotebookUserSettings.maxLinesInOutputCell:
-            output = output[:lyxNotebookUserSettings.maxLinesInOutputCell]
+        if len(output) > lyxNotebook_user_settings.maxLinesInOutputCell:
+            output = output[:lyxNotebook_user_settings.maxLinesInOutputCell]
             output.append("<<< WARNING: Lines truncated by LyX Notebook. >>>""")
 
         if self.noEcho is False and interpreterSpec["promptAtCellEnd"]:
@@ -980,7 +979,7 @@ class ControllerLyxWithInterpreter(object):
 
         # get the basic data
         dirData = self.lyxProcess.getUpdatedLyxDirectoryData(autoSaveUpdate=False)
-        numBackupBufferCopies = lyxNotebookUserSettings.numBackupBufferCopies
+        numBackupBufferCopies = lyxNotebook_user_settings.numBackupBufferCopies
 
         # move the older save files down the list to make room
         for saveNum in range(numBackupBufferCopies-1, 0, -1):
@@ -1032,7 +1031,7 @@ class ControllerLyxWithInterpreter(object):
         """Revert the most recently saved batch backup file to be current buffer."""
         # get basic data, autosaving as last resort in case this makes things worse
         dirData = self.lyxProcess.getUpdatedLyxDirectoryData(autoSaveUpdate=True)
-        numBackupBufferCopies = lyxNotebookUserSettings.numBackupBufferCopies
+        numBackupBufferCopies = lyxNotebook_user_settings.numBackupBufferCopies
 
         mostRecentBackup = ".LyxNotebookSave0_" + dirData[1]
         mostRecentBackupFull = os.path.join(dirData[0], mostRecentBackup)

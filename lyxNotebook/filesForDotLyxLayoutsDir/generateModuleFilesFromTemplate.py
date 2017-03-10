@@ -17,7 +17,7 @@ import sys
 # The interpreterSpecs module is loaded because it contains the string defining
 # the Listings formatting language for each type of interpreter it defines.
 sys.path.append("..")
-from interpreterSpecs import *
+from interpreter_specs import *
 
 
 # =============================================================

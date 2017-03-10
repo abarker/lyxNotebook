@@ -3,3 +3,11 @@
 *.pyo
 .ropeproject
 
+# sphinx build folder
+_build
+
+# py.test cashe
+.cache
+
+# vim swap
+*.swp

@@ -14,52 +14,52 @@ Notebook is able to use.
 To add a specification it is probably easiest to copy an existing one and then
 change the names and the values.  The name for the spec itself (i.e., the
 variable it is assigned to in the first line) should then be added to the list
-allSpecs at the end of this file.  All the fields must be present; there are no
-default values.
+`allSpecs` at the end of this file.  All the fields must be present; there are
+no default values.
 
 We now briefly describe some of the fields.  See the python2 spec below for
 descriptions of the others.
 
 ----
 
-progName : An arbitrary descriptive string for the interpreter.  It is what
+*  `progName` : An arbitrary descriptive string for the interpreter.  It is what
    will be printed out to describe the interpreter.  Uniqueness is not required.
    For example, by default Python 2 and Python 3 are both simply called Python.
    This string is used as the small label printed to the right of code cells.
    Changing this requires running install.py again.
 
-insetSpecifier : This is a string describing the interpreter which must be
+*  `insetSpecifier` : This is a string describing the interpreter which must be
    unique, and must contain only LETTER characters (no numbers).  This is
    because this string becomes part of the generated inset names, as well as a
    part of generated function names in Latex (Latex does not allow numbers in
    commands and \def strings).  Changing this requires running install.py again.
 
-listingsLanguage : the "language=xxxxx" setting for the Listings program.  It
+*  `listingsLanguage` : the `"language=xxxxx"` setting for the Listings program.  It
    can be set to the empty string to use no predefined language formatting.
    Changing this requires running install.py again.
 
 Changing any field other than one of the three above only requires restarting
-Lyx Notebook.  The above three require install.py be run again to re-generate
+Lyx Notebook.  The above three require `install.py` be run again to re-generate
 the module files.
 
-runCommand : The command which is to be run; must be in PATH or a full pathname.
+*  `runCommand` : The command which is to be run; must be in `PATH` or a full pathname.
 
-runArguments : A list of arguments to the runCommand.  Note that each part must
-   be a separate element of the list.  For example, ["--rcfile", "/tmp/myRcFile"]
+*  `runArguments` : A list of arguments to the `runCommand`.  Note that each part must
+   be a separate element of the list.  For example, `["--rcfile", "/tmp/myRcFile"]`
    rather than putting the file with the flag part.
 
 ----
 
-The preambleLatexCode string is initialization code which is substituted in the
-preamble of the document for each module is loaded (each interpreterSpec is
+The `preambleLatexCode` string is initialization code which is substituted in the
+preamble of the document for each module is loaded (each `interpreterSpec` is
 placed in its own module).  If the same code is repeated for different modules
 then be sure that it will not cause problems if it is run twice (such as when
 two Lyx Notebook modules are loaded).
 
 The big string blocks with Listings key=value pairs (such as
-python2.generalListingsCodeFormat) are Listings formatting code for all the
+`python2.generalListingsCodeFormat`) are Listings formatting code for all the
 cells of the specified type.  These are substituted into the preamble template,
-at places specified by metavars surrounded by << >>.
+at places specified by metavars surrounded by `<< >>`.
 
 The last line in such a block must not be a comment or end with a comment!
 Otherwise, commas can either be present or not on the last line (the other
@@ -75,10 +75,11 @@ color and nonColor output formats are currently the same (color is not used
 even in the color definitions).  We could have just had one type of output
 cell, but at some point we might want different formatting for the output
 of different interpreters.
+
 """
 
 from __future__ import print_function, division
-import lyxNotebookUserSettings # in case any of these settings are needed
+import lyxNotebook_user_settings # in case any of these settings are needed
 import os
 import sys
 
@@ -101,7 +102,7 @@ class SpecRecord(object):
 allSpecs = [] # the list of all defined specs; each section should append to it
 
 #
-# TODO: these language sections below could be separate files, in an interpreterSpecs
+# TODO: these language sections below could be separate files, in an interpreter_specs
 # directory.  Then it is very easy to add a new interpreter, or modify one.  The
 # bookkeeping is also simplified (someone could just send a file, not diffs).
 # At the end, each should append to allSpecs.
@@ -606,7 +607,7 @@ allSpecs.append(R)
 # auxiliaryFilesForInterpreters.  This bashrc file sources the usual ~/.bashrc
 # (if it exists and is readable) but then redefines the prompt strings to the
 # values which are set in the spec below.
-bashrcFile = os.path.join(lyxNotebookUserSettings.lyxNotebookSourceDir,
+bashrcFile = os.path.join(lyxNotebook_user_settings.lyxNotebookSourceDir,
                           "auxiliaryFilesForInterpreters", "lyxNotebookBashrc")
 
 bash = SpecRecord()

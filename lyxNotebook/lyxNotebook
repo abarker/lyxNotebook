@@ -1,5 +1,6 @@
 #! /usr/bin/python
 """
+
 =========================================================================
 This file is part of LyX Notebook, which works with LyX but is an
 independent project.  License details (MIT) can be found in the file
@@ -10,36 +11,37 @@ Copyright (c) 2012 Allen Barker
 
 This script runs the Lyx Notebook program.  It mainly checks to make sure
 that there is no other active Lyx Notebook process running, and if not then
-it launches an instance of the main ControllerLyxWithInterpreter class.
+it launches an instance of the main `ControllerLyxWithInterpreter` class.
 
-This program should always be run from the Lyx Notebook source directory,
-so it can find the path to that directory.  The variable
-lyxNotebookUserSettings.lyxNotebookSourceDir is dynamically set to the argv[0]
-directory of this command.  Use a short stub shell-script to call it from
-the source directory if you want a version in, say ~/bin.
+This program should always be run from the Lyx Notebook source directory, so it
+can find the path to that directory.  The variable
+`lyxNotebook_user_settings.lyxNotebookSourceDir` is dynamically set to the
+argv[0] directory of this command.  Use a short stub shell-script to call it
+from the source directory if you want a version in, say `~/bin`.
+
 """
 
 from __future__ import print_function, division
 import os
 import sys
-import lyxNotebookUserSettings # before controllerLyxWithInterpreter, dynamic vars set
+import lyxNotebook_user_settings # before controller_lyx_with_interpreter, dynamic vars set
 
 # Get the Lyx Notebook home directory.  Some interpreters may use this if they
 # store data in the auxiliaryFilesForInterpreters directory, so the value is
-# stored as an on-the-fly calculated variable in the lyxNotebookUserSettings
+# stored as an on-the-fly calculated variable in the lyxNotebook_user_settings
 # namespace.
 
-# TODO can use realpath(abspath(expanduser(...
+# TODO can use realpath(abspath(expanduser(... ALSO, don't use argv[0], use __file__
 # Can also use inspect (see utilities.py file)
 myCWD = os.getcwd()
 callingCommand = os.path.join(myCWD, os.path.expanduser(sys.argv[0]))
-lyxNotebookUserSettings.lyxNotebookSourceDir = os.path.dirname(callingCommand)
+lyxNotebook_user_settings.lyxNotebookSourceDir = os.path.dirname(callingCommand)
 
-# Do below import *after* the calculations above, since implicitly import interpreterSpecs
-from controllerLyxWithInterpreter import *
+# Do below import *after* the calculations above, since implicitly import interpreter_specs
+from controller_lyx_with_interpreter import *
 
 # Set the lockfile location to be in the user's local Lyx directory.
-userHomeLyxDirectory = lyxNotebookUserSettings.userHomeLyxDirectory
+userHomeLyxDirectory = lyxNotebook_user_settings.userHomeLyxDirectory
 lockfilePath = os.path.expanduser(
     os.path.join(userHomeLyxDirectory, "lyxNotebook.lockfile"))
 
@@ -77,7 +79,7 @@ pidfile.close()
 print("\n===================================================\n")
 print("Starting the LyX Notebook program...")
 print("Version from source directory:\n   ",
-      lyxNotebookUserSettings.lyxNotebookSourceDir)
+      lyxNotebook_user_settings.lyxNotebookSourceDir)
 
 controller = ControllerLyxWithInterpreter("lyxNotebookClient")
 

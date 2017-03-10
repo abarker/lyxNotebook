@@ -8,22 +8,26 @@ COPYING.
 Copyright (c) 2012 Allen Barker
 =========================================================================
 
-This module provides the class ExternalInterpreter, which runs an external
+This module provides the class `ExternalInterpreter`, which runs an external
 interpreter and passes strings back and forth to it.  It uses a pseudo-tty to
-run the specified interpreter interactively.
+run the specified interpreter interactively.  It works similarly to the Pexpect
+program (that program might replace some parts at some point, but it works as
+is).
 
 Some of this code is based on an example from
 http://stackoverflow.com/questions/4022600/python-pty-fork-how-does-it-work
 
-Note that the Python interpreter's output can be redirected to a file, as
+Note that the Python interpreter's output can be redirected to a file, as::
    python >outfile
 which only echos the input but sends all output to the file.
-Redirecting stderr, output 2, sends the Python prompts to a different file
+
+Redirecting stderr, output 2, sends the Python prompts to a different file::
    python >outfile 2>startupMessageAndPrompts
+
 Maybe modify later to use a separate file, to avoid problems if a program
 writes a prompt to output.
 
-With scala,
+With scala::
    scala >outfile
 *everything* goes into outfile, including echo of typed stuff.
 
@@ -36,17 +40,16 @@ import time
 import pty
 import signal
 # import subprocess # for alternative where subprocess.call is used
-import interpreterSpecs # only needed for testing code at end
+import interpreter_specs # only needed for testing code at end
 
 
 class ExternalInterpreter(object):
-
     """This class runs a single external interpreter.  There can be multiple
-    instances, each running a possibly different interpreter application.
-    The interpreter is forked as a process connected to a pseudo-tty, so
-    applications which expect terminal input can be run.  The only initialization
-    argument is an interpreterSpec dict object which has the predefined collection
-    of keys all defined."""
+    instances, each running a possibly different interpreter application.  The
+    interpreter is forked as a process connected to a pseudo-tty, so
+    applications which expect terminal input can be run.  The only
+    initialization argument is an interpreterSpec dict object which has the
+    predefined collection of keys all defined."""
 
     def __init__(self, interpreterSpec):
         self.debug = False # debug flag, for verbose output
@@ -281,9 +284,9 @@ class ExternalInterpreter(object):
 
 if __name__ == "__main__":
 
-    print("--------------- starting tests of externalInterpreter ONLY -----")
-    interp = ExternalInterpreter(interpreterSpecs.python)
-    #interp = ExternalInterpreter(interpreterSpecs.sage)
+    print("--------------- starting tests of external_interpreter ONLY -----")
+    interp = ExternalInterpreter(interpreter_specs.python)
+    #interp = ExternalInterpreter(interpreter_specs.sage)
     print("created new external class")
 
     interp.write("x=5\n")
