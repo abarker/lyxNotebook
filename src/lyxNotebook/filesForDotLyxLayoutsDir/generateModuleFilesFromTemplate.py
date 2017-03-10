@@ -1,5 +1,5 @@
-
 """
+
 =========================================================================
 This file is part of LyX Notebook, which works with LyX but is an
 independent project.  License details (MIT) can be found in the file
@@ -8,7 +8,8 @@ COPYING.
 Copyright (c) 2012 Allen Barker
 =========================================================================
 
-Generate all the .module files from templates.
+Generate all the `.module` files from templates.
+
 """
 
 from __future__ import print_function, division
@@ -26,7 +27,7 @@ from interpreter_specs import *
 # which is looped over <<basicCellType>>, 3) and a closing section.
 # =============================================================
 
-moduleHeaderTemplateCommon = \
+module_header_template_common = \
     r"""#\DeclareLyXModule{Lyx Notebook <<insetSpecifier>>}
 #DescriptionBegin
 #The <<insetSpecifier>> cells for Lyx Notebook.
@@ -73,7 +74,8 @@ AddToPreamble
    \def\lyxNotebookNeedspaceLabelValue{4\baselineskip}
 
 """
-moduleHeaderTemplateBasicCellTypeDependent = \
+
+module_header_template_basic_cell_type_dependent = \
     r"""
    %
    % Header stuff for the <<insetSpecifier>> <<basicCellType>> cells.
@@ -111,7 +113,8 @@ moduleHeaderTemplateBasicCellTypeDependent = \
    \ifthenelse{\isundefined{\lyxNotebookPrintOn}}{\def\lyxNotebookPrintOn{}}{}
    \expandafter\def\expandafter\lyxNotebookPrintOn\expandafter{\lyxNotebookPrintOn\lyxNotebookPrintOn<<basicCellType>><<insetSpecifier>>}
 """
-moduleHeaderTemplateEnd = \
+
+module_header_template_end = \
     r"""
 
 EndPreamble
@@ -121,7 +124,7 @@ EndPreamble
 # Define the basic template for Standard and Init cells.
 # ======================================================
 
-standardTemplate = \
+standard_template = \
     r"""
 
 InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
@@ -267,7 +270,7 @@ End
 # Define the basic template for Output cells.
 # ===========================================
 
-outputTemplate = \
+output_template = \
     r"""
 
 InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
@@ -386,7 +389,7 @@ End
 # Define the basic template for the module to redefine Listings to use a small font.
 # ==================================================================================
 
-listingsWithSmallFont = \
+listings_with_small_font = \
     r"""#\DeclareLyXModule{Listings with Small Font}
 #DescriptionBegin
 #Changes the built-in LyX listings insets to use a small font in the LyX display.
@@ -426,7 +429,7 @@ End
 
 # first do the Listings redefinition, since it just needs to be written out
 with open("lyxNotebookListingsWithSmallFont.module", "w") as f:
-    f.write(listingsWithSmallFont)
+    f.write(listings_with_small_font)
 
 # now do all the other modules, one for each interpreter specification
 for spec in allSpecs:
@@ -438,11 +441,11 @@ for spec in allSpecs:
     print("running for insetSpecifier=" + insetSpecifier
           + ",  progName=" + progName + ",  listingsLanguage=" + lstLanguage)
 
-    headCommon = moduleHeaderTemplateCommon
-    headDependent = moduleHeaderTemplateBasicCellTypeDependent
-    init = standardTemplate
-    standard = standardTemplate
-    output = outputTemplate
+    headCommon = module_header_template_common
+    headDependent = module_header_template_basic_cell_type_dependent
+    init = standard_template
+    standard = standard_template
+    output = output_template
 
     # replace meta-vars in the common header section
     headCommon = headCommon.replace("<<tripleQuote>>", "\"\"\"")
@@ -470,7 +473,7 @@ for spec in allSpecs:
     preambleLatexCode = preambleLatexCode.replace("<<lstLanguage>>", lstLanguage)
 
     # now we have the full .module file header (stuff before any InsetLayout commands)
-    head += preambleLatexCode + moduleHeaderTemplateEnd
+    head += preambleLatexCode + module_header_template_end
 
     # replace meta-vars in standard template
     standard = standard.replace("<<tripleQuote>>", "\"\"\"")
@@ -497,3 +500,4 @@ for spec in allSpecs:
     # write concat of all templates to correct output file
     with open("lyxNotebookCell"+insetSpecifier+".module", "w") as f:
         f.write(head + init + standard + output)
+
