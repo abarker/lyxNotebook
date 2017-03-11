@@ -990,8 +990,8 @@ class InteractWithLyxCells(object):
                 #
                 # Write the new cell text (it may have been modified in processing).
                 #
-                for cellLine in all_cells[current_cell]:
-                    out_file.write(convert_text_line_to_lyx_file_inset_format(cellLine))
+                for cell_line in all_cells[current_cell]:
+                    out_file.write(convert_text_line_to_lyx_file_inset_format(cell_line))
                 # now end the cell in out_file
                 out_file.write("\\end_inset\n")
                 #
@@ -1020,8 +1020,8 @@ class InteractWithLyxCells(object):
                 eval_output = all_cells[current_cell].evaluation_output
                 # if cell wasn't evaluated the set output to be empty
                 if eval_output is None: eval_output = []
-                for cellLine in eval_output:
-                    out_file.write(convert_text_line_to_lyx_file_inset_format(cellLine))
+                for cell_line in eval_output:
+                    out_file.write(convert_text_line_to_lyx_file_inset_format(cell_line))
                 # finished, end the output cell inset
                 out_file.write("\\end_inset\n") # 2 blanks pushed back from code cell end
             #
@@ -1332,15 +1332,15 @@ class InteractWithLyxCells(object):
                 code_out_file.write("\n" + banner_line + "\n\n")
 
             # write the cells of the inset_specifier type to the file
-            for basicCellType in ["Init", "Standard"]:
+            for basic_cell_type in ["Init", "Standard"]:
                 count = 0
                 for cell in all_cells:
                     cell_type = cell.get_cell_type()
-                    if cell_type[0] == basicCellType and cell_type[1] == inset_specifier:
+                    if cell_type[0] == basic_cell_type and cell_type[1] == inset_specifier:
                         count += 1
                         if commentLineBegin: # don't write if empty commentLineBegin string
                             code_out_file.write("\n" + banner_line + "\n")
-                            msg = commentLineBegin + " " + basicCellType + \
+                            msg = commentLineBegin + " " + basic_cell_type + \
                                 " cell number " + str(count) + "."
                             code_out_file.write(msg)
                             code_out_file.write("\n" + banner_line + "\n\n")

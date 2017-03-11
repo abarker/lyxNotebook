@@ -750,8 +750,8 @@ class ControllerLyxWithInterpreter(object):
             return # Not in a cell in the first place.
 
         # check that cell is code (could just check output=None later, but do here, too)
-        basicType, inset_specifier_language = code_cell_text.get_cell_type()
-        if basicType == "Output":
+        basic_type, inset_specifier_language = code_cell_text.get_cell_type()
+        if basic_type == "Output":
             return # Not a code cell.
 
         # TODO: optional line wrapping at the Python level (but currently works OK
@@ -794,7 +794,7 @@ class ControllerLyxWithInterpreter(object):
         # bug remains.
         # if len(output) > 0 and output[-1] == "\n": output[-1] = "\f\n"
 
-        basicType, inset_specifier = code_cell_text.get_cell_type()
+        basic_type, inset_specifier = code_cell_text.get_cell_type()
         self.lyx_process.replace_current_output_cell_text(output,
                       assert_inside_cell=True, inset_specifier=inset_specifier)
         return
@@ -805,8 +805,8 @@ class ControllerLyxWithInterpreter(object):
         code_cell_text instance as the data field evaluation_output.  Returns
         None for a non-code cell."""
 
-        basicType, inset_specifier_lang = code_cell_text.get_cell_type()
-        if basicType == "Output": # if not a code cell
+        basic_type, inset_specifier_lang = code_cell_text.get_cell_type()
+        if basic_type == "Output": # if not a code cell
             code_cell_text.evaluation_output = None
             return None
 
@@ -966,15 +966,17 @@ class ControllerLyxWithInterpreter(object):
         self.lyx_process.process_lfun("buffer-write", warn_error=False)
 
         # get the basic data
-        dir_data = self.lyx_process.get_updated_lyx_directory_data(auto_save_update=False)
+        dir_data = self.lyx_process.get_updated_lyx_directory_data(
+                                                              auto_save_update=False)
         num_backup_buffer_copies = lyxNotebook_user_settings.num_backup_buffer_copies
 
         # move the older save files down the list to make room
-        for saveNum in range(num_backup_buffer_copies-1, 0, -1):
-            older = ".LyxNotebookSave" + str(saveNum) + "_" + dir_data[1]
-            newer = ".LyxNotebookSave" + str(saveNum-1) + "_" + dir_data[1]
+        for save_num in range(num_backup_buffer_copies-1, 0, -1):
+            older = ".LyxNotebookSave" + str(save_num) + "_" + dir_data[1]
+            newer = ".LyxNotebookSave" + str(save_num-1) + "_" + dir_data[1]
             if os.path.exists(newer):
-                if os.path.exists(older): os.remove(older)
+                if os.path.exists(older):
+                    os.remove(older)
                 os.rename(newer, older)
 
         # wait for the buffer-write command started above to finish before final move
@@ -988,15 +990,19 @@ class ControllerLyxWithInterpreter(object):
                 # times above to reduce the delay
                 time.sleep(1.1)
                 prev_mtime = mtime
-            else: break
+            else:
+                break
 
         # variable newer should have ended up at save file 0, so move buffer to that
-        if os.path.exists(newer): os.remove(newer)
+        if os.path.exists(newer):
+            os.remove(newer)
         os.rename(dir_data[1], newer)
         os.rename(newfile, dir_data[1])
 
-        if reload_buffer: self.reload_buffer_file()
-        if messages: self.lyx_process.show_message(
+        if reload_buffer:
+            self.reload_buffer_file()
+        if messages:
+            self.lyx_process.show_message(
             "Replaced current buffer with newly evaluated output cells.")
         return
 
@@ -1049,9 +1055,9 @@ class ControllerLyxWithInterpreter(object):
         os.rename(most_recent_backup_full, current_buffer_full)
 
         # shift down all the older backups
-        for saveNum in range(1, num_backup_buffer_copies):
-            older = ".LyxNotebookSave" + str(saveNum) + "_" + dir_data[1]
-            newer = ".LyxNotebookSave" + str(saveNum-1) + "_" + dir_data[1]
+        for save_num in range(1, num_backup_buffer_copies):
+            older = ".LyxNotebookSave" + str(save_num) + "_" + dir_data[1]
+            newer = ".LyxNotebookSave" + str(save_num-1) + "_" + dir_data[1]
             if os.path.exists(older):
                 if os.path.exists(newer): os.remove(newer)
                 os.rename(older, newer)
