@@ -764,11 +764,13 @@ class ControllerLyxWithInterpreter(object):
         # get the code text from the current cell
         code_cell_text = self.lyx_process.get_current_cell_text()
 
-        if code_cell_text is None: return # not in a cell in the first place
+        if code_cell_text is None:
+            return # Not in a cell in the first place.
 
         # check that cell is code (could just check output=None later, but do here, too)
         basicType, inset_specifier_language = code_cell_text.get_cell_type()
-        if basicType == "Output": return # not a code cell
+        if basicType == "Output":
+            return # Not a code cell.
 
         # TODO: optional line wrapping at the Python level (but currently works OK
         # with listings).  Currently does nothing.  Can do the same with output
@@ -812,7 +814,7 @@ class ControllerLyxWithInterpreter(object):
 
         basicType, inset_specifier = code_cell_text.get_cell_type()
         self.lyx_process.replace_current_output_cell_text(output,
-                                   assert_inside_cell=True, inset_specifier=inset_specifier)
+                      assert_inside_cell=True, inset_specifier=inset_specifier)
         return
 
     def evaluate_code_in_cell_class(self, code_cell_text, just_send_newlines=False):

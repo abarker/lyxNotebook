@@ -59,7 +59,6 @@ import lyxNotebook_user_settings
 tmp_saved_lyx_file_name = "tmp_save_file_lyx_notebook_xxxxx.lyxnotebook"
 
 class Cell(list):
-
     """Simple container class derived from a list.  It is meant to hold lines
     of text corresponding to the contents of a cell.  The line numbers are
     relative to Latex files (when the cell text is extracted from such files)."""
@@ -109,7 +108,6 @@ class Cell(list):
 
 
 class TerminatedFile(object):
-
     """A class to read lines from a file with a known termination line, which may
     not be finished writing by a writer process.  This is to deal with possible
     race conditions.  The EOF line "" will be returned only after the file
@@ -183,14 +181,12 @@ def convert_text_line_to_lyx_file_inset_format(text_line):
 
 
 class InteractWithLyxCells(object):
-
     """The main class for handling interactions with a running Lyx process
     via the Lyx server.  Also handles writing and reading data from files in
     the user's home Lyx directory."""
 
     def __init__(self, client_name):
         """Initialize; client_name is arbitrary but should be a unique identifier."""
-
         self.client_name = client_name
 
         # make user_name part of temp file to avoid conflicts: different users, same dir
@@ -428,10 +424,10 @@ class InteractWithLyxCells(object):
         self.process_lfun("command-sequence", "message "+string)
 
     def char_left(self):
-        self.process_lfun("char-left") # don't bother returning value
+        self.process_lfun("char-left") # Don't bother returning value.
 
     def char_right(self):
-        self.process_lfun("char-right") # don't bother returning value
+        self.process_lfun("char-right") # Don't bother returning value.
 
     def inside_cell(self):
         """Are we inside a cell of the type associated with this class?  Only
@@ -478,7 +474,9 @@ class InteractWithLyxCells(object):
         return retval
 
     def inside_empty_cell(self, assert_inside_cell=False):
-        return self.at_cell_begin(assert_inside_cell) and self.at_cell_end(assert_inside_cell)
+        """Test if inside an empty cell."""
+        return (self.at_cell_begin(assert_inside_cell)
+                and self.at_cell_end(assert_inside_cell))
 
     def goto_cell_begin(self, assert_inside_cell=False):
         """Goes to beginning of current cell.  The LFUN inset-begin works
@@ -1139,14 +1137,15 @@ class InteractWithLyxCells(object):
 
     def replace_current_output_cell_text(self, line_list, create_if_necessary=True,
                goto_begin_after=False, assert_inside_cell=False, inset_specifier="Python"):
-        """Replace the text of the output cell corresponding to the current Standard
-        or Init cell.  The cell must immediately follow.  If it doesn't and
-        create_if_necessary is True then one will be created/inserted.  The default
+        """Replace the text of the output cell corresponding to the current `Standard`
+        or `Init` cell.  The cell must immediately follow.  If it isn't and
+        `create_if_necessary` is true then one will be created/inserted.  The default
         is a Python cell; this can be changed by setting inset_specifier to a value
         from one of the other interpreter specs."""
 
         if not assert_inside_cell:
-            if not self.inside_cell(): return # not even in a cell
+            if not self.inside_cell():
+                return # Not even in a cell.
 
         # First we run a big command-sequence to do the following:
         # -- use inset-select-all and two escapes to leave the inset (first escape
@@ -1161,8 +1160,15 @@ class InteractWithLyxCells(object):
         # (For some reason in 2.0.3 the inset-select-all doesn't gives the nice blue
         # selection-highlighting feedback when called this way, so it is added
         # in the evaluateCell routine if text in code cells isn't replaced.)
-        self.process_lfun("command-sequence",
-                         "inset-select-all;escape;escape;word-backward;inset-toggle open;word-forward;inset-toggle open;char-right")
+        command_sequence = ["inset-select-all;",
+                            "escape;"
+                            "escape;"
+                            "word-backward;"
+                            "inset-toggle open;"
+                            "word-forward;"
+                            "inset-toggle open;"
+                            "char-right"]
+        self.process_lfun("command-sequence", "".join(command_sequence))
 
         # At this point, if there is an inset afterward we are inside it.
 
@@ -1174,86 +1180,115 @@ class InteractWithLyxCells(object):
         #if self.inside_math_inset(): print("debug inside math inset") # debug test
         #else: print("debug not inside math inset")
 
-        # now test if we are inside a Lyx Notebook cell
-        if not self.inside_cell(): # no output cell immediately follows
-            if create_if_necessary: # create a new output cell
-                self.char_left() # undo char-right in test above (end just outside cell)
+        # Now test if we are inside a Lyx Notebook cell.
+        empty_cell = False
+        if not self.inside_cell(): # No output cell immediately follows.
+            if create_if_necessary: # Create a new output cell.
+                self.char_left() # Undo char-right in test above (end just outside cell).
                 # The line below handles the special case of end of buffer insert.
-                if self.inside_cell(): self.char_right()
+                if self.inside_cell():
+                    self.char_right()
                 # Now insert the output cell.
                 # Note that flex-insert adds the "Flex:" prefix on the cell name.
+                # Note this puts you inside the new Flex cell (so inset-toggle-open may
+                #    be unnecessary).
                 self.process_lfun("command-sequence",
                                  "flex-insert LyxNotebookCell:Output:"
                                  + inset_specifier+";inset-toggle open")
+                empty_cell = True
             else:
-                # if we don't create a new cell, go back inside the previous one
+                # If we don't create a new cell, go back inside the previous one.
                 self.char_left()
-                if not self.inside_cell(): self.char_left() # handles end of buffer, too
-                # note we currently stay at the end of inset, but could goto beginning
+                if not self.inside_cell():
+                    self.char_left() # Handles end of buffer, too.
+
+                # Note we currently stay at the end of inset, but could goto beginning.
                 return
-        self.replace_current_cell_text(line_list, assert_inside_cell=True)
+
+        # Test for empty cell by going left again; undo if necessary.
+        #
+        # Note this test and `empty_cell` flag was added in Mar. 2017 to fix a
+        # bug that was introduced by a change in how Lyx handles the
+        # "select-all" command in an empty cell (don't know version).  It now
+        # selects the whole cell, which then gets replaced.  So if empty we are
+        # inside and don't need to select anything since there is nothing to
+        # replace.
+        self.char_left()
+        if not self.inside_cell():
+            self.char_right()
+            empty_cell = True
+
+        self.replace_current_cell_text(line_list, assert_inside_cell=True,
+                                                  empty_cell=empty_cell)
         if goto_begin_after:
             self.goto_cell_begin(assert_inside_cell=True)
         return
 
     def replace_current_cell_text(self, line_list,
-                               goto_begin_after=False, assert_inside_cell=False):
-        r"""Replace the current cell's text with the lines in line_list
-        Currently line_list can be a Cell, but it can also just be a list since
-        no special Cell extra data is used.  The lines in line_list must be
-        newline terminated, but should not include any \begin and \end Latex
+                               goto_begin_after=False, assert_inside_cell=False,
+                               empty_cell=False):
+        r"""Replace the current cell's text with the lines in `line_list`
+        Currently `line_list` can be a Cell, but it can also just be a list since
+        no special `Cell` extra data is used.  The lines in `line_list` must be
+        newline terminated, but should not include any `\begin` and `\end` Latex
         markup lines for the cell type."""
 
-        # Write to a file and then read it in all at once, replacing selected text.
-        # This gives better undo behavior than a self-insert for each line.
+        # Write the text to a file and then read it in all at once, replacing
+        # selected text.  This gives better undo behavior than a self-insert
+        # for each line.
+
         if not assert_inside_cell:
-            if not self.inside_cell(): return # not even in a cell
+            if not self.inside_cell():
+                return # Not even in a cell.
 
         if len(line_list) == 0:
-            line_list = [""] # cells always have at least one line
+            line_list = [""] # Cells always have at least one line.
 
         tmp_file_name = open(self.temp_cell_write_file, "w")
 
-        # process all but the last line (we know it has at least one)
+        # Process all but the last line (we know it has at least one).
         if len(line_list) > 1:
             for line in line_list[0:-1]:
                 tmp_file_name.write(line)
 
-        # process the last line; strip off the newline so it displays right when read in
+        # Process the last line; strip off the newline so it displays right when read in.
         stripped_last_line = line_list[-1].rstrip("\n") # debug changed from plain strip
         delete_space = False
-        if stripped_last_line == "": # we cannot write and read a single empty string
-            stripped_last_line = " " # so write a space, to delete later
+        if stripped_last_line == "": # We cannot write and read a single empty string,
+            stripped_last_line = " " # so write a space, to delete later.
             delete_space = True
 
-        # write out to a temp file
+        # Write out to a temp file.
         tmp_file_name.write(stripped_last_line)
         tmp_file_name.close()
 
-        # read file into lyx, deleting space if it was inserted in special case above
+        # Read file into lyx, deleting space if it was inserted in special case above.
         self.replace_current_cell_text_from_plaintext_file(self.temp_cell_write_file,
-                                                     assert_inside_cell=assert_inside_cell)
-        if delete_space: self.process_lfun("char-delete-backward")
+                                                 assert_inside_cell=assert_inside_cell,
+                                                 empty_cell=empty_cell)
+        if delete_space:
+            self.process_lfun("char-delete-backward")
 
-        # clean up by deleting the temporary file
+        # Clean up by deleting the temporary file.
         os.remove(self.temp_cell_write_file)
         if goto_begin_after:
             self.goto_cell_begin(assert_inside_cell=True)
-        return
 
     def replace_current_cell_text_from_plaintext_file(self, filename,
-                                                assert_inside_cell=False):
+                                     assert_inside_cell=False, empty_cell=False):
         """Replaces the cell's text with the contents of file filename."""
+        print("DEBUG empty_cell is", empty_cell)
         if not assert_inside_cell:
-            if not self.inside_cell(): return
+            if not self.inside_cell():
+                return
 
-        # select everything in the inset, to be replace by the file-insert
-        self.process_lfun("inset-select-all") # faster than the three lines above
+        # Select everything in the inset, to be replace by the file-insert.
+        if not empty_cell:
+            self.process_lfun("inset-select-all") # Faster than the three lines above.
 
-        # read in the file, replacing selected text
+        # Read in the file, replacing selected text.
         # self.process_lfun("file-insert-plaintext-para", filename) # ignores newlines!
         self.process_lfun("file-insert-plaintext", filename)
-        return
 
     def write_all_cell_code_to_file(self, data_tuple_list):
         """Sequentially writes all the cell code to output files, with cells of
