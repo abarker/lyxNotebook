@@ -18,10 +18,8 @@ location), go to the subdirectory lyxNotebook, and run:
 
    ./install.py &
 
-This program only works on Linux systems, and has only been tested on Fedora 15
-and recent Ubuntu distributions.  Most of the testing has been with Python 2
-code cells.  The EasyGUI package for Python is required, but a version is now
-packaged with the code (EasyGUI is currently frozen in development).
+This program only works on Linux systems, and has only been tested recently on
+Ubuntu distributions.  Most of the testing has been with Python 2 code cells.
 
 Licensed under the MIT license.
 

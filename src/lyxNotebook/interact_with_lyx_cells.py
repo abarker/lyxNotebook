@@ -1213,9 +1213,7 @@ class InteractWithLyxCells(object):
         # selects the whole cell, which then gets replaced.  So if empty we are
         # inside and don't need to select anything since there is nothing to
         # replace.
-        self.char_left()
-        if not self.inside_cell():
-            self.char_right()
+        if not empty_cell and self.inside_empty_cell():
             empty_cell = True
 
         self.replace_current_cell_text(line_list, assert_inside_cell=True,
@@ -1277,7 +1275,6 @@ class InteractWithLyxCells(object):
     def replace_current_cell_text_from_plaintext_file(self, filename,
                                      assert_inside_cell=False, empty_cell=False):
         """Replaces the cell's text with the contents of file filename."""
-        print("DEBUG empty_cell is", empty_cell)
         if not assert_inside_cell:
             if not self.inside_cell():
                 return

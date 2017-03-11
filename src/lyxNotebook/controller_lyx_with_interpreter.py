@@ -368,57 +368,50 @@ class ControllerLyxWithInterpreter(object):
                     lines_to_show=len(choices))
                 if choice_str is None:
                     continue
-                print("Choice string is DEBUG:", choice_str)
                 choice_str = choice_str[5:].strip() # EasyGUI returns whole line.
                 key_action = choice_str
-                print("Key action is DEBUG:", key_action)
 
             # ====================================================================
             # Handle the general key actions, including commands set from submenu.
             # ====================================================================
+
+            print("Processing user command:", key_action)
+            self.lyx_process.show_message("Processing user command: " + key_action)
 
             #
             # Goto cell commands.
             #
 
             if key_action == "goto next any cell":
-                self.lyx_process.show_message("going to next cell")
                 self.lyx_process.open_all_cells() # gotoNextCell() needs open cells for now
                 self.lyx_process.goto_next_cell()
                 # self.lyx_process.goto_next_cell2() # alternate implementation, experimental
 
             elif key_action == "goto prev any cell":
-                self.lyx_process.show_message("going to previous cell")
                 self.lyx_process.open_all_cells() # gotoPrevCell() needs open cells for now
                 self.lyx_process.goto_prev_cell()
 
             elif key_action == "goto next code cell":
-                self.lyx_process.show_message("going to next code cell")
                 self.lyx_process.open_all_cells() # gotoNextCell() needs open cells for now
                 self.lyx_process.goto_next_cell(output=False)
 
             elif key_action == "goto prev code cell":
-                self.lyx_process.show_message("going to previous code cell")
                 self.lyx_process.open_all_cells() # gotoPrevCell() needs open cells for now
                 self.lyx_process.goto_prev_cell(output=False)
 
             elif key_action == "goto next init cell":
-                self.lyx_process.show_message("going to next init cell")
                 self.lyx_process.open_all_cells() # gotoNextCell() needs open cells for now
                 self.lyx_process.goto_next_cell(standard=False, output=False)
 
             elif key_action == "goto prev init cell":
-                self.lyx_process.show_message("going to prev init cell")
                 self.lyx_process.open_all_cells() # gotoPrevCell() needs open cells for now
                 self.lyx_process.goto_prev_cell(standard=False, output=False)
 
             elif key_action == "goto next standard cell":
-                self.lyx_process.show_message("going to next standard cell")
                 self.lyx_process.open_all_cells() # gotoNextCell() needs open cells for now
                 self.lyx_process.goto_next_cell(init=False, output=False)
 
             elif key_action == "goto prev standard cell":
-                self.lyx_process.show_message("going to prev standard cell")
                 self.lyx_process.open_all_cells() # gotoPrevCell() needs open cells for now
                 self.lyx_process.goto_prev_cell(init=False, output=False)
 
@@ -427,39 +420,31 @@ class ControllerLyxWithInterpreter(object):
             #
 
             elif key_action == "evaluate current cell":
-                self.lyx_process.show_message("evaluating the current cell")
                 self.evaluate_lyx_cell()
 
             elif key_action == "evaluate current cell after reinit":
-                self.lyx_process.show_message("evaluating the current cell after reinit")
                 print("Restarting all interpreters, single-interp restart unimplemented.")
                 self.reset_interpreters_for_buffer() # TODO currently restarts them all
                 self.evaluate_lyx_cell()
 
             elif key_action == "evaluate all code cells":
-                self.lyx_process.show_message("evaluating the all code cells")
                 self.evaluate_all_code_cells()
 
             elif key_action == "evaluate all code cells after reinit":
-                self.lyx_process.show_message("evaluating all code cells after reinit")
                 self.reset_interpreters_for_buffer()
                 self.evaluate_all_code_cells()
 
             elif key_action == "evaluate all init cells":
-                self.lyx_process.show_message("evaluating all init cells")
                 self.evaluate_all_code_cells(standard=False)
 
             elif key_action == "evaluate all init cells after reinit":
-                self.lyx_process.show_message("evaluating all init cells after reinit")
                 self.reset_interpreters_for_buffer()
                 self.evaluate_all_code_cells(standard=False)
 
             elif key_action == "evaluate all standard cells":
-                self.lyx_process.show_message("evaluating all standard cells")
                 self.evaluate_all_code_cells(init=False)
 
             elif key_action == "evaluate all standard cells after reinit":
-                self.lyx_process.show_message("evaluating all standard cells after reinit")
                 self.reset_interpreters_for_buffer()
                 self.evaluate_all_code_cells(init=False)
 
@@ -580,16 +565,13 @@ class ControllerLyxWithInterpreter(object):
                 self.lyx_process.show_message("inserted the most recent graphic file")
 
             elif key_action == "kill lyx notebook process":
-                self.lyx_process.show_message("killing LyX Notebook process")
                 sys.exit(0)
 
             elif key_action == "prompt echo on":
                 self.no_echo = False
-                self.lyx_process.show_message("set prompt echo to False")
 
             elif key_action == "prompt echo off":
                 self.no_echo = True
-                self.lyx_process.show_message("set prompt echo to True")
 
             elif key_action == "toggle prompt echo":
                 self.no_echo = not self.no_echo
