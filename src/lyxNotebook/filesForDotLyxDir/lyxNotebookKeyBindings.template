@@ -37,6 +37,6 @@
 \bind "S-F10" "server-notify"
 \bind "F11" "server-notify"
 \bind "S-F11" "server-notify"
-\bind "F12" "vc-command U $$p <<absPathToLyxNotebookSourceDir>>/lyxNotebookFromLFUN"
+\bind "F12" "vc-command U $$p <<abs_path_to_lyx_notebook_source_dir>>/lyxNotebookFromLFUN.py"
 \bind "S-F12" "server-notify"
 

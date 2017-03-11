@@ -152,7 +152,7 @@ AddToPreamble
    \ifthenelse{\isundefined{\lyxNotebookPrintOn}}{\def\lyxNotebookPrintOn{}}{}
    \expandafter\def\expandafter\lyxNotebookPrintOn\expandafter{\lyxNotebookPrintOn\lyxNotebookPrintOnOutputScala}
 
-   % Latex code for Scala cells from interpreterSpec.py
+   % Latex code for Scala cells from interpreter_spec.py
    %
    % Define some of the variables described in the documentation to set the font
    % size and family.  These definitions should preferably be used below instead of
@@ -183,7 +183,7 @@ AddToPreamble
    %
    % Now define the Listings styles for Lyx Notebook Scala,
    % setting the language to  (which will be replaced by the
-   % listingsLanguage field of the general spec.  Note the default frame
+   % listings_language field of the general spec.  Note the default frame
    % conventions are defined here (since the general code format for Init
    % and Standard cells doesn't differ).
    %
@@ -191,7 +191,7 @@ AddToPreamble
    % define style lyxNotebookNoColorInitScala
    \lstdefinestyle{lyxNotebookNoColorInitScala}{
       language=,
-      % generalListingsCodeFormat
+      % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morekeywords={abstract,case,catch,class,def,%
@@ -221,7 +221,7 @@ AddToPreamble
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       linewidth=\linewidth, % same right margin in indented env., boxes smaller
       upquote=true, 
-      % nonColorListingsCodeFormat
+      % non_color_listings_code_format
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookNoColorCodeFontFamily%
@@ -245,7 +245,7 @@ AddToPreamble
    % define style lyxNotebookColorInitScala
    \lstdefinestyle{lyxNotebookColorInitScala}{
       language=,
-      % generalListingsCodeFormat
+      % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morekeywords={abstract,case,catch,class,def,%
@@ -275,7 +275,7 @@ AddToPreamble
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       linewidth=\linewidth, % same right margin in indented env., boxes smaller
       upquote=true, 
-      % colorListingsCodeFormat
+      % color_listings_code_format
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookColorCodeFontFamily%
@@ -315,7 +315,7 @@ AddToPreamble
    % define style lyxNotebookNoColorOutputScala
    \lstdefinestyle{lyxNotebookNoColorOutputScala}{
       language=,
-      % generalListingsOutputFormat
+      % general_listings_output_format
       showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
@@ -334,7 +334,7 @@ AddToPreamble
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       aboveskip=\doubleskipamount, % make abut the cell above, a calulated value
       upquote=true, 
-      % nonColorListingsOutputFormat
+      % non_color_listings_output_format
       % set the font to a gray color
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
@@ -346,7 +346,7 @@ AddToPreamble
    % define lyxNotebookColorOutputScala
    \lstdefinestyle{lyxNotebookColorOutputScala}{
       language=,
-      % generalListingsOutputFormat
+      % general_listings_output_format
       showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
@@ -365,7 +365,7 @@ AddToPreamble
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       aboveskip=\doubleskipamount, % make abut the cell above, a calulated value
       upquote=true, 
-      % colorListingsOutputFormat
+      % color_listings_output_format
       % set the font to a gray color
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}

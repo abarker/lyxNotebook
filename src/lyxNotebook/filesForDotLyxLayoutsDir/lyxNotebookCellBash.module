@@ -152,7 +152,7 @@ AddToPreamble
    \ifthenelse{\isundefined{\lyxNotebookPrintOn}}{\def\lyxNotebookPrintOn{}}{}
    \expandafter\def\expandafter\lyxNotebookPrintOn\expandafter{\lyxNotebookPrintOn\lyxNotebookPrintOnOutputBash}
 
-   % Latex code for Bash cells from interpreterSpec.py
+   % Latex code for Bash cells from interpreter_spec.py
    %
    % Define some of the variables described in the documentation to set the font
    % size and family.  These definitions should preferably be used below instead of
@@ -183,7 +183,7 @@ AddToPreamble
    %
    % Now define the Listings styles for Lyx Notebook Bash,
    % setting the language to bash (which will be replaced by the
-   % listingsLanguage field of the general spec.  Note the default frame
+   % listings_language field of the general spec.  Note the default frame
    % conventions are defined here (since the general code format for Init
    % and Standard cells doesn't differ).
    %
@@ -191,7 +191,7 @@ AddToPreamble
    % define style lyxNotebookNoColorInitBash
    \lstdefinestyle{lyxNotebookNoColorInitBash}{
       language=bash,
-      % generalListingsCodeFormat
+      % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       upquote=true,
@@ -208,7 +208,7 @@ AddToPreamble
       breakatwhitespace=true,
       breakindent=1.5em,
       breakautoindent=true, 
-      % nonColorListingsCodeFormat
+      % non_color_listings_code_format
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookNoColorCodeFontFamily%
@@ -232,7 +232,7 @@ AddToPreamble
    % define style lyxNotebookColorInitBash
    \lstdefinestyle{lyxNotebookColorInitBash}{
       language=bash,
-      % generalListingsCodeFormat
+      % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       upquote=true,
@@ -249,7 +249,7 @@ AddToPreamble
       breakatwhitespace=true,
       breakindent=1.5em,
       breakautoindent=true, 
-      % colorListingsCodeFormat
+      % color_listings_code_format
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookColorCodeFontFamily%
@@ -289,7 +289,7 @@ AddToPreamble
    % define style lyxNotebookNoColorOutputBash
    \lstdefinestyle{lyxNotebookNoColorOutputBash}{
       language=,
-      % generalListingsOutputFormat
+      % general_listings_output_format
       showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
@@ -308,7 +308,7 @@ AddToPreamble
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       aboveskip=\doubleskipamount, % make abut the cell above, a calulated value
       upquote=true, 
-      % nonColorListingsOutputFormat
+      % non_color_listings_output_format
       % set the font to a gray color
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
@@ -320,7 +320,7 @@ AddToPreamble
    % define lyxNotebookColorOutputBash
    \lstdefinestyle{lyxNotebookColorOutputBash}{
       language=,
-      % generalListingsOutputFormat
+      % general_listings_output_format
       showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
@@ -339,7 +339,7 @@ AddToPreamble
       columns=fixed, % fewer chars per line, but keeps extra spaces inserted
       aboveskip=\doubleskipamount, % make abut the cell above, a calulated value
       upquote=true, 
-      % colorListingsOutputFormat
+      % color_listings_output_format
       % set the font to a gray color
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}

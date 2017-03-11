@@ -10,7 +10,7 @@ Lyx LFUN "server-notify" in the Lyx `.bind` file (which the install program crea
 as `lyxNotebookKeyBindings.bind` in the user's Lyx home directory)!
 
 To modify a key mapping in this file, simply change the string (or the None value)
-in the first component of a 2-tuple in the list `allCommandsAndKeymap` below.
+in the first component of a 2-tuple in the list `all_commands_and_keymap` below.
 The associated command strings in the second component of the 2-tuples should
 not be changed at all, or bugs will occur.
 
@@ -33,7 +33,7 @@ forward/backward keys.
 
 """
 
-allCommandsAndKeymap = [
+all_commands_and_keymap = [
     ("F1", "pop up submenu"),
     # Goto cell commands.
     (None, "goto next any cell"),

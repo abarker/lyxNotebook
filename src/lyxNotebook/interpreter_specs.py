@@ -14,7 +14,7 @@ Notebook is able to use.
 To add a specification it is probably easiest to copy an existing one and then
 change the names and the values.  The name for the spec itself (i.e., the
 variable it is assigned to in the first line) should then be added to the list
-`allSpecs` at the end of this file.  All the fields must be present; there are
+`all_specs` at the end of this file.  All the fields must be present; there are
 no default values.
 
 We now briefly describe some of the fields.  See the python2 spec below for
@@ -22,19 +22,19 @@ descriptions of the others.
 
 ----
 
-*  `progName` : An arbitrary descriptive string for the interpreter.  It is what
+*  `prog_name` : An arbitrary descriptive string for the interpreter.  It is what
    will be printed out to describe the interpreter.  Uniqueness is not required.
    For example, by default Python 2 and Python 3 are both simply called Python.
    This string is used as the small label printed to the right of code cells.
    Changing this requires running install.py again.
 
-*  `insetSpecifier` : This is a string describing the interpreter which must be
+*  `inset_specifier` : This is a string describing the interpreter which must be
    unique, and must contain only LETTER characters (no numbers).  This is
    because this string becomes part of the generated inset names, as well as a
    part of generated function names in Latex (Latex does not allow numbers in
    commands and \def strings).  Changing this requires running install.py again.
 
-*  `listingsLanguage` : the `"language=xxxxx"` setting for the Listings program.  It
+*  `listings_language` : the `"language=xxxxx"` setting for the Listings program.  It
    can be set to the empty string to use no predefined language formatting.
    Changing this requires running install.py again.
 
@@ -42,9 +42,9 @@ Changing any field other than one of the three above only requires restarting
 Lyx Notebook.  The above three require `install.py` be run again to re-generate
 the module files.
 
-*  `runCommand` : The command which is to be run; must be in `PATH` or a full pathname.
+*  `run_command` : The command which is to be run; must be in `PATH` or a full pathname.
 
-*  `runArguments` : A list of arguments to the `runCommand`.  Note that each part must
+*  `run_arguments` : A list of arguments to the `run_command`.  Note that each part must
    be a separate element of the list.  For example, `["--rcfile", "/tmp/myRcFile"]`
    rather than putting the file with the flag part.
 
@@ -57,7 +57,7 @@ then be sure that it will not cause problems if it is run twice (such as when
 two Lyx Notebook modules are loaded).
 
 The big string blocks with Listings key=value pairs (such as
-`python2.generalListingsCodeFormat`) are Listings formatting code for all the
+`python2.general_listings_code_format`) are Listings formatting code for all the
 cells of the specified type.  These are substituted into the preamble template,
 at places specified by metavars surrounded by `<< >>`.
 
@@ -91,21 +91,21 @@ class SpecRecord(object):
 
     def __init__(self):
         self.params = None # a dict mapping interpreter attributes to values
-        self.preambleLatexCode = None # Latex init code to go in the preamble once.
-        self.generalListingsCodeFormat = None # format options for all code cells
-        self.nonColorListingsCodeFormat = None # format options for non-color code cells
-        self.colorListingsCodeFormat = None # format options for color code cells
-        self.generalListingsOutputFormat = None # format options for all output cells
-        self.nonColorListingsOutputFormat = None # format options for non-color output cells
-        self.colorListingsOutputFormat = None # format options for color output cells
+        self.preamble_latex_code = None # Latex init code to go in the preamble once.
+        self.general_listings_code_format = None # format options for all code cells
+        self.non_color_listings_code_format = None # format options for non-color code cells
+        self.color_listings_code_format = None # format options for color code cells
+        self.general_listings_output_format = None # format options for all output cells
+        self.non_color_listings_output_format = None # format options for non-color output cells
+        self.color_listings_output_format = None # format options for color output cells
 
-allSpecs = [] # the list of all defined specs; each section should append to it
+all_specs = [] # the list of all defined specs; each section should append to it
 
 #
 # TODO: these language sections below could be separate files, in an interpreter_specs
 # directory.  Then it is very easy to add a new interpreter, or modify one.  The
 # bookkeeping is also simplified (someone could just send a file, not diffs).
-# At the end, each should append to allSpecs.
+# At the end, each should append to all_specs.
 #
 
 #
@@ -117,25 +117,25 @@ allSpecs = [] # the list of all defined specs; each section should append to it
 
 python2 = SpecRecord()
 python2.params = {
-    "progName": "Python",# name of the prog, used in formatted label
-    "mainPrompt": ">>> ",   # the main prompt
-    "contPrompt": "... ",   # the continuation prompt
-    "runCommand": "python", # command to run the interpreter, in path
-    "runArguments": ["-u"],   # arguments to the runCommand
-    "fileSuffix": ".py",    # suffix for code in interpreter language
-    "commentLine": "#",      # char which starts a comment line
-    "lineContinuation": "\\",     # char which denotes line continuation
-    "insetSpecifier": "PythonTwo", # e.g., Flex:LyxNotebook:Standard:PythonTwo
-    "listingsLanguage": "python", # the language=???? value for formatting
-    "startupSleepSecs": 0.01,     # initialization time for interpreter startup
-    "beforeReadSleepSecs": 0.01,     # delay between writing to interp and reading
-    "noopAtCellEnd": "pass\n", # a command to always evaluate at cell ends
-    "exitCommand": "exit()\n", # the command to exit the interpreter
-    "delNewlinePrePrompt": False,      # whether to remove a newline before prompt
-    "promptAtCellEnd": True,  # in echo mode, show waiting prompt at cell end
-    "indentDownToZeroNewline": True, # newline when Python indent goes down to zero
-    "ignoreEmptyLines": True,    # ignore lines of just whitespace in code cells
-    "runOnlyOnDemand": True     # don't start unless required to eval a cell
+    "prog_name": "Python",# name of the prog, used in formatted label
+    "main_prompt": ">>> ",   # the main prompt
+    "cont_prompt": "... ",   # the continuation prompt
+    "run_command": "python", # command to run the interpreter, in path
+    "run_arguments": ["-u"],   # arguments to the run_command
+    "file_suffix": ".py",    # suffix for code in interpreter language
+    "comment_line": "#",      # char which starts a comment line
+    "line_continuation": "\\",     # char which denotes line continuation
+    "inset_specifier": "PythonTwo", # e.g., Flex:LyxNotebook:Standard:PythonTwo
+    "listings_language": "python", # the language=???? value for formatting
+    "startup_sleep_secs": 0.01,     # initialization time for interpreter startup
+    "before_read_sleep_secs": 0.01,     # delay between writing to interp and reading
+    "noop_at_cell_end": "pass\n", # a command to always evaluate at cell ends
+    "exit_command": "exit()\n", # the command to exit the interpreter
+    "del_newline_pre_prompt": False,      # whether to remove a newline before prompt
+    "prompt_at_cell_end": True,  # in echo mode, show waiting prompt at cell end
+    "indent_down_to_zero_newline": True, # newline when Python indent goes down to zero
+    "ignore_empty_lines": True,    # ignore lines of just whitespace in code cells
+    "run_only_on_demand": True     # don't start unless required to eval a cell
 }
 
 
@@ -147,8 +147,8 @@ python2.params = {
 # users can reset the frames in their own local language styles (note comma issues
 # should be automatically fixed now assuming no bugs)
 
-python2.preambleLatexCode = r"""
-   % Latex code for <<insetSpecifier>> cells from interpreterSpec.py
+python2.preamble_latex_code = r"""
+   % Latex code for <<inset_specifier>> cells from interpreter_spec.py
    %
    % Define some of the variables described in the documentation to set the font
    % size and family.  These definitions should preferably be used below instead of
@@ -177,66 +177,66 @@ python2.preambleLatexCode = r"""
    \definecolor{purple9}{rgb}{0.4,0.0,1.0}
 
    %
-   % Now define the Listings styles for Lyx Notebook <<insetSpecifier>>,
-   % setting the language to <<lstLanguage>> (which will be replaced by the
-   % listingsLanguage field of the general spec.  Note the default frame
+   % Now define the Listings styles for Lyx Notebook <<inset_specifier>>,
+   % setting the language to <<lst_language>> (which will be replaced by the
+   % listings_language field of the general spec.  Note the default frame
    % conventions are defined here (since the general code format for Init
    % and Standard cells doesn't differ).
    %
 
-   % define style lyxNotebookNoColorInit<<insetSpecifier>>
-   \lstdefinestyle{lyxNotebookNoColorInit<<insetSpecifier>>}{
-      language=<<lstLanguage>>,
-      <<generalListingsCodeFormat>>
-      <<nonColorListingsCodeFormat>>
+   % define style lyxNotebookNoColorInit<<inset_specifier>>
+   \lstdefinestyle{lyxNotebookNoColorInit<<inset_specifier>>}{
+      language=<<lst_language>>,
+      <<general_listings_code_format>>
+      <<non_color_listings_code_format>>
       frame=TbLR
    }
 
-   % define style lyxNotebookNoColorStandard<<insetSpecifier>>
-   \lstdefinestyle{lyxNotebookNoColorStandard<<insetSpecifier>>}{
-      style=lyxNotebookNoColorInit<<insetSpecifier>>,
+   % define style lyxNotebookNoColorStandard<<inset_specifier>>
+   \lstdefinestyle{lyxNotebookNoColorStandard<<inset_specifier>>}{
+      style=lyxNotebookNoColorInit<<inset_specifier>>,
       frame=tblr
    }
 
-   % define style lyxNotebookColorInit<<insetSpecifier>>
-   \lstdefinestyle{lyxNotebookColorInit<<insetSpecifier>>}{
-      language=<<lstLanguage>>,
-      <<generalListingsCodeFormat>>
-      <<colorListingsCodeFormat>>
+   % define style lyxNotebookColorInit<<inset_specifier>>
+   \lstdefinestyle{lyxNotebookColorInit<<inset_specifier>>}{
+      language=<<lst_language>>,
+      <<general_listings_code_format>>
+      <<color_listings_code_format>>
       frame=TbLR
    }
 
-   % define style lyxNotebookColorStandard<<insetSpecifier>>
-   \lstdefinestyle{lyxNotebookColorStandard<<insetSpecifier>>}{
-      style=lyxNotebookColorInit<<insetSpecifier>>,
+   % define style lyxNotebookColorStandard<<inset_specifier>>
+   \lstdefinestyle{lyxNotebookColorStandard<<inset_specifier>>}{
+      style=lyxNotebookColorInit<<inset_specifier>>,
       frame=tblr
    }
 
-   % define style lyxNotebookColorNonEval<<insetSpecifier>>
-   \lstdefinestyle{lyxNotebookColorNonEval<<insetSpecifier>>}{
-      style=lyxNotebookColorInit<<insetSpecifier>>,
+   % define style lyxNotebookColorNonEval<<inset_specifier>>
+   \lstdefinestyle{lyxNotebookColorNonEval<<inset_specifier>>}{
+      style=lyxNotebookColorInit<<inset_specifier>>,
       frame=TBLR
    }
 
-   % define style lyxNotebookNoColorNonEval<<insetSpecifier>>
-   \lstdefinestyle{lyxNotebookNoColorNonEval<<insetSpecifier>>}{
-      style=lyxNotebookNoColorInit<<insetSpecifier>>,
+   % define style lyxNotebookNoColorNonEval<<inset_specifier>>
+   \lstdefinestyle{lyxNotebookNoColorNonEval<<inset_specifier>>}{
+      style=lyxNotebookNoColorInit<<inset_specifier>>,
       frame=TBLR
    }
 
-   % define style lyxNotebookNoColorOutput<<insetSpecifier>>
-   \lstdefinestyle{lyxNotebookNoColorOutput<<insetSpecifier>>}{
+   % define style lyxNotebookNoColorOutput<<inset_specifier>>
+   \lstdefinestyle{lyxNotebookNoColorOutput<<inset_specifier>>}{
       language=,
-      <<generalListingsOutputFormat>>
-      <<nonColorListingsOutputFormat>>
+      <<general_listings_output_format>>
+      <<non_color_listings_output_format>>
       frame=tblr
    }
 
-   % define lyxNotebookColorOutput<<insetSpecifier>>
-   \lstdefinestyle{lyxNotebookColorOutput<<insetSpecifier>>}{
+   % define lyxNotebookColorOutput<<inset_specifier>>
+   \lstdefinestyle{lyxNotebookColorOutput<<inset_specifier>>}{
       language=,
-      <<generalListingsOutputFormat>>
-      <<colorListingsOutputFormat>>
+      <<general_listings_output_format>>
+      <<color_listings_output_format>>
       frame=tblr
    }
 
@@ -246,11 +246,11 @@ python2.preambleLatexCode = r"""
 # last in a list can end in comma or not, since this is checked-for and corrected,
 # but should not end in a pure comment line (with nothing else but a comment)
 
-python2.generalListingsCodeFormat = r"""
-      % generalListingsCodeFormat
+python2.general_listings_code_format = r"""
+      % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
-      morecomment=[s]{<<tripleQuote>>}{<<tripleQuote>>},
+      morecomment=[s]{<<triple_quote>>}{<<triple_quote>>},
       %alsoletter={1234567890}, % numbers like letters
       % but in otherkeywords causes it to highlight in strings and comments
       %otherkeywords={(,),[,],\{,\},@,\,,:,.,`,=,;,+=,-=,*=,/=,//=,%=,&=,|=,^=,>>=,<<=,**=} % delimiters in Python
@@ -284,8 +284,8 @@ python2.generalListingsCodeFormat = r"""
       upquote=true,
 """
 
-python2.nonColorListingsCodeFormat = r"""
-      % nonColorListingsCodeFormat
+python2.non_color_listings_code_format = r"""
+      % non_color_listings_code_format
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookNoColorCodeFontFamily%
@@ -299,8 +299,8 @@ python2.nonColorListingsCodeFormat = r"""
       keywordstyle=[3]\bfseries,
 """
 
-python2.colorListingsCodeFormat = r"""
-      % colorListingsCodeFormat
+python2.color_listings_code_format = r"""
+      % color_listings_code_format
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
                  \lyxNotebookColorCodeFontFamily%
@@ -318,8 +318,8 @@ python2.colorListingsCodeFormat = r"""
       keywordstyle=[3]\bfseries\color{yellowGold9},
 """
 
-python2.generalListingsOutputFormat = r"""
-      % generalListingsOutputFormat
+python2.general_listings_output_format = r"""
+      % general_listings_output_format
       showlines=true, % keep blank lines at end
       %mathescape=true,
       showstringspaces=false,
@@ -340,8 +340,8 @@ python2.generalListingsOutputFormat = r"""
       upquote=true,
 """
 
-python2.nonColorListingsOutputFormat = r"""
-      % nonColorListingsOutputFormat
+python2.non_color_listings_output_format = r"""
+      % non_color_listings_output_format
       % set the font to a gray color
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}%
@@ -349,8 +349,8 @@ python2.nonColorListingsOutputFormat = r"""
                  \color[rgb]{0.2,0.2,0.2}
 """
 
-python2.colorListingsOutputFormat = r"""
-      % colorListingsOutputFormat
+python2.color_listings_output_format = r"""
+      % color_listings_output_format
       % set the font to a gray color
       basicstyle=\lyxNotebookFontSize%
                  \setstretch{1}
@@ -358,7 +358,7 @@ python2.colorListingsOutputFormat = r"""
                  \color[rgb]{0.2,0.2,0.2}
 """
 
-allSpecs.append(python2)
+all_specs.append(python2)
 
 # ==================================================================================
 #
@@ -366,44 +366,44 @@ allSpecs.append(python2)
 #
 # ==================================================================================
 #
-# This is the same as Python 2 except for progName, runCommand, and insetSpecifier.
+# This is the same as Python 2 except for prog_name, run_command, and inset_specifier.
 # We could have just made python3 a deep copy of python2 and modified those values.
 
 python3 = SpecRecord()
 python3.params = {
-    "progName": "Python", # name of the prog, used in formatted label
-    "mainPrompt": ">>> ",   # the main prompt
-    "contPrompt": "... ",   # the continuation prompt
-    "runCommand": "python3", # command to run the interpreter, in path
-    "runArguments": ["-u"],   # arguments to the runCommand
-    "fileSuffix": ".py",    # suffix for code in interpreter language
-    "commentLine": "#",      # char which starts a comment line
-    "lineContinuation": "\\",     # char which denotes line continuation
-    "insetSpecifier": "Python", # e.g., Flex:LyxNotebook:Standard:Python
-    "listingsLanguage": "python", # the language=???? value for formatting
-    "startupSleepSecs": 0.01,     # initialization time for interpreter startup
-    "beforeReadSleepSecs": 0.01,     # delay between writing to interp and reading
-    "noopAtCellEnd": "pass\n", # a command to always evaluate at cell ends
-    "exitCommand": "exit()\n", # the command to exit the interpreter
-    "delNewlinePrePrompt": False,      # whether to remove a newline before prompt
-    "promptAtCellEnd": True,  # in echo mode, show waiting prompt at cell end
-    "indentDownToZeroNewline": True, # newline when Python indent goes down to zero
-    "ignoreEmptyLines": True,    # ignore lines of just whitespace in code cells
-    "runOnlyOnDemand": True     # don't start unless required to eval a cell
+    "prog_name": "Python", # name of the prog, used in formatted label
+    "main_prompt": ">>> ",   # the main prompt
+    "cont_prompt": "... ",   # the continuation prompt
+    "run_command": "python3", # command to run the interpreter, in path
+    "run_arguments": ["-u"],   # arguments to the run_command
+    "file_suffix": ".py",    # suffix for code in interpreter language
+    "comment_line": "#",      # char which starts a comment line
+    "line_continuation": "\\",     # char which denotes line continuation
+    "inset_specifier": "Python", # e.g., Flex:LyxNotebook:Standard:Python
+    "listings_language": "python", # the language=???? value for formatting
+    "startup_sleep_secs": 0.01,     # initialization time for interpreter startup
+    "before_read_sleep_secs": 0.01,     # delay between writing to interp and reading
+    "noop_at_cell_end": "pass\n", # a command to always evaluate at cell ends
+    "exit_command": "exit()\n", # the command to exit the interpreter
+    "del_newline_pre_prompt": False,      # whether to remove a newline before prompt
+    "prompt_at_cell_end": True,  # in echo mode, show waiting prompt at cell end
+    "indent_down_to_zero_newline": True, # newline when Python indent goes down to zero
+    "ignore_empty_lines": True,    # ignore lines of just whitespace in code cells
+    "run_only_on_demand": True     # don't start unless required to eval a cell
 }
 
 # all formatting is identical to Python2
-python3.preambleLatexCode = python2.preambleLatexCode
+python3.preamble_latex_code = python2.preamble_latex_code
 
-python3.generalListingsCodeFormat = python2.generalListingsCodeFormat
-python3.nonColorListingsCodeFormat = python2.nonColorListingsCodeFormat
-python3.colorListingsCodeFormat = python2.colorListingsCodeFormat
+python3.general_listings_code_format = python2.general_listings_code_format
+python3.non_color_listings_code_format = python2.non_color_listings_code_format
+python3.color_listings_code_format = python2.color_listings_code_format
 
-python3.generalListingsOutputFormat = python2.generalListingsOutputFormat
-python3.nonColorListingsOutputFormat = python2.nonColorListingsOutputFormat
-python3.colorListingsOutputFormat = python2.colorListingsOutputFormat
+python3.general_listings_output_format = python2.general_listings_output_format
+python3.non_color_listings_output_format = python2.non_color_listings_output_format
+python3.color_listings_output_format = python2.color_listings_output_format
 
-allSpecs.append(python3)
+all_specs.append(python3)
 
 # ==================================================================================
 #
@@ -424,39 +424,39 @@ allSpecs.append(python3)
 
 sage = SpecRecord()
 sage.params = {
-    "progName": "Sage",
-    "mainPrompt": "sage: ",
-    "contPrompt": "....: ",
-    "runCommand": "/usr/bin/sage", # try local, too
-    "runArguments": [],
-    "fileSuffix": ".sage",
-    "commentLine": "#",
-    "lineContinuation": "\\",
-    "insetSpecifier": "Sage", # e.g., Flex:LyxNotebook:Standard:Sage
-    "listingsLanguage": "python", # same as Python
-    "startupSleepSecs": 3.0,  # sage startup is slow
-    "beforeReadSleepSecs": 0.02,  # sage slower than raw Python
-    "noopAtCellEnd": "pass\npass\n", # two to catch some extra indent cases
-    "exitCommand": "exit()\n",
-    "delNewlinePrePrompt": False,
-    "promptAtCellEnd": True,
-    "indentDownToZeroNewline": True,
-    "ignoreEmptyLines": True,
-    "runOnlyOnDemand": True
+    "prog_name": "Sage",
+    "main_prompt": "sage: ",
+    "cont_prompt": "....: ",
+    "run_command": "/usr/bin/sage", # try local, too
+    "run_arguments": [],
+    "file_suffix": ".sage",
+    "comment_line": "#",
+    "line_continuation": "\\",
+    "inset_specifier": "Sage", # e.g., Flex:LyxNotebook:Standard:Sage
+    "listings_language": "python", # same as Python
+    "startup_sleep_secs": 3.0,  # sage startup is slow
+    "before_read_sleep_secs": 0.02,  # sage slower than raw Python
+    "noop_at_cell_end": "pass\npass\n", # two to catch some extra indent cases
+    "exit_command": "exit()\n",
+    "del_newline_pre_prompt": False,
+    "prompt_at_cell_end": True,
+    "indent_down_to_zero_newline": True,
+    "ignore_empty_lines": True,
+    "run_only_on_demand": True
 }
 
 # all formatting is identical to Python2
-sage.preambleLatexCode = python2.preambleLatexCode
+sage.preamble_latex_code = python2.preamble_latex_code
 
-sage.generalListingsCodeFormat = python2.generalListingsCodeFormat
-sage.nonColorListingsCodeFormat = python2.nonColorListingsCodeFormat
-sage.colorListingsCodeFormat = python2.colorListingsCodeFormat
+sage.general_listings_code_format = python2.general_listings_code_format
+sage.non_color_listings_code_format = python2.non_color_listings_code_format
+sage.color_listings_code_format = python2.color_listings_code_format
 
-sage.generalListingsOutputFormat = python2.generalListingsOutputFormat
-sage.nonColorListingsOutputFormat = python2.nonColorListingsOutputFormat
-sage.colorListingsOutputFormat = python2.colorListingsOutputFormat
+sage.general_listings_output_format = python2.general_listings_output_format
+sage.non_color_listings_output_format = python2.non_color_listings_output_format
+sage.color_listings_output_format = python2.color_listings_output_format
 
-allSpecs.append(sage)
+all_specs.append(sage)
 
 # ==================================================================================
 #
@@ -466,29 +466,29 @@ allSpecs.append(sage)
 
 scala = SpecRecord()
 scala.params = {
-    "progName": "Scala",
-    "mainPrompt": "scala> ",
-    "contPrompt": "     | ",
-    "runCommand": "scala",
-    "runArguments": [],
-    "fileSuffix": ".scala",
-    "commentLine": "//",
-    "lineContinuation": None,
-    "insetSpecifier": "Scala", # e.g., Flex:LyxNotebook:Standard:Scala
-    "listingsLanguage": "", # no Scala predefined yet in Listings
-    "startupSleepSecs": 1.0, # startup can be slow...
-    "beforeReadSleepSecs": 0.01,
-    "noopAtCellEnd": None,
-    "exitCommand": "exit()\n",
-    "delNewlinePrePrompt": True, # Scala interp. adds a blank line before prompt
-    "promptAtCellEnd": True,
-    "indentDownToZeroNewline": False,
-    "ignoreEmptyLines": True,
-    "runOnlyOnDemand": True
+    "prog_name": "Scala",
+    "main_prompt": "scala> ",
+    "cont_prompt": "     | ",
+    "run_command": "scala",
+    "run_arguments": [],
+    "file_suffix": ".scala",
+    "comment_line": "//",
+    "line_continuation": None,
+    "inset_specifier": "Scala", # e.g., Flex:LyxNotebook:Standard:Scala
+    "listings_language": "", # no Scala predefined yet in Listings
+    "startup_sleep_secs": 1.0, # startup can be slow...
+    "before_read_sleep_secs": 0.01,
+    "noop_at_cell_end": None,
+    "exit_command": "exit()\n",
+    "del_newline_pre_prompt": True, # Scala interp. adds a blank line before prompt
+    "prompt_at_cell_end": True,
+    "indent_down_to_zero_newline": False,
+    "ignore_empty_lines": True,
+    "run_only_on_demand": True
 }
 
-scala.generalListingsCodeFormat = r"""
-      % generalListingsCodeFormat
+scala.general_listings_code_format = r"""
+      % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       morekeywords={abstract,case,catch,class,def,%
@@ -503,7 +503,7 @@ scala.generalListingsCodeFormat = r"""
       morecomment=[n]{/*}{*/},
       morestring=[b]",
       morestring=[b]',
-      morestring=[b]<<tripleQuote>>,
+      morestring=[b]<<triple_quote>>,
       %mathescape=true,
       % Use backslash for line continuation.
       prebreak=\bf\textbackslash,
@@ -521,18 +521,18 @@ scala.generalListingsCodeFormat = r"""
 """
 
 # use same code in the preamble
-scala.preambleLatexCode = python2.preambleLatexCode
+scala.preamble_latex_code = python2.preamble_latex_code
 
 # re-use the color settings from Python2
-scala.nonColorListingsCodeFormat = python2.nonColorListingsCodeFormat
-scala.colorListingsCodeFormat = python2.colorListingsCodeFormat
+scala.non_color_listings_code_format = python2.non_color_listings_code_format
+scala.color_listings_code_format = python2.color_listings_code_format
 
 # use the same output cells as Python2
-scala.generalListingsOutputFormat = python2.generalListingsOutputFormat
-scala.nonColorListingsOutputFormat = python2.nonColorListingsOutputFormat
-scala.colorListingsOutputFormat = python2.colorListingsOutputFormat
+scala.general_listings_output_format = python2.general_listings_output_format
+scala.non_color_listings_output_format = python2.non_color_listings_output_format
+scala.color_listings_output_format = python2.color_listings_output_format
 
-allSpecs.append(scala)
+all_specs.append(scala)
 
 # ==================================================================================
 #
@@ -542,29 +542,29 @@ allSpecs.append(scala)
 
 R = SpecRecord()
 R.params = {
-    "progName": "R",
-    "mainPrompt": "> ",
-    "contPrompt": "+ ",
-    "runCommand": "R",
-    "runArguments": ["--no-save", "--no-restore", "--no-readline"],
-    "fileSuffix": ".R",
-    "commentLine": "#",
-    "lineContinuation": None,
-    "insetSpecifier": "R", # e.g., Flex:LyxNotebook:Standard:Scala
-    "listingsLanguage": "R", # no Scala predefined yet in Listings
-    "startupSleepSecs": 1.0,
-    "beforeReadSleepSecs": 0.01,
-    "noopAtCellEnd": None,
-    "exitCommand": "quit(save=\"no\")\n",
-    "delNewlinePrePrompt": False,
-    "promptAtCellEnd": True,
-    "indentDownToZeroNewline": False,
-    "ignoreEmptyLines": True,
-    "runOnlyOnDemand": True
+    "prog_name": "R",
+    "main_prompt": "> ",
+    "cont_prompt": "+ ",
+    "run_command": "R",
+    "run_arguments": ["--no-save", "--no-restore", "--no-readline"],
+    "file_suffix": ".R",
+    "comment_line": "#",
+    "line_continuation": None,
+    "inset_specifier": "R", # e.g., Flex:LyxNotebook:Standard:Scala
+    "listings_language": "R", # no Scala predefined yet in Listings
+    "startup_sleep_secs": 1.0,
+    "before_read_sleep_secs": 0.01,
+    "noop_at_cell_end": None,
+    "exit_command": "quit(save=\"no\")\n",
+    "del_newline_pre_prompt": False,
+    "prompt_at_cell_end": True,
+    "indent_down_to_zero_newline": False,
+    "ignore_empty_lines": True,
+    "run_only_on_demand": True
 }
 
-R.generalListingsCodeFormat = r"""
-      % generalListingsCodeFormat
+R.general_listings_code_format = r"""
+      % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       upquote=true,
@@ -584,18 +584,18 @@ R.generalListingsCodeFormat = r"""
 """
 
 # use same code in the preamble
-R.preambleLatexCode = python2.preambleLatexCode
+R.preamble_latex_code = python2.preamble_latex_code
 
 # re-use the color settings from Python2
-R.nonColorListingsCodeFormat = python2.nonColorListingsCodeFormat
-R.colorListingsCodeFormat = python2.colorListingsCodeFormat
+R.non_color_listings_code_format = python2.non_color_listings_code_format
+R.color_listings_code_format = python2.color_listings_code_format
 
 # use the same output cells as Python2
-R.generalListingsOutputFormat = python2.generalListingsOutputFormat
-R.nonColorListingsOutputFormat = python2.nonColorListingsOutputFormat
-R.colorListingsOutputFormat = python2.colorListingsOutputFormat
+R.general_listings_output_format = python2.general_listings_output_format
+R.non_color_listings_output_format = python2.non_color_listings_output_format
+R.color_listings_output_format = python2.color_listings_output_format
 
-allSpecs.append(R)
+all_specs.append(R)
 
 # ==================================================================================
 #
@@ -607,34 +607,34 @@ allSpecs.append(R)
 # auxiliaryFilesForInterpreters.  This bashrc file sources the usual ~/.bashrc
 # (if it exists and is readable) but then redefines the prompt strings to the
 # values which are set in the spec below.
-bashrcFile = os.path.join(lyxNotebook_user_settings.lyxNotebookSourceDir,
+bashrc_file = os.path.join(lyxNotebook_user_settings.lyx_notebook_source_dir,
                           "auxiliaryFilesForInterpreters", "lyxNotebookBashrc")
 
 bash = SpecRecord()
 bash.params = {
-    "progName": "Bash",
-    "mainPrompt": "bash $ ",
-    "contPrompt": "bash > ",
-    "runCommand": "bash",
-    "runArguments": ["--rcfile", bashrcFile],
-    "fileSuffix": ".bash",
-    "commentLine": "#",
-    "lineContinuation": None,
-    "insetSpecifier": "Bash", # e.g., Flex:LyxNotebook:Standard:Scala
-    "listingsLanguage": "bash", # no Scala predefined yet in Listings
-    "startupSleepSecs": 0.2,
-    "beforeReadSleepSecs": 0.01,
-    "noopAtCellEnd": None,
-    "exitCommand": "exit\n",
-    "delNewlinePrePrompt": False,
-    "promptAtCellEnd": True,
-    "indentDownToZeroNewline": False,
-    "ignoreEmptyLines": True,
-    "runOnlyOnDemand": True
+    "prog_name": "Bash",
+    "main_prompt": "bash $ ",
+    "cont_prompt": "bash > ",
+    "run_command": "bash",
+    "run_arguments": ["--rcfile", bashrc_file],
+    "file_suffix": ".bash",
+    "comment_line": "#",
+    "line_continuation": None,
+    "inset_specifier": "Bash", # e.g., Flex:LyxNotebook:Standard:Scala
+    "listings_language": "bash", # no Scala predefined yet in Listings
+    "startup_sleep_secs": 0.2,
+    "before_read_sleep_secs": 0.01,
+    "noop_at_cell_end": None,
+    "exit_command": "exit\n",
+    "del_newline_pre_prompt": False,
+    "prompt_at_cell_end": True,
+    "indent_down_to_zero_newline": False,
+    "ignore_empty_lines": True,
+    "run_only_on_demand": True
 }
 
-bash.generalListingsCodeFormat = r"""
-      % generalListingsCodeFormat
+bash.general_listings_code_format = r"""
+      % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks
       sensitive=true,
       upquote=true,
@@ -654,24 +654,24 @@ bash.generalListingsCodeFormat = r"""
 """
 
 # use same code in the preamble
-bash.preambleLatexCode = python2.preambleLatexCode
+bash.preamble_latex_code = python2.preamble_latex_code
 
 # re-use the color settings from Python2
-bash.nonColorListingsCodeFormat = python2.nonColorListingsCodeFormat
-bash.colorListingsCodeFormat = python2.colorListingsCodeFormat
+bash.non_color_listings_code_format = python2.non_color_listings_code_format
+bash.color_listings_code_format = python2.color_listings_code_format
 
 # use the same output cells as Python2
-bash.generalListingsOutputFormat = python2.generalListingsOutputFormat
-bash.nonColorListingsOutputFormat = python2.nonColorListingsOutputFormat
-bash.colorListingsOutputFormat = python2.colorListingsOutputFormat
+bash.general_listings_output_format = python2.general_listings_output_format
+bash.non_color_listings_output_format = python2.non_color_listings_output_format
+bash.color_listings_output_format = python2.color_listings_output_format
 
-allSpecs.append(bash)
+all_specs.append(bash)
 
 # ==================================================================================
 # end of spec definitions
 # ==================================================================================
 
-# Note we can remove anything from allSpecs here (or, equivalently, comment-out
+# Note we can remove anything from all_specs here (or, equivalently, comment-out
 # the line above where it was added.
 
 # ==================================================================================
@@ -679,64 +679,64 @@ allSpecs.append(bash)
 # ==================================================================================
 # This could be done later with the subs in generateModuleFilesFromTemplateFiles.py,
 # but we might as well build and check/test the full preamble here (a few metavars
-# like <<lstLanguage>> and <<insetSpecifier>> will remain to be substituted there).
+# like <<lst_language>> and <<inset_specifier>> will remain to be substituted there).
 
 
-def fixComma(keyValueLines, endInComma=True):
+def fix_comma(key_value_lines, end_in_comma=True):
     """Returns the key=value list with a trailing comma either there or not."""
-    lines = keyValueLines.strip("\n\t ").splitlines() # kill begin and end empty lines
+    lines = key_value_lines.strip("\n\t ").splitlines() # kill begin and end empty lines
     if len(lines) == 0: return "% empty key-value list placeholder"
     # split off any comment at end of last line
-    lastNonCommentLineIndex = -1
+    last_non_comment_line_index = -1
     for i in range(len(lines)-1, -1, -1):
-        currLine = lines[i].strip()
-        if len(currLine) == 0: continue
-        if currLine[0] != "%":
-            lastNonCommentLineIndex = i
+        curr_line = lines[i].strip()
+        if len(curr_line) == 0: continue
+        if curr_line[0] != "%":
+            last_non_comment_line_index = i
             break
-    if lastNonCommentLineIndex == -1:
+    if last_non_comment_line_index == -1:
         return "\n".join(lines) # all lines are comments, re-join and return them
-    lastLine = lines[lastNonCommentLineIndex]
-    i = 0; splitPoint = len(lastLine)
-    while i < len(lastLine): # go through each char looking for comment part
-        if lastLine[i] == "\\":
+    last_line = lines[last_non_comment_line_index]
+    i = 0; split_point = len(last_line)
+    while i < len(last_line): # go through each char looking for comment part
+        if last_line[i] == "\\":
             i += 2 # skip any escaped percent signs
             continue
-        if lastLine[i] == "%":
-            splitPoint = i # found first non-escaped percent
+        if last_line[i] == "%":
+            split_point = i # found first non-escaped percent
             break
         i += 1
-    mainLastLine = lastLine[0:splitPoint].rstrip()
-    commentLastLine = lastLine[splitPoint:]
-    if mainLastLine == "":
+    main_last_line = last_line[0:split_point].rstrip()
+    comment_last_line = last_line[split_point:]
+    if main_last_line == "":
         print("Error: last line in interpreter spec key=value list cannot be comment.")
         sys.exit(-1)
-    if mainLastLine[-1] == ",":
-        if not endInComma: mainLastLine = mainLastLine[0:-1]
+    if main_last_line[-1] == ",":
+        if not end_in_comma: main_last_line = main_last_line[0:-1]
     else:
-        if endInComma: mainLastLine = mainLastLine + ","
-    lines[lastNonCommentLineIndex] = mainLastLine + " " + commentLastLine # rejoin
+        if end_in_comma: main_last_line = main_last_line + ","
+    lines[last_non_comment_line_index] = main_last_line + " " + comment_last_line # rejoin
     return "\n".join(lines)
 
-for spec in allSpecs:
-    preamble = spec.preambleLatexCode
+for spec in all_specs:
+    preamble = spec.preamble_latex_code
     # make the metavar substitutions with replace
-    preamble = preamble.replace("<<generalListingsCodeFormat>>",
-                                fixComma(spec.generalListingsCodeFormat, True))
-    preamble = preamble.replace("<<nonColorListingsCodeFormat>>",
-                                fixComma(spec.nonColorListingsCodeFormat, True))
-    preamble = preamble.replace("<<colorListingsCodeFormat>>",
-                                fixComma(spec.colorListingsCodeFormat, True))
-    preamble = preamble.replace("<<generalListingsOutputFormat>>",
-                                fixComma(spec.generalListingsOutputFormat, True))
-    preamble = preamble.replace("<<nonColorListingsOutputFormat>>",
-                                fixComma(spec.nonColorListingsOutputFormat, True))
-    preamble = preamble.replace("<<colorListingsOutputFormat>>",
-                                fixComma(spec.colorListingsOutputFormat, True))
-    spec.preambleLatexCode = preamble
+    preamble = preamble.replace("<<general_listings_code_format>>",
+                                fix_comma(spec.general_listings_code_format, True))
+    preamble = preamble.replace("<<non_color_listings_code_format>>",
+                                fix_comma(spec.non_color_listings_code_format, True))
+    preamble = preamble.replace("<<color_listings_code_format>>",
+                                fix_comma(spec.color_listings_code_format, True))
+    preamble = preamble.replace("<<general_listings_output_format>>",
+                                fix_comma(spec.general_listings_output_format, True))
+    preamble = preamble.replace("<<non_color_listings_output_format>>",
+                                fix_comma(spec.non_color_listings_output_format, True))
+    preamble = preamble.replace("<<color_listings_output_format>>",
+                                fix_comma(spec.color_listings_output_format, True))
+    spec.preamble_latex_code = preamble
 
 
 if __name__ == "__main__":
 
     # look at the final, substituted version
-    print(python2.preambleLatexCode)
+    print(python2.preamble_latex_code)

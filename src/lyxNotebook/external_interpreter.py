@@ -51,25 +51,25 @@ class ExternalInterpreter(object):
     initialization argument is an interpreterSpec dict object which has the
     predefined collection of keys all defined."""
 
-    def __init__(self, interpreterSpec):
+    def __init__(self, interpreter_spec):
         self.debug = False # debug flag, for verbose output
-        # copy some of interpreterSpec data which is used in this
+        # copy some of interpreter_spec data which is used in this
         # module to class member variables
-        self.progName = interpreterSpec["progName"]
-        self.insetSpecifier = interpreterSpec["insetSpecifier"]
-        self.mainPrompt = interpreterSpec["mainPrompt"]
-        self.contPrompt = interpreterSpec["contPrompt"]
-        self.runCommand = interpreterSpec["runCommand"]
-        self.runArguments = interpreterSpec["runArguments"]
-        self.startupSleepSecs = interpreterSpec["startupSleepSecs"]
-        self.beforeReadSleepSecs = interpreterSpec["beforeReadSleepSecs"]
-        self.exitCommand = interpreterSpec["exitCommand"]
+        self.prog_name = interpreter_spec["prog_name"]
+        self.inset_specifier = interpreter_spec["inset_specifier"]
+        self.main_prompt = interpreter_spec["main_prompt"]
+        self.cont_prompt = interpreter_spec["cont_prompt"]
+        self.run_command = interpreter_spec["run_command"]
+        self.run_arguments = interpreter_spec["run_arguments"]
+        self.startup_sleep_secs = interpreter_spec["startup_sleep_secs"]
+        self.before_read_sleep_secs = interpreter_spec["before_read_sleep_secs"]
+        self.exit_command = interpreter_spec["exit_command"]
 
         self.running = False
-        self.beforeFirstRead = True
-        self.beforeFirstReadOrWrite = True
-        self.readErrorFound = False
-        if self.debug: print("running", self.progName)
+        self.before_first_read = True
+        self.before_first_read_or_write = True
+        self.read_error_found = False
+        if self.debug: print("running", self.prog_name)
 
         # try a pseudo-terminal fork
         try:
@@ -114,10 +114,10 @@ class ExternalInterpreter(object):
             # Example:
             #    os.execlp("python","ThePythonProgram", "-u", "pyecho.py")
             try:
-                os.execlp(self.runCommand, "LyxNotebook"+self.insetSpecifier+"Process",
-                          *self.runArguments)
+                os.execlp(self.run_command, "LyxNotebook"+self.inset_specifier+"Process",
+                          *self.run_arguments)
                 # below line also works in place of above (with exit below and import)
-                #subprocess.call([self.runCommand]+self.runArguments, shell=True)
+                #subprocess.call([self.run_command]+self.run_arguments, shell=True)
             except:
                 print("Cannot spawn execlp...")
             # sys.exit(0) # needed when subprocess.call is used above
@@ -131,80 +131,80 @@ class ExternalInterpreter(object):
             if self.debug: print("In Parent Process: PID=" + str(os.getpid()))
             # We MUST read from fd in order for the child to be spawned.
             try:
-                firstReadFromFd = os.read(self.fd, 10000)
+                first_read_from_fd = os.read(self.fd, 10000)
             except OSError:
-                self.reportReadError()
+                self.report_read_error()
                 return
-            if self.debug: print(firstReadFromFd)
+            if self.debug: print(first_read_from_fd)
             # This ^^ line above prints out the "In Child Process..." string written
             # by the child process.
-            self.spawnTime = time.time()
+            self.spawn_time = time.time()
 
-            # self.readInterpreterInitMessage() # wait and do this on-demand (read/write)
+            # self.read_interpreter_init_message() # wait and do this on-demand (read/write)
         return
 
-    def readInterpreterInitMessage(self):
+    def read_interpreter_init_message(self):
         """Read the initialization message from the interpreter, and the first
-        prompt (after waiting at least self.startupSleepSecs since self.spawnTime).
+        prompt (after waiting at least self.startup_sleep_secs since self.spawn_time).
         This is an internal initialization routine."""
-        time.sleep(max([0, (self.spawnTime + self.startupSleepSecs) - time.time()]))
+        time.sleep(max([0, (self.spawn_time + self.startup_sleep_secs) - time.time()]))
         #self.interpreterList[i].write("x=5\n")
         #self.interpreterList[i].write("print x*x\n")
-        print("----- initialization message of interpreter", self.progName)
+        print("----- initialization message of interpreter", self.prog_name)
         print(self.read())
-        print("----- end initialization of interpreter", self.progName)
+        print("----- end initialization of interpreter", self.prog_name)
 
     def write(self, string):
         """Writes to the stdin of the child's process.  The input string should be
         code that is executable in the interpreter, and should be newline terminated."""
-        if self.beforeFirstReadOrWrite:
-            # time.sleep(self.startupSleepSecs)
-            self.beforeFirstReadOrWrite = False
-            self.readInterpreterInitMessage()
+        if self.before_first_read_or_write:
+            # time.sleep(self.startup_sleep_secs)
+            self.before_first_read_or_write = False
+            self.read_interpreter_init_message()
         # write string to fd, returns # bytes
-        stringByteArray = string.encode("utf-8") # encode for Python3 compatibility
-        numBytesWritten = os.write(self.fd, stringByteArray) # return val currently unused
+        string_byte_array = string.encode("utf-8") # encode for Python3 compatibility
+        num_bytes_written = os.write(self.fd, string_byte_array) # return val currently unused
         sys.stdout.flush()
         # Before the first self.read we must read back the writes, or they will
         # produce a double echo effect... just how it works.  We don't need this
         # when readInterpreterInitMessage() always reads before a write, but it is
         # good to handle in general.
-        if self.beforeFirstRead and not self.readErrorFound:
+        if self.before_first_read and not self.read_error_found:
             # sys.stdout.flush()
             try:
                 os.read(self.fd, 100000)
             except OSError:
-                self.reportReadError()
+                self.report_read_error()
 
-    def read(self, maxBytes=100000, removeBackslashR=True):
+    def read(self, max_bytes=100000, remove_backslash_r=True):
         """Reads from the stdout of the child process, up until a new prompt appears.
         The process is read until a prompt on a new line is detected.
         The directly read strings have newlines of \\r\\n, but by default the \\r
         values are removed before returning the final string value (since it can
         cause problems in later processing)."""
-        if self.beforeFirstReadOrWrite:
-            # time.sleep(self.startupSleepSecs)
-            self.beforeFirstReadOrWrite = False
-            self.readInterpreterInitMessage()
-        readString = ""
+        if self.before_first_read_or_write:
+            # time.sleep(self.startup_sleep_secs)
+            self.before_first_read_or_write = False
+            self.read_interpreter_init_message()
+        read_string = ""
         while True:
             # brief sleep to make sure child has time to read any writes into its stdin
-            time.sleep(self.beforeReadSleepSecs)
+            time.sleep(self.before_read_sleep_secs)
             sys.stdout.flush()
             sys.stdin.flush() # probably not be needed
-            # read at most maxBytes bytes from fd, return "" at EOF
+            # read at most max_bytes bytes from fd, return "" at EOF
             try:
-                readString += os.read(self.fd, maxBytes).decode(
+                read_string += os.read(self.fd, max_bytes).decode(
                     "utf-8") # decode for Python3
             except OSError:
-                self.reportReadError()
-            if self.readErrorFound:
+                self.report_read_error()
+            if self.read_error_found:
                 # return nothing for now, user must see message on screen
-                self.reportReadError() # print message again
-                errString = u"\nError in LyxNotebook reading interpreter, see error" \
+                self.report_read_error() # print message again
+                err_string = u"\nError in LyxNotebook reading interpreter, see error" \
                     " messages.\n"
-                errString += self.mainPrompt # add prompt so string appears in output
-                return errString
+                err_string += self.main_prompt # add prompt so string appears in output
+                return err_string
 
             # We read until the interpreter returns a prompt, so we know that it is
             # finished with its evaluation.
@@ -223,39 +223,39 @@ class ExternalInterpreter(object):
             #    print "not printed"
             # hang()
 
-            lines = readString.splitlines()  # keepends = False
-            possibleMainPrompt = lines[-1]
-            possibleContPrompt = lines[-1]
+            lines = read_string.splitlines()  # keepends = False
+            possible_main_prompt = lines[-1]
+            possible_cont_prompt = lines[-1]
 
             # see if we really got a prompt...
             # note that some interpreters will add autoindent spaces, so look for prefix
-            if (possibleMainPrompt.find(self.mainPrompt) == 0
-                             and possibleMainPrompt.rstrip() == self.mainPrompt.rstrip()):
+            if (possible_main_prompt.find(self.main_prompt) == 0
+                             and possible_main_prompt.rstrip() == self.main_prompt.rstrip()):
                 if self.debug: print("got a main prompt, breaking")
                 break
-            if (possibleContPrompt.find(self.contPrompt) == 0
-                             and possibleContPrompt.rstrip() == self.contPrompt.rstrip()):
+            if (possible_cont_prompt.find(self.cont_prompt) == 0
+                             and possible_cont_prompt.rstrip() == self.cont_prompt.rstrip()):
                 if self.debug: print("got a continuation prompt, breaking")
                 break
             # This sleep only executes waiting for slow operations on the child to
             # return a prompt, or when there is some problem causing a hang
             time.sleep(0.5) # could sum up to get a maxTime for possible hangs, throw err
-        if removeBackslashR:
+        if remove_backslash_r:
             # assume no naturally occurring \r characters and only " \r" or "\r\n"
-            readString = readString.replace("\r\n", "\n")
+            read_string = read_string.replace("\r\n", "\n")
             # very long lines sent to intrpreter can have " \r" inserted in result...
-            readString = readString.replace(" \r", "")
+            read_string = read_string.replace(" \r", "")
             # now delete any remaining \r characters
-            readString = readString.replace("\r", "")
-        self.beforeFirstRead = False
-        return readString
+            read_string = read_string.replace("\r", "")
+        self.before_first_read = False
+        return read_string
 
     def kill(self, soft=True, hard=False):
         """Do a soft or a hard kill, or both to try soft before hard."""
         # controlD = "\x04"
         if soft:
-            exitSequence = self.exitCommand.splitlines(True) # keepends=True
-            for command in exitSequence:
+            exit_sequence = self.exit_command.splitlines(True) # keepends=True
+            for command in exit_sequence:
                 self.write(command)
             if hard: time.sleep(1) # wait one second for soft kill before trying hard
         if hard:
@@ -270,10 +270,10 @@ class ExternalInterpreter(object):
             self.kill(True, True)
         return
 
-    def reportReadError(self):
-        self.readErrorFound = True
+    def report_read_error(self):
+        self.read_error_found = True
         print("Error in LyxNotebook reading the output from interpreter"
-              "\nstarted with this command string:\n   ", self.runCommand,
+              "\nstarted with this command string:\n   ", self.run_command,
               "\nNo output can be read.  Are you sure the path to the"
               "\ninterpreter's executable is correct?", file=sys.stderr)
         return
@@ -295,29 +295,29 @@ if __name__ == "__main__":
 
     #sys.exit(0)
 
-    inChars = ""
+    in_chars = ""
     interp.write("x=5\n")
-    inChars += interp.read()
-    #sys.stdout.write(inChars); inChars=""
+    in_chars += interp.read()
+    #sys.stdout.write(in_chars); in_chars=""
     # Note extra \n required in line below, since raw writes are being used (not
     # the fancy version that sends newline on indentation down to zero) and we
     # will get a continuation prompt if only a single \n is sent.
     interp.write("if 4!=3: pass\n\n")
-    inChars += interp.read()
-    sys.stdout.write(inChars); inChars = ""
+    in_chars += interp.read()
+    sys.stdout.write(in_chars); in_chars = ""
 
     interp.write("print 'extra bonus 1'\n")
-    # inChars += interp.read()
+    # in_chars += interp.read()
     interp.write("print 'extra bonus 2'\n")
-    #inChars += interp.read()
+    #in_chars += interp.read()
     interp.write("print 'extra bonus 3'\n")
-    inChars += interp.read()
-    sys.stdout.write(inChars); inChars = ""
+    in_chars += interp.read()
+    sys.stdout.write(in_chars); in_chars = ""
     #print()
     #print("done first batch")
 
     interp.write("for i in range(0,10000): w=i+1\n\n") # note extra \n required!
-    inChars += interp.read() # if we read right after, avoid the piling-up double echo
+    in_chars += interp.read() # if we read right after, avoid the piling-up double echo
     """
    If our controller process goes on and writes later lines while python churns
    on loop we can get the "piling up" effect, where stdin doesn't get read soon
@@ -330,8 +330,8 @@ if __name__ == "__main__":
     interp.write("x=5\n")
     interp.write("x\n")
     interp.write("print 'extra bonus 5'\n")
-    inChars += interp.read()
-    sys.stdout.write(inChars); inChars = ""
+    in_chars += interp.read()
+    sys.stdout.write(in_chars); in_chars = ""
     #print()
     #print("done second batch")
     print("before soft kill")

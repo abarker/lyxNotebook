@@ -16,7 +16,7 @@
 
 # Include the Lyx Notebook key bindings.
 # This line can be commented-out to temporarily avoid binding the function keys.
-\bind_file "<<userHomeLyxDirectory>>/lyxNotebookKeyBindings"
+\bind_file "<<user_home_lyx_directory>>/lyxNotebookKeyBindings"
 
 # Make any additional bind definitions or include any other .bind files below.
 

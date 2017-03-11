@@ -25,19 +25,19 @@ import sys
 # The interpreterSpecs module is loaded because it contains the string defining
 # the Listings formatting language for each type of interpreter it defines.
 sys.path.append("..")
-from interpreter_specs import allSpecs
+from interpreter_specs import all_specs
 
 
 # =============================================================
 # Define the basic template for the header of the .module file.
 # There is 1) a common beginning part in each module, 2) a part
-# which is looped over <<basicCellType>>, 3) and a closing section.
+# which is looped over <<basic_cell_type>>, 3) and a closing section.
 # =============================================================
 
 module_header_template_common = \
-    r"""#\DeclareLyXModule{Lyx Notebook <<insetSpecifier>>}
+    r"""#\DeclareLyXModule{Lyx Notebook <<inset_specifier>>}
 #DescriptionBegin
-#The <<insetSpecifier>> cells for Lyx Notebook.
+#The <<inset_specifier>> cells for Lyx Notebook.
 #DescriptionEnd
 
 # Author : alb
@@ -51,7 +51,7 @@ Requires "listings,verbatim,ifthen,color,marginnote,needspace,graphicx,setspace,
 
 AddToPreamble
    %
-   % The preamble inserted by the Lyx Notebook module for <<insetSpecifier>>.
+   % The preamble inserted by the Lyx Notebook module for <<inset_specifier>>.
    %
    \usepackage{listings}
    \usepackage{verbatim} % to make comment blocks for non-printing
@@ -85,40 +85,40 @@ AddToPreamble
 module_header_template_basic_cell_type_dependent = \
     r"""
    %
-   % Header stuff for the <<insetSpecifier>> <<basicCellType>> cells.
+   % Header stuff for the <<inset_specifier>> <<basic_cell_type>> cells.
    %
    % Define the function to turn off printing (just make same as verbatim comment)
-   % for the inset specifier <<insetSpecifier>> and basic cell type <<basicCellType>>
+   % for the inset specifier <<inset_specifier>> and basic cell type <<basic_cell_type>>
    % Note at least some EOL comments required below or extra space inserted in text.
-   \def\lyxNotebookPrintingIsOff<<basicCellType>><<insetSpecifier>>{false}
-   \def\lyxNotebookPrintOff<<basicCellType>><<insetSpecifier>>{%
-      \def\lyxNotebookPrintingIsOff<<basicCellType>><<insetSpecifier>>{true}%
-      \let\oldLyxNotebookCell<<basicCellType>><<insetSpecifier>>\lyxNotebookCell<<basicCellType>><<insetSpecifier>>%
-      \let\lyxNotebookCell<<basicCellType>><<insetSpecifier>>=\comment%
-      \let\oldEndlyxNotebookCell<<basicCellType>><<insetSpecifier>>\endlyxNotebookCell<<basicCellType>><<insetSpecifier>>%
-      \let\endlyxNotebookCell<<basicCellType>><<insetSpecifier>>=\endcomment%
+   \def\lyxNotebookPrintingIsOff<<basic_cell_type>><<inset_specifier>>{false}
+   \def\lyxNotebookPrintOff<<basic_cell_type>><<inset_specifier>>{%
+      \def\lyxNotebookPrintingIsOff<<basic_cell_type>><<inset_specifier>>{true}%
+      \let\oldLyxNotebookCell<<basic_cell_type>><<inset_specifier>>\lyxNotebookCell<<basic_cell_type>><<inset_specifier>>%
+      \let\lyxNotebookCell<<basic_cell_type>><<inset_specifier>>=\comment%
+      \let\oldEndlyxNotebookCell<<basic_cell_type>><<inset_specifier>>\endlyxNotebookCell<<basic_cell_type>><<inset_specifier>>%
+      \let\endlyxNotebookCell<<basic_cell_type>><<inset_specifier>>=\endcomment%
    }%
 
    % Define the function to turn printing back on if it has been turned off
-   % for the inset specifier <<insetSpecifier>> and basic cell type <<basicCellType>>
+   % for the inset specifier <<inset_specifier>> and basic cell type <<basic_cell_type>>
    % Note at least some EOL comments required below or extra space inserted in text.
-   \def\lyxNotebookPrintOn<<basicCellType>><<insetSpecifier>>{%
-      \ifthenelse{\equal{\lyxNotebookPrintingIsOff<<basicCellType>><<insetSpecifier>>}{true}}{%
-         \let\lyxNotebookCell<<basicCellType>><<insetSpecifier>>=\oldLyxNotebookCell<<basicCellType>><<insetSpecifier>>%
-         \let\endlyxNotebookCell<<basicCellType>><<insetSpecifier>>=\oldEndlyxNotebookCell<<basicCellType>><<insetSpecifier>>%
-         \def\lyxNotebookPrintingIsOff<<basicCellType>><<insetSpecifier>>{false}%
+   \def\lyxNotebookPrintOn<<basic_cell_type>><<inset_specifier>>{%
+      \ifthenelse{\equal{\lyxNotebookPrintingIsOff<<basic_cell_type>><<inset_specifier>>}{true}}{%
+         \let\lyxNotebookCell<<basic_cell_type>><<inset_specifier>>=\oldLyxNotebookCell<<basic_cell_type>><<inset_specifier>>%
+         \let\endlyxNotebookCell<<basic_cell_type>><<inset_specifier>>=\oldEndlyxNotebookCell<<basic_cell_type>><<inset_specifier>>%
+         \def\lyxNotebookPrintingIsOff<<basic_cell_type>><<inset_specifier>>{false}%
       }%
       {}%
    }%
 
    % Build up the general printing off/on commands by adding commands for the
-   % inset specifier <<insetSpecifier>> and basic cell type <<basicCellType>>
+   % inset specifier <<inset_specifier>> and basic cell type <<basic_cell_type>>
    % (Note expandafter is used to avoid recursion problems; using e.g.
    % \let\oldegg\egg and then using oldegg on the r.h.s. should also work.)
    \ifthenelse{\isundefined{\lyxNotebookPrintOff}}{\def\lyxNotebookPrintOff{}}{}
-   \expandafter\def\expandafter\lyxNotebookPrintOff\expandafter{\lyxNotebookPrintOff\lyxNotebookPrintOff<<basicCellType>><<insetSpecifier>>}
+   \expandafter\def\expandafter\lyxNotebookPrintOff\expandafter{\lyxNotebookPrintOff\lyxNotebookPrintOff<<basic_cell_type>><<inset_specifier>>}
    \ifthenelse{\isundefined{\lyxNotebookPrintOn}}{\def\lyxNotebookPrintOn{}}{}
-   \expandafter\def\expandafter\lyxNotebookPrintOn\expandafter{\lyxNotebookPrintOn\lyxNotebookPrintOn<<basicCellType>><<insetSpecifier>>}
+   \expandafter\def\expandafter\lyxNotebookPrintOn\expandafter{\lyxNotebookPrintOn\lyxNotebookPrintOn<<basic_cell_type>><<inset_specifier>>}
 """
 
 module_header_template_end = \
@@ -134,7 +134,7 @@ EndPreamble
 standard_template = \
     r"""
 
-InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
+InsetLayout Flex:LyxNotebookCell:<<basic_cell_type>>:<<inset_specifier>>
         # Flex custom layouts work with flex-insert, but exact case matters, e.g.,
         #    flex-insert Flex:WrapListings
         # Also works with inset-forall:
@@ -159,7 +159,7 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
    #
    # Labels, fonts, and colors.
    #
-   LabelString          "<<insetSpecifier>> <<labelModifier>> Code"
+   LabelString          "<<inset_specifier>> <<label_modifier>> Code"
    Decoration           classic
    BgColor              white
    Font # the font of the text in Lyx, not the Latex font
@@ -178,7 +178,7 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
    #
    # Latex-related settings.
    #
-   LatexName            lyxNotebookCell<<basicCellType>><<insetSpecifier>>
+   LatexName            lyxNotebookCell<<basic_cell_type>><<inset_specifier>>
    # LatexType            command
    LatexType            Environment
    # RequiredArgs         0    # not used
@@ -188,9 +188,9 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
    RefPrefix            "lyxCell"
    Preamble
       %
-      % The preamble inserted by <<insetSpecifier>> <<basicCellType>> InsetLayout.
+      % The preamble inserted by <<inset_specifier>> <<basic_cell_type>> InsetLayout.
       %
-      \lstnewenvironment{lyxNotebookCell<<basicCellType>><<insetSpecifier>>}{%
+      \lstnewenvironment{lyxNotebookCell<<basic_cell_type>><<inset_specifier>>}{%
          \mbox{}% try to keep all on one line so margin notes stay with listings
          % -----------------------------------------------------------------------
          % Do color-related lstsets, according to user choice of color or not.
@@ -199,12 +199,12 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
             % --------------------------------------------------------------------
             % Begin then section of ifthenelse, formatting without color.
             % --------------------------------------------------------------------
-            \lstset{style=lyxNotebookNoColor<<basicCellType>><<insetSpecifier>>}%
+            \lstset{style=lyxNotebookNoColor<<basic_cell_type>><<inset_specifier>>}%
          } % end then section of ifthenelse
          {  % -----------------------------------------------------------------------
             % Begin else section of ifthenelse, color formatting.
             % -----------------------------------------------------------------------
-            \lstset{style=lyxNotebookColor<<basicCellType>><<insetSpecifier>>}%
+            \lstset{style=lyxNotebookColor<<basic_cell_type>><<inset_specifier>>}%
          } % end else section of ifthenelse
          % -----------------------------------------------------------------------
          % Now execute the any relevant user-defined lstset commands.
@@ -215,25 +215,25 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
             \lyxNotebookLstsetAllAll%
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         \ifthenelse{\isundefined{\lyxNotebookLstset<<basicCellType>>All}}
+         \ifthenelse{\isundefined{\lyxNotebookLstset<<basic_cell_type>>All}}
          {} % do nothing if command is undefined
          {  % otherwise, the user defined it so call it
-            \lyxNotebookLstset<<basicCellType>>All%
+            \lyxNotebookLstset<<basic_cell_type>>All%
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         \ifthenelse{\isundefined{\lyxNotebookLstsetAll<<insetSpecifier>>}}
+         \ifthenelse{\isundefined{\lyxNotebookLstsetAll<<inset_specifier>>}}
          {} % do nothing if command is undefined
          {  % otherwise, the user defined it so call it
-            \lyxNotebookLstsetAll<<insetSpecifier>>%
+            \lyxNotebookLstsetAll<<inset_specifier>>%
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         \ifthenelse{\isundefined{\lyxNotebookLstset<<basicCellType>><<insetSpecifier>>}}
+         \ifthenelse{\isundefined{\lyxNotebookLstset<<basic_cell_type>><<inset_specifier>>}}
          {} % do nothing if command is undefined
          {  % otherwise, the user defined it so call it
-            \lyxNotebookLstset<<basicCellType>><<insetSpecifier>>%
+            \lyxNotebookLstset<<basic_cell_type>><<inset_specifier>>%
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         % Put a rotated, bold, ttfamily "<<progName>>"
+         % Put a rotated, bold, ttfamily "<<prog_name>>"
          % always in the right margin.
          % -----------------------------------------------------------------------
          \ifthenelse{\equal{\lyxNotebookNoCellLabels}{false}}{%
@@ -254,10 +254,10 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
             %\Needspace*{\lyxNotebookNeedspaceLabelValue}% exact, flushbottom
             %\Needspace{\lyxNotebookNeedspaceLabelValue}% exact but not flushbottom
             \needspace{\lyxNotebookNeedspaceLabelValue}% not flushbottom, approx
-            {\reversemarginpar\marginnote[]{\rotatebox{-90}{\lyxNotebookLabelFormat <<progName>>}}[0.8em]}\marginnote[]{\rotatebox{-90}{\lyxNotebookLabelFormat <<progName>>}}[0.8em]%
+            {\reversemarginpar\marginnote[]{\rotatebox{-90}{\lyxNotebookLabelFormat <<prog_name>>}}[0.8em]}\marginnote[]{\rotatebox{-90}{\lyxNotebookLabelFormat <<prog_name>>}}[0.8em]%
             %{\reversemarginpar % this gets the "always to right" for even & odd pages
-            %\marginpar[\rotatebox{-90}{\bfseries\ttfamily\tiny <<progName>>}]{rrev}}
-            %\marginpar[lplain]{\rotatebox{-90}{\bfseries\ttfamily\tiny <<progName>>}}
+            %\marginpar[\rotatebox{-90}{\bfseries\ttfamily\tiny <<prog_name>>}]{rrev}}
+            %\marginpar[lplain]{\rotatebox{-90}{\bfseries\ttfamily\tiny <<prog_name>>}}
             \nopagebreak%
          } % end of do label-printing
          {} % do nothing when lyxNotebookNoCellLabels is true
@@ -265,7 +265,7 @@ InsetLayout Flex:LyxNotebookCell:<<basicCellType>>:<<insetSpecifier>>
       }% end of lstnewenvironment starting code block
       { % begin of lstnewenvironment ending code block
          % try to avoid breaks between code cells and output cells (if output printed)
-         \ifthenelse{\equal{\lyxNotebookPrintingIsOffOutput<<insetSpecifier>>}{false}}{%
+         \ifthenelse{\equal{\lyxNotebookPrintingIsOffOutput<<inset_specifier>>}{false}}{%
          \nopagebreak
          }{}%
       }% end of lstnewenvironment ending code block
@@ -280,7 +280,7 @@ End
 output_template = \
     r"""
 
-InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
+InsetLayout Flex:LyxNotebookCell:Output:<<inset_specifier>>
         # Flex custom layouts work with flex-insert, but exact case matters, e.g.,
         #    flex-insert Flex:WrapListings
         # Also works with inset-forall:
@@ -305,7 +305,7 @@ InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
    #
    # Labels, fonts, and colors.
    #
-   LabelString          "<<insetSpecifier>> Output"
+   LabelString          "<<inset_specifier>> Output"
    # Decoration           minimalistic
    Decoration           classic
    BgColor              white
@@ -325,7 +325,7 @@ InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
    #
    # Latex-related settings.
    #
-   LatexName            lyxNotebookCellOutput<<insetSpecifier>>
+   LatexName            lyxNotebookCellOutput<<inset_specifier>>
    # LatexType            command
    LatexType            Environment
    # RequiredArgs         0    # not used
@@ -335,7 +335,7 @@ InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
    RefPrefix            "lyxCell"
    Preamble
       %
-      % The preamble inserted by <<insetSpecifier>> Output InsetLayout.
+      % The preamble inserted by <<inset_specifier>> Output InsetLayout.
       %
 
       % calculate the length of spacing between two listings, to remove it
@@ -343,7 +343,7 @@ InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
       \setlength{\doubleskipamount}{-\medskipamount}
       \addtolength{\doubleskipamount}{2pt}
 
-      \lstnewenvironment{lyxNotebookCellOutput<<insetSpecifier>>}{
+      \lstnewenvironment{lyxNotebookCellOutput<<inset_specifier>>}{
          \nopagebreak % try to keep on the same page as standard cell above it
          % -----------------------------------------------------------------------
          % Do color-related lstsets, according to user choice of color or not.
@@ -352,13 +352,13 @@ InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
             % --------------------------------------------------------------------
             % Begin then section of ifthenelse, formatting without color.
             % --------------------------------------------------------------------
-            \lstset{style=lyxNotebookNoColorOutput<<insetSpecifier>>}
+            \lstset{style=lyxNotebookNoColorOutput<<inset_specifier>>}
          } % end then section of ifthenelse
          {
             % -----------------------------------------------------------------------
             % Begin else section of ifthenelse, color formatting.
             % -----------------------------------------------------------------------
-            \lstset{style=lyxNotebookColorOutput<<insetSpecifier>>}
+            \lstset{style=lyxNotebookColorOutput<<inset_specifier>>}
          } % end else section of ifthenelse
          % -----------------------------------------------------------------------
          % Now execute the any relevant user-defined lstset commands.
@@ -369,22 +369,22 @@ InsetLayout Flex:LyxNotebookCell:Output:<<insetSpecifier>>
             \lyxNotebookLstsetAllAll
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         \ifthenelse{\isundefined{\lyxNotebookLstset<<basicCellType>>All}}
+         \ifthenelse{\isundefined{\lyxNotebookLstset<<basic_cell_type>>All}}
          {} % do nothing if command is undefined
          {  % otherwise, the user defined it so call it
-            \lyxNotebookLstset<<basicCellType>>All
+            \lyxNotebookLstset<<basic_cell_type>>All
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         \ifthenelse{\isundefined{\lyxNotebookLstsetAll<<insetSpecifier>>}}
+         \ifthenelse{\isundefined{\lyxNotebookLstsetAll<<inset_specifier>>}}
          {} % do nothing if command is undefined
          {  % otherwise, the user defined it so call it
-            \lyxNotebookLstsetAll<<insetSpecifier>>
+            \lyxNotebookLstsetAll<<inset_specifier>>
          } % end of else section of ifthenelse for whether user lstset is defined
          % -----------------------------------------------------------------------
-         \ifthenelse{\isundefined{\lyxNotebookLstset<<basicCellType>><<insetSpecifier>>}}
+         \ifthenelse{\isundefined{\lyxNotebookLstset<<basic_cell_type>><<inset_specifier>>}}
          {} % do nothing if command is undefined
          {  % otherwise, the user defined it so call it
-            \lyxNotebookLstset<<basicCellType>><<insetSpecifier>>
+            \lyxNotebookLstset<<basic_cell_type>><<inset_specifier>>
          } % end of else section of ifthenelse for whether user lstset is defined
       }% end of lstnewenvironment starting code block
       {}% all of lstnewenvironment ending code (empty)
@@ -441,73 +441,73 @@ def generate_files_from_templates():
         f.write(listings_with_small_font)
 
     # now do all the other modules, one for each interpreter specification
-    for spec in allSpecs:
-        preambleLatexCode = spec.preambleLatexCode
-        insetSpecifier = spec.params["insetSpecifier"]
-        progName = spec.params["progName"]
-        lstLanguage = spec.params["listingsLanguage"]
+    for spec in all_specs:
+        preamble_latex_code = spec.preamble_latex_code
+        inset_specifier = spec.params["inset_specifier"]
+        prog_name = spec.params["prog_name"]
+        lst_language = spec.params["listings_language"]
 
-        print("running for insetSpecifier=" + insetSpecifier
-              + ",  progName=" + progName + ",  listingsLanguage=" + lstLanguage)
+        print("running for inset_specifier=" + inset_specifier
+              + ",  prog_name=" + prog_name + ",  listings_language=" + lst_language)
 
-        headCommon = module_header_template_common
-        headDependent = module_header_template_basic_cell_type_dependent
+        head_common = module_header_template_common
+        head_dependent = module_header_template_basic_cell_type_dependent
         init = standard_template
         standard = standard_template
         output = output_template
 
         # replace meta-vars in the common header section
-        headCommon = headCommon.replace("<<tripleQuote>>", "\"\"\"")
-        headCommon = headCommon.replace("<<insetSpecifier>>", insetSpecifier)
-        headCommon = headCommon.replace("<<progName>>", progName)
-        headCommon = headCommon.replace("<<lstLanguage>>", lstLanguage)
+        head_common = head_common.replace("<<triple_quote>>", "\"\"\"")
+        head_common = head_common.replace("<<inset_specifier>>", inset_specifier)
+        head_common = head_common.replace("<<prog_name>>", prog_name)
+        head_common = head_common.replace("<<lst_language>>", lst_language)
 
-        head = headCommon
+        head = head_common
 
-        # replace meta-vars in dependent header, one copy for each basicCellType
-        # NOTE that we could have just treated the sections as <<...>> vars in headCommon
-        for basicCellType in ["Init", "Standard", "Output"]:
-            headTmp = headDependent
-            headTmp = headTmp.replace("<<tripleQuote>>", "\"\"\"")
-            headTmp = headTmp.replace("<<insetSpecifier>>", insetSpecifier)
-            headTmp = headTmp.replace("<<progName>>", progName)
-            headTmp = headTmp.replace("<<lstLanguage>>", lstLanguage)
-            headTmp = headTmp.replace("<<basicCellType>>", basicCellType)
-            head += headTmp
+        # replace meta-vars in dependent header, one copy for each basic_cell_type
+        # NOTE that we could have just treated the sections as <<...>> vars in head_common
+        for basic_cell_type in ["Init", "Standard", "Output"]:
+            head_tmp = head_dependent
+            head_tmp = head_tmp.replace("<<triple_quote>>", "\"\"\"")
+            head_tmp = head_tmp.replace("<<inset_specifier>>", inset_specifier)
+            head_tmp = head_tmp.replace("<<prog_name>>", prog_name)
+            head_tmp = head_tmp.replace("<<lst_language>>", lst_language)
+            head_tmp = head_tmp.replace("<<basic_cell_type>>", basic_cell_type)
+            head += head_tmp
 
-        # replace certain meta-vars in preambleLatexCode
-        preambleLatexCode = preambleLatexCode.replace("<<tripleQuote>>", "\"\"\"")
-        preambleLatexCode = preambleLatexCode.replace("<<insetSpecifier>>", insetSpecifier)
-        preambleLatexCode = preambleLatexCode.replace("<<progName>>", progName)
-        preambleLatexCode = preambleLatexCode.replace("<<lstLanguage>>", lstLanguage)
+        # replace certain meta-vars in preamble_latex_code
+        preamble_latex_code = preamble_latex_code.replace("<<triple_quote>>", "\"\"\"")
+        preamble_latex_code = preamble_latex_code.replace("<<inset_specifier>>", inset_specifier)
+        preamble_latex_code = preamble_latex_code.replace("<<prog_name>>", prog_name)
+        preamble_latex_code = preamble_latex_code.replace("<<lst_language>>", lst_language)
 
         # now we have the full .module file header (stuff before any InsetLayout commands)
-        head += preambleLatexCode + module_header_template_end
+        head += preamble_latex_code + module_header_template_end
 
         # replace meta-vars in standard template
-        standard = standard.replace("<<tripleQuote>>", "\"\"\"")
-        standard = standard.replace("<<insetSpecifier>>", insetSpecifier)
-        standard = standard.replace("<<progName>>", progName)
-        standard = standard.replace("<<labelModifier>>", "") # just Code, no special label
-        standard = standard.replace("<<lstLanguage>>", lstLanguage)
-        standard = standard.replace("<<basicCellType>>", "Standard")
+        standard = standard.replace("<<triple_quote>>", "\"\"\"")
+        standard = standard.replace("<<inset_specifier>>", inset_specifier)
+        standard = standard.replace("<<prog_name>>", prog_name)
+        standard = standard.replace("<<label_modifier>>", "") # just Code, no special label
+        standard = standard.replace("<<lst_language>>", lst_language)
+        standard = standard.replace("<<basic_cell_type>>", "Standard")
 
         # replace meta-vars in init template
         # init cells are currently identical to standard cells except for the frame spec
-        init = init.replace("<<tripleQuote>>", "\"\"\"")
-        init = init.replace("<<insetSpecifier>>", insetSpecifier)
-        init = init.replace("<<progName>>", progName)
-        init = init.replace("<<labelModifier>>", "Init") # use "Init Code" on inset label
-        init = init.replace("<<lstLanguage>>", lstLanguage)
-        init = init.replace("<<basicCellType>>", "Init")
+        init = init.replace("<<triple_quote>>", "\"\"\"")
+        init = init.replace("<<inset_specifier>>", inset_specifier)
+        init = init.replace("<<prog_name>>", prog_name)
+        init = init.replace("<<label_modifier>>", "Init") # use "Init Code" on inset label
+        init = init.replace("<<lst_language>>", lst_language)
+        init = init.replace("<<basic_cell_type>>", "Init")
 
         # replace meta-vars in output template
-        output = output.replace("<<insetSpecifier>>", insetSpecifier)
-        output = output.replace("<<progName>>", progName)
-        output = output.replace("<<basicCellType>>", "Output")
+        output = output.replace("<<inset_specifier>>", inset_specifier)
+        output = output.replace("<<prog_name>>", prog_name)
+        output = output.replace("<<basic_cell_type>>", "Output")
 
         # write concat of all templates to correct output file
-        with open("lyxNotebookCell"+insetSpecifier+".module", "w") as f:
+        with open("lyxNotebookCell"+inset_specifier+".module", "w") as f:
             f.write(head + init + standard + output)
 
 generate_files_from_templates()
