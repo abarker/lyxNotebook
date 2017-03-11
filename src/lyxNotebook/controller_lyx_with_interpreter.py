@@ -375,7 +375,7 @@ class ControllerLyxWithInterpreter(object):
             # Handle the general key actions, including commands set from submenu.
             # ====================================================================
 
-            print("Processing user command:", key_action)
+            print("LyxNotebook processing user command:", key_action)
             self.lyx_process.show_message("Processing user command: " + key_action)
 
             #
