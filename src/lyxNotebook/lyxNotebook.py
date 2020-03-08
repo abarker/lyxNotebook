@@ -32,18 +32,17 @@ import lyxNotebook_user_settings # before controller_lyx_with_interpreter, dynam
 # stored as an on-the-fly calculated variable in the lyxNotebook_user_settings
 # namespace.
 
-# TODO can use realpath(abspath(expanduser(... ALSO, don't use argv[0], use __file__
-# Can also use inspect (see utilities.py file)
-my_CWD = os.getcwd()
-calling_command = os.path.join(my_CWD, os.path.expanduser(sys.argv[0]))
-lyxNotebook_user_settings.lyx_notebook_source_dir = os.path.dirname(calling_command)
+# Todo: don't use argv[0], use __file__ or a dir_locator module.
+calling_command = os.path.abspath(os.path.expanduser(sys.argv[0]))
+lyx_notebook_source_dir = os.path.dirname(calling_command)
+lyxNotebook_user_settings.lyx_notebook_source_dir = lyx_notebook_source_dir
+os.chdir(lyx_notebook_source_dir) # Makes relatives paths work in user_settings.
 
 # Do below import *after* the calculations above, since implicitly import interpreter_specs
 from controller_lyx_with_interpreter import ControllerLyxWithInterpreter
 
 # Set the lockfile location to be in the user's local Lyx directory.
 user_home_lyx_directory = lyxNotebook_user_settings.user_home_lyx_directory
-print("DEBUG lyxNotebook.py user_home_lyx_directory", user_home_lyx_directory)
 lockfile_path = os.path.abspath(os.path.expanduser(
     os.path.join(user_home_lyx_directory, "lyxNotebook.lockfile")))
 

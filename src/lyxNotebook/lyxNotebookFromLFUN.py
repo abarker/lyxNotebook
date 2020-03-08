@@ -61,7 +61,7 @@ always_start_new_terminal = lyxNotebook_user_settings.always_start_new_terminal
 calling_command = os.path.abspath(os.path.expanduser(sys.argv[0]))
 lyx_notebook_source_dir = os.path.dirname(calling_command)
 lyxNotebook_run_path = os.path.join(lyx_notebook_source_dir, "lyxNotebook.py")
-os.chdir(lyx_notebook_source_dir) # This is to make relative paths work in user_settings file.
+os.chdir(lyx_notebook_source_dir) # Make relative paths work in user_settings file.
 
 my_PID = os.getpid()
 my_CWD = os.getcwd()
@@ -196,10 +196,10 @@ if always_start_new_terminal or terminal == "?":
         # new terminal (since one was created for it).  Could kluge some flag
         # or file, but it doesn't seem worth it as of now.  So call lyxNotebook.
         proc = subprocess.Popen(
-            ["xterm -e /bin/bash -l -c 'cd %s ; %s'" % (my_CWD, lyxNotebook_run_path)],
+            ["xterm -e /bin/bash -l -c 'cd {} ; {}'".format(my_CWD, lyxNotebook_run_path)],
             shell=True)
     else:
         pass # later add terminal for other platforms
 else: # got a unique terminal associated with current process or Lyx process
-    proc = subprocess.Popen(["%s >%s 2>&1" % (lyxNotebook_run_path, terminal)], shell=True)
+    proc = subprocess.Popen(["{} >{} 2>&1".format(lyxNotebook_run_path, terminal)], shell=True)
 

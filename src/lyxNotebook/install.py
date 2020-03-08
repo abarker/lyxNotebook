@@ -59,30 +59,28 @@ def find_source_directory():
           source_dir_with_tilde, "\n")
     return source_dir
 
-def setup_key_binding_files(user_home_lyx_directory_expanded, source_dir):
-    """User-modifiable key-binding file (TODO: better as a fun or 3)."""
+def setup_key_binding_files(user_home_lyx_directory, source_dir):
+    """Set up the user-modifiable key-binding file."""
 
     # Process the user-modifiable bind file to load the path of the Lyx Notebook bindings.
     bind_template_pathname = path.join(
         source_dir, "filesForDotLyxDir", "userCustomizableKeyBindings.template")
-    bind_template = open(bind_template_pathname, "r")
-    bind_contents_str = bind_template.read()
-    bind_template.close()
+    with open(bind_template_pathname, "r") as bind_template:
+        bind_contents_str = bind_template.read()
     bind_contents_str = bind_contents_str.replace("<<user_home_lyx_directory>>",
-                             user_home_lyx_directory_expanded)
+                             user_home_lyx_directory)
 
     # Write out the final user-modifiable .bind file.
     bind_file_pathname = path.join(
         source_dir, "filesForDotLyxDir", "userCustomizableKeyBindings.bind")
-    bind_file = open(bind_file_pathname, "w")
-    bind_file.write(bind_contents_str)
-    bind_file.close()
+    with open(bind_file_pathname, "w") as bind_file:
+        bind_file.write(bind_contents_str)
     print("Generated the key-binding file\n   ",
           bind_file_pathname, "\nfrom the corresponding .template file.")
 
     # Copy the user-modifiable .bind file to the user_home_lyx_directory.
     bind_file_dest = path.join(
-        user_home_lyx_directory_expanded, "userCustomizableKeyBindings.bind")
+        user_home_lyx_directory, "userCustomizableKeyBindings.bind")
     yesno = 1
     if os.path.exists(bind_file_dest):
         msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
@@ -104,24 +102,22 @@ def setup_key_binding_files(user_home_lyx_directory_expanded, source_dir):
     # Process the Lyx Notebook bind file to contain the path of the user's source directory.
     bind_template_pathname = path.join(
         source_dir, "filesForDotLyxDir", "lyxNotebookKeyBindings.template")
-    bind_template = open(bind_template_pathname, "r")
-    bind_contents_str = bind_template.read()
-    bind_template.close()
+    with open(bind_template_pathname, "r") as bind_template:
+        bind_contents_str = bind_template.read()
     bind_contents_str = bind_contents_str.replace("<<abs_path_to_lyx_notebook_source_dir>>",
                                               source_dir) # must be absolute path
 
-    # Write out the final Lyx Notebook .bind file.
+    # Write out the final Lyx Notebook .bind file to the filesForDotLyxDir directory.
     bind_file_pathname = path.join(
         source_dir, "filesForDotLyxDir", "lyxNotebookKeyBindings.bind")
-    bind_file = open(bind_file_pathname, "w")
-    bind_file.write(bind_contents_str)
-    bind_file.close()
+    with open(bind_file_pathname, "w") as bind_file:
+        bind_file.write(bind_contents_str)
     print("Generated the key-binding file\n   ",
           bind_file_pathname, "\nfrom the corresponding .template file.")
 
-    # Copy the Lyx Notebook .bind file to the user_home_lyx_directory.
+    # Copy the Lyx Notebook .bind file from filesForDotLyxDir to user_home_lyx_directory.
     bind_file_dest = path.join(
-        user_home_lyx_directory_expanded, "lyxNotebookKeyBindings.bind")
+        user_home_lyx_directory, "lyxNotebookKeyBindings.bind")
     yesno = 1
     if os.path.exists(bind_file_dest):
         msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
@@ -135,8 +131,8 @@ def setup_key_binding_files(user_home_lyx_directory_expanded, source_dir):
               bind_file_dest, "\n")
     os.remove(bind_file_pathname) # Delete local copy to avoid confusion.
 
-def setup_module_files(user_home_lyx_directory_expanded, source_dir):
-    """Setup the .module files"""
+def setup_module_files(user_home_lyx_directory, source_dir):
+    """Generate the .module files and copy to `user_home_lyx_directory`"""
 
     # Go to the directory for .module files.
     modules_directory = path.join(source_dir, "filesForDotLyxLayoutsDir")
@@ -147,8 +143,9 @@ def setup_module_files(user_home_lyx_directory_expanded, source_dir):
     dot_module_files = glob.glob("*.module")
     for oldModuleFile in dot_module_files: # Delete the old .module files.
         os.remove(oldModuleFile)
-        installed = os.path.join(user_home_lyx_directory_expanded, "layouts", oldModuleFile)
-        if os.path.exists(installed): os.remove(installed)
+        installed = os.path.join(user_home_lyx_directory, "layouts", oldModuleFile)
+        if os.path.exists(installed):
+            os.remove(installed)
 
     # Regenerate all the .module files, in case the user changed interpreter_specs.py.
     from generate_module_files_from_template import generate_files_from_templates
@@ -159,23 +156,24 @@ def setup_module_files(user_home_lyx_directory_expanded, source_dir):
     dot_module_files = glob.glob("*.module")
     for newModuleFile in dot_module_files:
         path_in_layouts_dir = path.join(
-            user_home_lyx_directory_expanded, "layouts", newModuleFile)
+            user_home_lyx_directory, "layouts", newModuleFile)
         shutil.copyfile(newModuleFile, path_in_layouts_dir)
 
 def run_setup():
     """Main routine to run the setup."""
+    print()
     print("="*70)
     print("\nStarting the install and setup of LyX Notebook...\n")
 
-    user_home_lyx_directory = lyxNotebook_user_settings.user_home_lyx_directory
-    user_home_lyx_directory_expanded = path.abspath(path.expanduser(user_home_lyx_directory))
+    user_home_lyx_directory_original = lyxNotebook_user_settings.user_home_lyx_directory
+    user_home_lyx_directory = path.abspath(path.expanduser(user_home_lyx_directory_original))
 
     # Find the Lyx Notebook source directory from the invoking pathname and cwd.
     source_dir = find_source_directory()
 
-    setup_key_binding_files(user_home_lyx_directory_expanded, source_dir)
+    setup_key_binding_files(user_home_lyx_directory, source_dir)
 
-    setup_module_files(user_home_lyx_directory_expanded, source_dir)
+    setup_module_files(user_home_lyx_directory, source_dir)
 
     # Finished the first phase.
     msg = "Finished the first phase of the setup."
@@ -215,7 +213,6 @@ def run_setup():
     See the documentation file lyxNotebookDocs.pdf for further information.
 
     """
-
     print("="*70)
     print("\n" + text)
     easygui.textbox(msg=msg, text=text, title="LyX Notebook Setup")

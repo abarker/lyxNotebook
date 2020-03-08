@@ -15,7 +15,6 @@ User-modifiable settings for the Lyx Notebook program.
 # The LyX user home directory.
 user_home_lyx_directory = "~/.lyx"
 user_home_lyx_directory = "../../test/.lyx"
-print("DEBUG user_home_lyx_directory", user_home_lyx_directory)
 #user_home_lyx_directory = "~/.lyx-2.1.0svn"
 #user_home_lyx_directory = "~/.lyx-2.0.4svn"
 
@@ -23,7 +22,6 @@ print("DEBUG user_home_lyx_directory", user_home_lyx_directory)
 lyx_server_pipe = "~/.lyx/lyxpipe"
 import os
 lyx_server_pipe = os.path.join(user_home_lyx_directory, "lyxpipe")
-print("DEBUG lyx_server_pipe", lyx_server_pipe)
 #lyx_server_pipe = "~/.lyx-2.1.0svn/lyxpipe"
 #lyx_server_pipe = "~/.lyx-2.0.4svn/lyxpipe"
 
