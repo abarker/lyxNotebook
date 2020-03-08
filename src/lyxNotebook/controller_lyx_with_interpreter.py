@@ -216,7 +216,7 @@ class InterpreterProcessCollection(object):
     InterpreterProcess class instances.  Starts processes when necessary."""
 
     def __init__(self, current_buffer):
-        if lyxNotebook_user_settings.separate_interpreters_for_each_buffer is False:
+        if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
             current_buffer = "___dummy___" # force all to use same buffer if not set
         self.interpreter_spec_list = [specName.params
                                     for specName in interpreter_specs.all_specs]
@@ -244,7 +244,7 @@ class InterpreterProcessCollection(object):
         """Reset the interpreter for inset_specifier cells for buffer buffer_name.
         Restarts the whole process.  If inset_specifier is the empty string then
         reset for all inset specifiers."""
-        if lyxNotebook_user_settings.separate_interpreters_for_each_buffer is False:
+        if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
             buffer_name = "___dummy___" # force all to use same buffer if not set
         inset_specifier_list = [inset_specifier]
         if inset_specifier == "": # do all if empty string
@@ -258,12 +258,12 @@ class InterpreterProcessCollection(object):
 
     def get_interpreter_process(self, buffer_name, inset_specifier):
         """Get interpreter process, creating/starting one if one not there already."""
-        if lyxNotebook_user_settings.separate_interpreters_for_each_buffer is False:
+        if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
             buffer_name = "___dummy___" # force all to use same buffer if not set
         key = (buffer_name, inset_specifier)
         if not key in self.main_dict:
             msg = "Starting interpreter for " + inset_specifier
-            if lyxNotebook_user_settings.separate_interpreters_for_each_buffer is True:
+            if lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
                 msg += ", for buffer:\n   " + buffer_name
             print(msg)
             self.main_dict[key] = InterpreterProcess(
@@ -623,7 +623,7 @@ class ControllerLyxWithInterpreter(object):
             """Return True if a server-notify was ignored and user wants to quit."""
             # eat all events between cell evals, and check if NOTIFY was ignored
             self.lyx_process.get_server_event(info=False, error=False, notify=False)
-            if self.lyx_process.ignored_server_notify_event is True:
+            if self.lyx_process.ignored_server_notify_event:
                 msg = "Halt multi-cell evaluation at the current point?"
                 choices = (["Yes", "No"])
                 reply = eg.buttonbox(msg, choices=choices)
@@ -844,7 +844,7 @@ class ControllerLyxWithInterpreter(object):
             output = output[:lyxNotebook_user_settings.max_lines_in_output_cell]
             output.append("<<< WARNING: Lines truncated by LyX Notebook. >>>""")
 
-        if self.no_echo is False and interpreter_spec["prompt_at_cell_end"]:
+        if not self.no_echo and interpreter_spec["prompt_at_cell_end"]:
             output.append(interpreter_process.most_recent_prompt)
 
         code_cell_text.evaluation_output = output
