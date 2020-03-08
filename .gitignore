@@ -28,6 +28,9 @@ _build
 # Vim swap.
 *.swp
 
+# PyCharm.
+.idea
+
 # Installer logs.
 pip-log.txt
 pip-delete-this-directory.txt
@@ -35,4 +38,7 @@ pip-delete-this-directory.txt
 # Distribution directory from setup.py sdist.
 /dist
 !*/dist # Needed for older versions of git (don't ignore dist deeper than root level).
+
+# Mypy type-checker cache.
+.mypy_cache
 

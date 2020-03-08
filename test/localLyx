@@ -1,0 +1,11 @@
+#!/bin/bash
+
+TEST_LYX_HOME_PATH="$lyxnotebook/../../test/.lyx" # Home dir for the test version of lyx.
+
+#SYSDIR="-sysdir $noback/compile_lyx/lyx/lib" # For compiled version, set up with path.
+
+LYX_SRC="$noback/compile_lyx/lyx/src/lyx"
+
+echo "$LYX_SRC -userdir \"$TEST_LYX_HOME_PATH\" $SYSDIR \"$@\""
+$LYX_SRC -userdir "$TEST_LYX_HOME_PATH" $SYSDIR "$@" &
+

@@ -46,7 +46,7 @@ import easygui_096 as easygui # Use a locally modified version of easygui.
 import lyxNotebook_user_settings
 
 user_home_lyx_directory = lyxNotebook_user_settings.user_home_lyx_directory
-user_home_lyx_directory_expanded = path.expanduser(user_home_lyx_directory)
+user_home_lyx_directory_expanded = path.abspath(path.expanduser(user_home_lyx_directory))
 
 print("="*70)
 print("\nStarting the install and setup of LyX Notebook...\n")
@@ -166,6 +166,7 @@ dot_module_files = glob.glob("*.module")
 for newModuleFile in dot_module_files:
     path_in_layouts_dir = path.join(
         user_home_lyx_directory_expanded, "layouts", newModuleFile)
+    print("shutil.copyfile({},{})".format(newModuleFile, path_in_layouts_dir))
     shutil.copyfile(newModuleFile, path_in_layouts_dir)
 
 # Finished the first phase.
