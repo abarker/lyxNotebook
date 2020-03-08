@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.4 created this file. For more info see https://www.lyx.org/
+\lyxformat 592
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass article
 \begin_preamble
 
@@ -75,18 +77,22 @@ lyxNotebookCellBash
 \maintain_unincluded_children false
 \language english
 \language_package default
-\inputencoding auto
-\fontencoding global
-\font_roman lmodern
-\font_sans lmss
-\font_typewriter beramono
-\font_math auto
+\inputencoding auto-legacy
+\fontencoding auto
+\font_roman "lmodern" "default"
+\font_sans "lmss" "default"
+\font_typewriter "beramono" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
-\font_osf false
-\font_sf_scale 100
-\font_tt_scale 84
+\font_roman_osf false
+\font_sans_osf false
+\font_typewriter_osf false
+\font_sf_scale 100 100
+\font_tt_scale 84 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -116,6 +122,8 @@ lyxNotebookCellBash
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
+\use_lineno 0
 \branch nonprinting cells
 \selected 1
 \filename_suffix 0
@@ -133,12 +141,18 @@ lyxNotebookCellBash
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 2
 \paperpagestyle headings
+\tablestyle default
 \tracking_changes false
 \output_changes false
+\change_bars false
+\postpone_fragile_content false
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
@@ -232,8 +246,9 @@ hfill
 \end_layout
 
 \begin_layout Standard
-What chars does no passthru mess with? TeX and LaTeX? What others? !@#$%^&*()_+|
-}{[]
+What chars does no passthru mess with? \SpecialChar TeX
+ and \SpecialChar LaTeX
+? What others? !@#$%^&*()_+|}{[]
 \backslash
 ;
 \begin_inset Quotes erd
@@ -1091,6 +1106,8 @@ Some Plots
 \begin_layout Standard
 Here is a figure.
 \begin_inset Float figure
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -1419,6 +1436,8 @@ status open
  Oh, I also made a float for the plot output (input into a figure float
  using S-F10).
 \begin_inset Float figure
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -1930,6 +1949,7 @@ R
 \begin_layout Standard
 Here is some R code from Wikipedia article on R.
 \begin_inset Branch nonprinting cells
+inverted 0
 status open
 
 \begin_layout Standard
@@ -2048,6 +2068,7 @@ Branches
 
 \begin_layout Standard
 \begin_inset Branch nonprinting cells
+inverted 0
 status open
 
 \begin_layout Standard

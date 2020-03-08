@@ -57,14 +57,15 @@ python_version = platform.python_version_tuple()
 lyx_command_string = lyxNotebook_user_settings.lyx_command_string
 always_start_new_terminal = lyxNotebook_user_settings.always_start_new_terminal
 
+# Get path of the lyxNotebook script and dir from calling command for this script.
+calling_command = os.path.abspath(os.path.expanduser(sys.argv[0]))
+lyx_notebook_source_dir = os.path.dirname(calling_command)
+lyxNotebook_run_path = os.path.join(lyx_notebook_source_dir, "lyxNotebook.py")
+os.chdir(lyx_notebook_source_dir) # This is to make relative paths work in user_settings file.
+
 my_PID = os.getpid()
 my_CWD = os.getcwd()
 operating_system_platform = sys.platform
-
-# Get path of the lyxNotebook script and dir from calling command for this script.
-calling_command = os.path.join(my_CWD, os.path.expanduser(sys.argv[0]))
-lyx_notebook_source_dir = os.path.dirname(calling_command)
-run_path = os.path.join(lyx_notebook_source_dir, "lyxNotebook.py")
 
 # Utility function to get command output, for portability and future development.
 
@@ -101,7 +102,7 @@ if tty_command_output != "not a tty" and not always_start_new_terminal:
     print("Running LyX Notebook from terminal %s returned by tty command."
           % tty_command_output)
     try:
-        subprocess.call(run_path, shell=True)
+        subprocess.call(lyxNotebook_run_path, shell=True)
     except:
         sys.exit(0)
     sys.exit(0)
@@ -195,10 +196,10 @@ if always_start_new_terminal or terminal == "?":
         # new terminal (since one was created for it).  Could kluge some flag
         # or file, but it doesn't seem worth it as of now.  So call lyxNotebook.
         proc = subprocess.Popen(
-            ["xterm -e /bin/bash -l -c 'cd %s ; %s'" % (my_CWD, run_path)],
+            ["xterm -e /bin/bash -l -c 'cd %s ; %s'" % (my_CWD, lyxNotebook_run_path)],
             shell=True)
     else:
         pass # later add terminal for other platforms
 else: # got a unique terminal associated with current process or Lyx process
-    proc = subprocess.Popen(["%s >%s 2>&1" % (run_path, terminal)], shell=True)
+    proc = subprocess.Popen(["%s >%s 2>&1" % (lyxNotebook_run_path, terminal)], shell=True)
 

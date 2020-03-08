@@ -43,8 +43,9 @@ from controller_lyx_with_interpreter import ControllerLyxWithInterpreter
 
 # Set the lockfile location to be in the user's local Lyx directory.
 user_home_lyx_directory = lyxNotebook_user_settings.user_home_lyx_directory
-lockfile_path = os.path.expanduser(
-    os.path.join(user_home_lyx_directory, "lyxNotebook.lockfile"))
+print("DEBUG lyxNotebook.py user_home_lyx_directory", user_home_lyx_directory)
+lockfile_path = os.path.abspath(os.path.expanduser(
+    os.path.join(user_home_lyx_directory, "lyxNotebook.lockfile")))
 
 #
 # Make sure this script is not already running in an existing process.
