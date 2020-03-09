@@ -72,7 +72,7 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
 
     # Process the user-modifiable bind file to load the path of the Lyx Notebook bindings.
     bind_template_pathname = path.join(
-        source_dir, "filesForDotLyxDir", "userCustomizableKeyBindings.template")
+        source_dir, "files_for_dot_lyx_dir", "userCustomizableKeyBindings.template")
     with open(bind_template_pathname, "r") as bind_template:
         bind_contents_str = bind_template.read()
     bind_contents_str = bind_contents_str.replace("<<user_home_lyx_directory>>",
@@ -108,21 +108,21 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
 
     # Process the Lyx Notebook bind file to contain the path of the user's source directory.
     bind_template_pathname = path.join(
-        source_dir, "filesForDotLyxDir", "lyxNotebookKeyBindings.template")
+        source_dir, "files_for_dot_lyx_dir", "lyxNotebookKeyBindings.template")
     with open(bind_template_pathname, "r") as bind_template:
         bind_contents_str = bind_template.read()
     bind_contents_str = bind_contents_str.replace("<<lyxNotebook_run_script_path>>",
                                               lyxNotebook_run_script_path) # MUST be absolute path
 
     with tempfile.TemporaryDirectory() as tmpdir_name:
-        # Write out the final Lyx Notebook .bind file to the filesForDotLyxDir directory.
+        # Write out the final Lyx Notebook .bind file to the files_for_dot_lyx_dir directory.
         bind_file_pathname = path.join(tmpdir_name, "lyxNotebookKeyBindings.bind")
         with open(bind_file_pathname, "w") as bind_file:
             bind_file.write(bind_contents_str)
         print("Generated the key-binding file\n   ",
               bind_file_pathname, "\nfrom the corresponding .template file.")
 
-        # Copy the Lyx Notebook .bind file from filesForDotLyxDir to user_home_lyx_directory.
+        # Copy the Lyx Notebook .bind file from files_for_dot_lyx_dir to user_home_lyx_directory.
         bind_file_dest = path.join(
             user_home_lyx_directory, "lyxNotebookKeyBindings.bind")
         yesno = 1
@@ -143,7 +143,7 @@ def setup_module_files(user_home_lyx_directory, source_dir):
     # the directory where the temp files have been saved (prepare for pip install).
 
     # Go to the directory for .module files.
-    modules_directory = path.join(source_dir, "filesForDotLyxLayoutsDir")
+    modules_directory = path.join(source_dir, "files_for_dot_lyx_layouts_dir")
     os.chdir(modules_directory)
 
     # First remove any old .module files in that directory.

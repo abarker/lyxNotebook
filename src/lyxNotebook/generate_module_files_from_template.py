@@ -15,7 +15,7 @@ imports from `process_interpreter_specs`.
 
 All file reads and writes are from the Python current working directory.  This
 module expects that the CWD when it is run will be the
-`filesForDotLyxLayoutsDir` directory!
+`files_for_dot_lyx_layouts_dir` directory!
 
 """
 

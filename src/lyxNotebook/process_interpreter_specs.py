@@ -134,7 +134,7 @@ bash.params = {
     "comment_line": "#",
     "line_continuation": None,
     "inset_specifier": "Bash", # e.g., Flex:LyxNotebook:Standard:Scala
-    "listings_language": "bash", # no Scala predefined yet in Listings
+    "listings_language": "bash",
     "startup_sleep_secs": 0.2,
     "before_read_sleep_secs": 0.01,
     "noop_at_cell_end": None,
