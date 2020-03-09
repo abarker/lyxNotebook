@@ -41,6 +41,7 @@ import shutil
 import glob
 from os import path
 import platform
+import tempfile
 # import easygui
 from . import easygui_096 as easygui # Use a locally modified version of easygui.
 from . import lyxNotebook_user_settings
@@ -77,29 +78,28 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
     bind_contents_str = bind_contents_str.replace("<<user_home_lyx_directory>>",
                              user_home_lyx_directory)
 
-    # Write out the final user-modifiable .bind file.
-    bind_file_pathname = path.join(
-        source_dir, "filesForDotLyxDir", "userCustomizableKeyBindings.bind")
-    with open(bind_file_pathname, "w") as bind_file:
-        bind_file.write(bind_contents_str)
-    print("Generated the key-binding file\n   ",
-          bind_file_pathname, "\nfrom the corresponding .template file.")
+    with tempfile.TemporaryDirectory() as tmpdir_name:
+        # Write out the final user-modifiable .bind file.
+        bind_file_pathname = path.join(tmpdir_name, "userCustomizableKeyBindings.bind")
+        with open(bind_file_pathname, "w") as bind_file:
+            bind_file.write(bind_contents_str)
+        print("Generated the key-binding file\n   ",
+              bind_file_pathname, "\nfrom the corresponding .template file.")
 
-    # Copy the user-modifiable .bind file to the user_home_lyx_directory.
-    bind_file_dest = path.join(
-        user_home_lyx_directory, "userCustomizableKeyBindings.bind")
-    yesno = 1
-    if os.path.exists(bind_file_dest):
-        msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
-        yesno = easygui.ynbox(msg, "LyX Notebook Setup")
-    if yesno == 1:
-        shutil.copyfile(bind_file_pathname, bind_file_dest)
-        print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
-              bind_file_dest, "\n")
-    else:
-        print("\nDid not overwrite existing key-binding in the LyX home directory:\n   ",
-              bind_file_dest, "\n")
-    os.remove(bind_file_pathname) # delete local copy to avoid confusion
+        # Copy the user-modifiable .bind file to the user_home_lyx_directory.
+        bind_file_dest = path.join(
+                           user_home_lyx_directory, "userCustomizableKeyBindings.bind")
+        yesno = 1
+        if os.path.exists(bind_file_dest):
+            msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
+            yesno = easygui.ynbox(msg, "LyX Notebook Setup")
+        if yesno == 1:
+            shutil.copyfile(bind_file_pathname, bind_file_dest)
+            print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
+                  bind_file_dest, "\n")
+        else:
+            print("\nDid not overwrite existing key-binding in the LyX home directory:\n   ",
+                  bind_file_dest, "\n")
 
     #
     # Lyx Notebook key-binding file (TODO better as a fun call or three, repeated code)
@@ -114,32 +114,33 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
     bind_contents_str = bind_contents_str.replace("<<lyxNotebook_run_script_path>>",
                                               lyxNotebook_run_script_path) # MUST be absolute path
 
-    # Write out the final Lyx Notebook .bind file to the filesForDotLyxDir directory.
-    bind_file_pathname = path.join(
-        source_dir, "filesForDotLyxDir", "lyxNotebookKeyBindings.bind")
-    with open(bind_file_pathname, "w") as bind_file:
-        bind_file.write(bind_contents_str)
-    print("Generated the key-binding file\n   ",
-          bind_file_pathname, "\nfrom the corresponding .template file.")
+    with tempfile.TemporaryDirectory() as tmpdir_name:
+        # Write out the final Lyx Notebook .bind file to the filesForDotLyxDir directory.
+        bind_file_pathname = path.join(tmpdir_name, "lyxNotebookKeyBindings.bind")
+        with open(bind_file_pathname, "w") as bind_file:
+            bind_file.write(bind_contents_str)
+        print("Generated the key-binding file\n   ",
+              bind_file_pathname, "\nfrom the corresponding .template file.")
 
-    # Copy the Lyx Notebook .bind file from filesForDotLyxDir to user_home_lyx_directory.
-    bind_file_dest = path.join(
-        user_home_lyx_directory, "lyxNotebookKeyBindings.bind")
-    yesno = 1
-    if os.path.exists(bind_file_dest):
-        msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
-        yesno = easygui.ynbox(msg, "LyX Notebook Setup")
-    if yesno == 1:
-        shutil.copyfile(bind_file_pathname, bind_file_dest)
-        print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
-              bind_file_dest, "\n")
-    else:
-        print("\nDid not overwrite existing key-binding in the LyX home directory:\n   ",
-              bind_file_dest, "\n")
-    os.remove(bind_file_pathname) # Delete local copy to avoid confusion.
+        # Copy the Lyx Notebook .bind file from filesForDotLyxDir to user_home_lyx_directory.
+        bind_file_dest = path.join(
+            user_home_lyx_directory, "lyxNotebookKeyBindings.bind")
+        yesno = 1
+        if os.path.exists(bind_file_dest):
+            msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
+            yesno = easygui.ynbox(msg, "LyX Notebook Setup")
+        if yesno == 1:
+            shutil.copyfile(bind_file_pathname, bind_file_dest)
+            print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
+                  bind_file_dest, "\n")
+        else:
+            print("\nDid not overwrite existing key-binding in the LyX home directory:\n   ",
+                  bind_file_dest, "\n")
 
 def setup_module_files(user_home_lyx_directory, source_dir):
     """Generate the .module files and copy to `user_home_lyx_directory`"""
+    # TODO: Use a temporary directory like in the binding code above.  Then delete
+    # the directory where the temp files have been saved (prepare for pip install).
 
     # Go to the directory for .module files.
     modules_directory = path.join(source_dir, "filesForDotLyxLayoutsDir")
@@ -155,7 +156,7 @@ def setup_module_files(user_home_lyx_directory, source_dir):
             os.remove(installed)
 
     # Regenerate all the .module files, in case the user changed interpreter_specs.py.
-    from generate_module_files_from_template import generate_files_from_templates
+    from .generate_module_files_from_template import generate_files_from_templates
     generate_files_from_templates()
 
     # Copy all the .module files to the layouts directory.
