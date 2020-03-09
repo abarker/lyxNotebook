@@ -28,11 +28,10 @@ with open(os.path.join("src", "lyxNotebook", "__init__.py")) as f:
 # directory and subdirectory.
 
 # Paths to data files, relative to the main package directory.
-# TODO: Setup these paths for package_data, and uncomment the kwarg below.
-path_to_copied_exe64 = os.path.join(
-               "pdftoppm_windows_local", "xpdf_tools_win_4_01_01", "bin64", "pdftoppm.exe")
-path_to_copied_exe32 = os.path.join(
-               "pdftoppm_windows_local", "xpdf_tools_win_4_01_01", "bin32", "pdftoppm.exe")
+lyxnotebook_bindings = os.path.join(
+               "templates_for_dot_lyx_dir_bind_files", "lyxNotebookKeyBindings.template")
+user_customizable_bindings = os.path.join(
+               "templates_for_dot_lyx_dir_bind_files", "userCustomizableKeyBindings.template")
 
 package_dir = {"": "src"} # Note src isn't used in later dotted package paths, set here!
 packages = find_packages("src") # Finds submodules (otherwise need explicit listing).
@@ -61,7 +60,9 @@ setup(
     # TODO: Setup entry points.
     #entry_points = {
     #    "console_scripts": ["pdf-crop-margins = pdfCropMargins.pdfCropMargins:main"]
+    #    "console_scripts": ["lyxnotebook = pdfCropMargins.pdfCropMargins:main"]
     #    },
+    #scripts=['bin/funniest-joke'],
     license="GPL",
     classifiers=[
         # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -97,7 +98,7 @@ setup(
     author_email="Allen.L.Barker@gmail.com",
 
     #include_package_data=True, # Not set True when package_data is set.
-    #package_data={"lyxNotebook":[path_to_copied_exe32, path_to_copied_exe64]},
+    package_data={"lyxNotebook":[lyxnotebook_bindings, user_customizable_bindings]},
     zip_safe=False,
 
     # Automated stuff below
