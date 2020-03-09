@@ -14,7 +14,7 @@ The Lyx Notebook program can be started in one of three ways.  It can 1) be run
 from the command line in a terminal, 2) be run from a Lyx process which was run
 from the command line in a terminal, or 3) be run from a Lyx process which was
 run from an icon or a menu.  (We assume that Lyx Notebook is not run directly
-from an icon or menu, but that shouldn't actually affect anything).
+from an icon or menu, but that shouldn't actually affect anything.)
 
 We have three cases to deal with.  First, either the running "self" process is
 associated with a terminal (this script was run from the command line) or it
@@ -24,11 +24,6 @@ subcases.  Either the user's running Lyx process is associated with a tty (it
 was run from a command line) or it is not (it was run from the start menu or
 an icon).  In the first subcase we use the tty for the running Lyx process, and
 in the latter case we run the program in a new terminal window.
-
-This script is assumed to be located in the same directory as the lyxNotebook
-script (otherwise it will not find the lyxNotebook script, which it calls after
-setting up the tty).  Call it from a stub shell script if you need to put an
-executable file somewhere else.
 
 """
 
@@ -71,8 +66,7 @@ operating_system_platform = sys.platform
 def get_command_output(command_and_arg_list):
     """Return the output of the passed-in command."""
     print("\nPROCESS CALL:", " ".join(command_and_arg_list))
-    output = subprocess.check_output(command_and_arg_list)
-    output = output.decode("utf-8")
+    output = subprocess.check_output(command_and_arg_list).decode("utf-8")
     print("OUTPUT:\n", output)
     return output
 

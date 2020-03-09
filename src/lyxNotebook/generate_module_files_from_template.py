@@ -11,7 +11,7 @@ Copyright (c) 2012 Allen Barker
 Generate all the `.module` files from templates.
 
 This module is only used by `install.py` to generate `.module` files.  It only
-imports from `interpreter_specs`.
+imports from `process_interpreter_specs`.
 
 All file reads and writes are from the Python current working directory.  This
 module expects that the CWD when it is run will be the
@@ -25,7 +25,7 @@ import sys
 # The interpreterSpecs module is loaded because it contains the string defining
 # the Listings formatting language for each type of interpreter it defines.
 sys.path.append("..")
-from .interpreter_specs import all_specs
+from .process_interpreter_specs import all_specs
 
 
 # =============================================================

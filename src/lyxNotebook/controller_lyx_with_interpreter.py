@@ -36,7 +36,7 @@ from . import easygui_096 as eg # Use a local, modified version.
 from . import lyxNotebook_user_settings
 from .interact_with_lyx_cells import InteractWithLyxCells, Cell
 from .external_interpreter import ExternalInterpreter
-from . import interpreter_specs # Specs for all the interpreters which are allowed.
+from . import process_interpreter_specs # Specs for all the interpreters which are allowed.
 from . import keymap # The current mapping of keys to Lyx Notebook functions.
 
 
@@ -219,7 +219,7 @@ class InterpreterProcessCollection(object):
         if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
             current_buffer = "___dummy___" # force all to use same buffer if not set
         self.interpreter_spec_list = [specName.params
-                                    for specName in interpreter_specs.all_specs]
+                                    for specName in process_interpreter_specs.all_specs]
         self.num_specs = len(self.interpreter_spec_list)
         self.inset_specifier_to_interpreter_spec_dict = {}
         self.all_inset_specifiers = []
@@ -286,10 +286,10 @@ class InterpreterProcessCollection(object):
 
 class ControllerLyxWithInterpreter(object):
     """This class is the high-level controller class which deals with user
-    interactions and which manages the Lyx process and the interpreter processes.
-    The interpreter specifications are read from the module interpreter_specs.  The
-    list interpreter_specs.all_specs in that module is assumed to contains all the
-    specs."""
+    interactions and which manages the Lyx process and the interpreter
+    processes.  The interpreter specifications are read from the module
+    process_interpreter_specs.  The list process_interpreter_specs.all_specs in
+    that module is assumed to contains all the specs."""
 
     def __init__(self, clientname):
 

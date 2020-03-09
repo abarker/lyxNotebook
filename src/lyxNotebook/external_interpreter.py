@@ -40,7 +40,7 @@ import time
 import pty
 import signal
 # import subprocess # for alternative where subprocess.call is used
-from . import interpreter_specs # only needed for testing code at end
+from . import process_interpreter_specs # only needed for testing code at end
 
 
 class ExternalInterpreter(object):
@@ -285,8 +285,8 @@ class ExternalInterpreter(object):
 if __name__ == "__main__":
 
     print("--------------- starting tests of external_interpreter ONLY -----")
-    interp = ExternalInterpreter(interpreter_specs.python)
-    #interp = ExternalInterpreter(interpreter_specs.sage)
+    interp = ExternalInterpreter(process_interpreter_specs.python)
+    #interp = ExternalInterpreter(process_interpreter_specs.sage)
     print("created new external class")
 
     interp.write("x=5\n")

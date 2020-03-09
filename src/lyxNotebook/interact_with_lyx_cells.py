@@ -27,7 +27,6 @@ unless there is an error, in which case the format is::
 The server-notify events which are sent out from Lyx only have two fields::
        NOTIFY:<key pressed>
 
-
 For info on the Lyx LFUNs that can be sent over the Lyx server, see
 http://wiki.lyx.org/sourcedoc/svn/namespacelyx.html#5ae63e8160e98b54ad28f142ed40c202
 For similar technical notes, with raw newlines explicitly specified in the docs
@@ -63,7 +62,7 @@ class Cell(list):
     of text corresponding to the contents of a cell.  The line numbers are
     relative to Latex files (when the cell text is extracted from such files)."""
     # TODO: maybe go back to list as internal, using composition.  Inheriting
-    # from list isn't a great idea.  General list operations return lists,
+    # from list isn't a great idea.  General list-returning operations return lists,
     # not Cell subclasses.
 
     def __init__(self):
@@ -83,7 +82,8 @@ class Cell(list):
         """Note this depends on the naming convention in the .module files.
         Returns an ordered pair (<basictype>,<language>).  For example,
         ("Standard", "Python")."""
-        if self.begin_line == -1: return None
+        if self.begin_line == -1:
+            return None
         if self.begin_line.find(r"\begin_inset Flex LyxNotebookCell") == 0: # from Lyx
             split_line = self.begin_line.split(":")
             language = split_line[-1].strip()
@@ -104,7 +104,7 @@ class Cell(list):
             else:
                 language = None
                 basic_type = None
-        return (basic_type, language)
+        return basic_type, language
 
 
 class TerminatedFile(object):
@@ -231,7 +231,8 @@ class InteractWithLyxCells(object):
         # empty out and ignore any existing replies or notify-events (for Lyx
         # Notebook commands) which are in the lyxServerPipeOut
         while True:
-            if self.get_server_event() is None: break
+            if self.get_server_event() is None:
+                break
 
         # Magic cookie initializations.
 
@@ -247,8 +248,6 @@ class InteractWithLyxCells(object):
             self.del_cookie_forward_string += "char-delete-forward;"
             self.del_cookie_backward_string += "char-delete-backward;"
             self.back_cookie_string += "char-left;"
-
-        return # end of __init__
 
     def set_magic_cookie(self, string):
         """Set the magic cookie value.  A convenience function, instead of just
@@ -841,13 +840,14 @@ class InteractWithLyxCells(object):
         flag useLatexExport=True.
         """
         latex_file = TerminatedFile(filename, r"\end{document}",
-                                   "getAllCellTextFromLatex")
+                                    "getAllCellTextFromLatex")
         cell_list = []
         inside_cell = False
         set_next_cell_cookie_line_before = -1
         while True:
             line = latex_file.readline()
-            if line == "": break
+            if line == "":
+                break
             # search lines starting with \begin{lyxNotebookCell, \end{lyxNotebookCell,
             # or a cookie at the start of a cell line or anywhere in an ordinary line
             if line.find(r"\begin{lyxNotebookCell") == 0 and line.strip()[-1] == "}":
@@ -888,7 +888,6 @@ class InteractWithLyxCells(object):
         To save the file and then get the most recent data from the .lyx save
         file, call getUpdatedCellText() with flag useLatexExport=False.
         """
-
         in_file = TerminatedFile(filename, r"\end_document",
                                 "getAllCellTextFromLyxFile")
         cell_list = []
@@ -897,7 +896,8 @@ class InteractWithLyxCells(object):
         set_next_cell_cookie_line_before = -1
         while True:
             line = in_file.readline();
-            if line == "": break
+            if line == "":
+                break
             # search lines starting with something like
             #    \begin_inset Flex LyxNotebookCell:Standard:PythonTwo
             # or a cookie at the start of a cell line or anywhere in an ordinary line
@@ -955,23 +955,27 @@ class InteractWithLyxCells(object):
         current_cell = -1
         while True:
             line = in_file.readline()
-            if line == "": break
+            if line == "":
+                break
             elif line.find(r"\begin_inset Flex LyxNotebookCell:") == 0:
                 out_file.write(line) # start the new cell
                 # find out what basic type of cell it is (Init, Standard, or Output)
                 if line.find(r"\begin_inset Flex LyxNotebookCell:Init") == 0:
                     basic_type = "Init"
-                    if not init: continue # just echo whole cell unless selected
+                    if not init:
+                        continue # just echo whole cell unless selected
                 elif line.find(r"\begin_inset Flex LyxNotebookCell:Standard") == 0:
                     basic_type = "Standard"
-                    if not standard: continue # just echo it unless selected
+                    if not standard:
+                        continue # just echo it unless selected
                 else: # else must be an isolated output cell
                     continue # output cells right after code cells are handed at same time
                 # find the corresponding Cell in all_cells
                 while True:
                     current_cell += 1
                     bType, inset_spec = all_cells[current_cell].get_cell_type()
-                    if bType == basic_type: break
+                    if bType == basic_type:
+                        break
                 # do an error check here, make sure inset_spec matches not just basic_type
                 if not (line.find(
                         r"\begin_inset Flex LyxNotebookCell:"+bType+":"+inset_spec) == 0):
@@ -981,8 +985,10 @@ class InteractWithLyxCells(object):
                 # echo back all cell-header stuff to out_file until a plain layout starts
                 while True:
                     line = in_file.readline()
-                    if line.rstrip() == r"\begin_layout Plain Layout": break
-                    else: out_file.write(line)
+                    if line.rstrip() == r"\begin_layout Plain Layout":
+                        break
+                    else:
+                        out_file.write(line)
                 # now eat the old cell text up to the inset end, and ignore it
                 while line.rstrip() != r"\end_inset":
                     # later may want to check for cookie inside old cell
@@ -1001,15 +1007,18 @@ class InteractWithLyxCells(object):
                 while True:
                     saved_lines.insert(0, in_file.readline())
                     # save lines up to first non-empty, then break
-                    if saved_lines[0].rstrip() != "": break
+                    if saved_lines[0].rstrip() != "":
+                        break
                 if saved_lines[0].find(
                         r"\begin_inset Flex LyxNotebookCell:Output:"+inset_spec) == 0:
                     # got an output cell, eat it
                     while True:
-                        if in_file.readline().rstrip() == r"\end_inset": break
+                        if in_file.readline().rstrip() == r"\end_inset":
+                            break
                 else:
                     # no output, pushback all saved lines
-                    for line in saved_lines: in_file.pushback(line)
+                    for line in saved_lines:
+                        in_file.pushback(line)
                 out_file.write("\n\n") # two blank lines between insets
                 #
                 # Ready to write a new output cell, in both cases.
@@ -1019,7 +1028,8 @@ class InteractWithLyxCells(object):
                 out_file.write("status open\n\n") # always create an open cell
                 eval_output = all_cells[current_cell].evaluation_output
                 # if cell wasn't evaluated the set output to be empty
-                if eval_output is None: eval_output = []
+                if eval_output is None:
+                    eval_output = []
                 for cell_line in eval_output:
                     out_file.write(convert_text_line_to_lyx_file_inset_format(cell_line))
                 # finished, end the output cell inset
@@ -1033,7 +1043,6 @@ class InteractWithLyxCells(object):
                 out_file.write(line)
         in_file.close()
         out_file.close()
-        return
 
     def get_updated_lyx_directory_data(self, auto_save_update=False):
         """
@@ -1054,9 +1063,11 @@ class InteractWithLyxCells(object):
 
         # try a save to auto-save file, then check if one exists newer than basename
         # (latter check needed for initial files which haven't been changed)
-        if auto_save_update: self.process_lfun("buffer-auto-save")
+        if auto_save_update:
+            self.process_lfun("buffer-auto-save")
         auto_save_filename = "#" + basename + "#"
-        if not os.path.exists(auto_save_filename): auto_save_filename = ""
+        if not os.path.exists(auto_save_filename):
+            auto_save_filename = ""
         elif (os.path.exists(basename)
               and os.stat(auto_save_filename).st_mtime < os.stat(basename).st_mtime):
             print("Warning: auto-save file older than buffer file, not using it.")
@@ -1096,10 +1107,13 @@ class InteractWithLyxCells(object):
         num_output_cells = 0
         for cell in cell_list:
             basic_type, language = cell.get_cell_type()
-            if basic_type == "Init": num_init_cells += 1
-            elif basic_type == "Standard": num_standard_cells += 1
-            elif basic_type == "Output": num_output_cells += 1
-        return (num_init_cells, num_standard_cells, num_output_cells)
+            if basic_type == "Init":
+                num_init_cells += 1
+            elif basic_type == "Standard":
+                num_standard_cells += 1
+            elif basic_type == "Output":
+                num_output_cells += 1
+        return num_init_cells, num_standard_cells, num_output_cells
 
     def get_current_cell_text(self, use_latex_export=False):
         r"""Returns a Cell data structure containing the current text of the cell,
@@ -1110,12 +1124,12 @@ class InteractWithLyxCells(object):
         save/export, removing the cookie, and then reading all the cells in from
         that file and looking for which one has the cookie.  (This routine is
         nontrivial due to a lack of LFUNs to do it more directly.)"""
-
         # This routine is similar to getAllCellText() except the current cell has
         # to be singled out (identified with a cookie).
-        if not self.inside_cell(): return None # return None if not in a cell
+        if not self.inside_cell():
+            return None # return None if not in a cell
         self.insert_magic_cookie_inside_current(assert_inside_cell=True,
-                                            on_current_line=True)
+                                                on_current_line=True)
         all_cells = self.get_all_cell_text(use_latex_export=use_latex_export)
         self.delete_magic_cookie_inside_current(assert_cursor_at_cookie_end=True)
         found_cookie = False
@@ -1132,8 +1146,10 @@ class InteractWithLyxCells(object):
                 found_cookie = True
                 return_cell = cell
         # return Cell() # Was causing bugs in ordinary Listings cells, now return None.
-        if found_cookie: return return_cell
-        else: return None
+        if found_cookie:
+            return return_cell
+        else:
+            return None
 
     def replace_current_output_cell_text(self, line_list, create_if_necessary=True,
                goto_begin_after=False, assert_inside_cell=False, inset_specifier="Python"):
@@ -1142,7 +1158,6 @@ class InteractWithLyxCells(object):
         `create_if_necessary` is true then one will be created/inserted.  The default
         is a Python cell; this can be changed by setting inset_specifier to a value
         from one of the other interpreter specs."""
-
         if not assert_inside_cell:
             if not self.inside_cell():
                 return # Not even in a cell.
@@ -1220,7 +1235,6 @@ class InteractWithLyxCells(object):
                                                   empty_cell=empty_cell)
         if goto_begin_after:
             self.goto_cell_begin(assert_inside_cell=True)
-        return
 
     def replace_current_cell_text(self, line_list,
                                goto_begin_after=False, assert_inside_cell=False,
@@ -1230,7 +1244,6 @@ class InteractWithLyxCells(object):
         no special `Cell` extra data is used.  The lines in `line_list` must be
         newline terminated, but should not include any `\begin` and `\end` Latex
         markup lines for the cell type."""
-
         # Write the text to a file and then read it in all at once, replacing
         # selected text.  This gives better undo behavior than a self-insert
         # for each line.
@@ -1298,7 +1311,6 @@ class InteractWithLyxCells(object):
         will silently overwrite filename.  If comment-line char is set to a
         non-empty value then extra information to be written to the file in
         comments."""
-
         # update the Latex and get the name of the file it was exported to
         (currentBufferFileDirectory,
          currentBufferFilename,
@@ -1316,7 +1328,8 @@ class InteractWithLyxCells(object):
 
             # don't write if no cells of the particular type
             cells = [c for c in all_cells if c.get_cell_type()[1] == inset_specifier]
-            if len(cells) == 0: continue
+            if len(cells) == 0:
+                continue
 
             # write an informative header comment to the file
             code_out_file = open(filename, "w")
@@ -1347,7 +1360,6 @@ class InteractWithLyxCells(object):
                         for line in cell:
                             code_out_file.write(line)
             code_out_file.close()
-        return
 
     def insert_most_recent_graphic_as_inset(self):
         """Find the most recent graphics file in the current buffer's directory
@@ -1365,7 +1377,8 @@ class InteractWithLyxCells(object):
         for dirpath, subdirs, files in os.walk(dir_data[0]):
             for fname in files:
                 fnameRoot, extension = os.path.splitext(fname)
-                if not (extension in graphic_extensions): continue
+                if not (extension in graphic_extensions):
+                    continue
                 full_path = os.path.join(dirpath, fname)
                 mtime = os.stat(full_path).st_mtime # or can use os.path.getmtime()
                 if mtime > max_mtime:
@@ -1391,7 +1404,6 @@ class InteractWithLyxCells(object):
         graph_str = r"graphics lyxscale 100 width 5in keepAspectRatio filename " \
             + most_recent
         self.process_lfun("inset-insert", graph_str)
-        return
 
 """
 Reference Material

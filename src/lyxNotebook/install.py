@@ -155,7 +155,7 @@ def setup_module_files(user_home_lyx_directory, source_dir):
         if os.path.exists(installed):
             os.remove(installed)
 
-    # Regenerate all the .module files, in case the user changed interpreter_specs.py.
+    # Regenerate all the .module files, in case the user changed interpreter specs.
     from .generate_module_files_from_template import generate_files_from_templates
     generate_files_from_templates()
 
