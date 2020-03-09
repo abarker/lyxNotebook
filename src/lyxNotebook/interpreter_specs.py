@@ -79,9 +79,9 @@ of different interpreters.
 """
 
 from __future__ import print_function, division
-import lyxNotebook_user_settings # in case any of these settings are needed
 import os
 import sys
+from . import lyxNotebook_user_settings # in case any of these settings are needed
 
 
 class SpecRecord(object):

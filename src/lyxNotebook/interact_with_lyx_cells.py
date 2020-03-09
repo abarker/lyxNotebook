@@ -52,8 +52,8 @@ import datetime
 import getpass
 import random
 import string # just for generating random filenames
-import easygui_096 as eg
-import lyxNotebook_user_settings
+from . import easygui_096 as eg
+from . import lyxNotebook_user_settings
 
 # This file is repeatedly written temporarily to current dir, then deleted.
 tmp_saved_lyx_file_name = "tmp_save_file_lyx_notebook_xxxxx.lyxnotebook"

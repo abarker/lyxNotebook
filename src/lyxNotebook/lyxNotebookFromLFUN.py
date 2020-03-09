@@ -46,7 +46,7 @@ import subprocess
 import os
 import sys
 import platform
-import lyxNotebook_user_settings
+from . import lyxNotebook_user_settings
 
 python_version = platform.python_version_tuple()
 
@@ -58,8 +58,7 @@ lyx_command_string = lyxNotebook_user_settings.lyx_command_string
 always_start_new_terminal = lyxNotebook_user_settings.always_start_new_terminal
 
 # Get path of the lyxNotebook script and dir from calling command for this script.
-calling_command = os.path.abspath(os.path.expanduser(sys.argv[0]))
-lyx_notebook_source_dir = os.path.dirname(calling_command)
+lyx_notebook_source_dir = os.path.dirname(__file__)
 lyxNotebook_run_path = os.path.join(lyx_notebook_source_dir, "lyxNotebook.py")
 os.chdir(lyx_notebook_source_dir) # Make relative paths work in user_settings file.
 
@@ -80,126 +79,128 @@ def get_command_output(command_and_arg_list):
         f = os.popen(command_string)
         return f.read()
 
-# Call the tty command to see if it returns a terminal.  Note that it will
-# fail if current "self" process was started via a Lyx LFUN call.  (The ps
-# output can give a tty even in that case, but we need to differentiate
-# since to work correctly when called from inside Lyx the stdout and
-# stderr must be explicitly redirected to a terminal.)
+def main():
 
-try:
-    tty_command_output = get_command_output(["tty"]).strip()
-except:
-    # If tty command fails, assume there is no associated tty and set
-    # output the same as the output of the tty command when no tty.
-    print("Exception in tty command, assuming 'not a tty' as the response.")
-    tty_command_output = "not a tty"
+    # Call the tty command to see if it returns a terminal.  Note that it will
+    # fail if current "self" process was started via a Lyx LFUN call.  (The ps
+    # output can give a tty even in that case, but we need to differentiate
+    # since to work correctly when called from inside Lyx the stdout and
+    # stderr must be explicitly redirected to a terminal.)
 
-#
-# If the tty command found a tty, just start up the program normally.
-#
-
-if tty_command_output != "not a tty" and not always_start_new_terminal:
-    print("Running LyX Notebook from terminal %s returned by tty command."
-          % tty_command_output)
     try:
-        subprocess.call(lyxNotebook_run_path, shell=True)
+        tty_command_output = get_command_output(["tty"]).strip()
     except:
+        # If tty command fails, assume there is no associated tty and set
+        # output the same as the output of the tty command when no tty.
+        print("Exception in tty command, assuming 'not a tty' as the response.")
+        tty_command_output = "not a tty"
+
+    #
+    # If the tty command found a tty, just start up the program normally.
+    #
+
+    if tty_command_output != "not a tty" and not always_start_new_terminal:
+        print("Running LyX Notebook from terminal %s returned by tty command."
+              % tty_command_output)
+        try:
+            subprocess.call(lyxNotebook_run_path, shell=True)
+        except:
+            sys.exit(0)
         sys.exit(0)
-    sys.exit(0)
 
-#
-# Parse the output of the ps command to find a tty.  Use "ps -f" and parse
-# according to labels on the first line, for portability (to Cygwin).
-#
+    #
+    # Parse the output of the ps command to find a tty.  Use "ps -f" and parse
+    # according to labels on the first line, for portability (to Cygwin).
+    #
 
-process_data = get_command_output(["ps", "-f"])
-process_data = process_data.splitlines()
+    process_data = get_command_output(["ps", "-f"])
+    process_data = process_data.splitlines()
 
-column_labels = process_data[0].split() # split on whitespace
-for i in range(len(column_labels)):
-    if column_labels[i].strip() == "PID": pid_col = i
-    if column_labels[i].strip() == "UID": uid_col = i
-    if column_labels[i].strip() == "CMD": cmd_col = i
-    if column_labels[i].strip() == "TTY": tty_col = i
-del process_data[0] # remove the first line of the output, with column labels
+    column_labels = process_data[0].split() # split on whitespace
+    for i in range(len(column_labels)):
+        if column_labels[i].strip() == "PID": pid_col = i
+        if column_labels[i].strip() == "UID": uid_col = i
+        if column_labels[i].strip() == "CMD": cmd_col = i
+        if column_labels[i].strip() == "TTY": tty_col = i
+    del process_data[0] # remove the first line of the output, with column labels
 
-# Go through process_data to find user ID and TTY for the current "self" process.
-# Also, delete all but the basename in the CMD column.
-for i in range(len(process_data)):
-    process_data[i] = process_data[i].split() # split on whitespace
-    pid = int(process_data[i][pid_col].strip())
-    if pid == my_PID:
-        # note the tty can be set in ps even if the tty command earlier failed
-        my_tty = process_data[i][tty_col].strip()
-        # get user of the current running "self" process
-        my_USER = process_data[i][uid_col].strip()
-    process_data[i][cmd_col] = os.path.basename(process_data[i][cmd_col]) # only base
+    # Go through process_data to find user ID and TTY for the current "self" process.
+    # Also, delete all but the basename in the CMD column.
+    for i in range(len(process_data)):
+        process_data[i] = process_data[i].split() # split on whitespace
+        pid = int(process_data[i][pid_col].strip())
+        if pid == my_PID:
+            # note the tty can be set in ps even if the tty command earlier failed
+            my_tty = process_data[i][tty_col].strip()
+            # get user of the current running "self" process
+            my_USER = process_data[i][uid_col].strip()
+        process_data[i][cmd_col] = os.path.basename(process_data[i][cmd_col]) # only base
 
-#
-# Find the tty associated with Lyx, or create one with xterm.
-#
+    #
+    # Find the tty associated with Lyx, or create one with xterm.
+    #
 
-# Make a sublist containing only the Lyx processes.
-my_lyx_procs = [p for p in process_data
-              if p[cmd_col] == lyx_command_string and p[uid_col] == my_USER]
+    # Make a sublist containing only the Lyx processes.
+    my_lyx_procs = [p for p in process_data
+                  if p[cmd_col] == lyx_command_string and p[uid_col] == my_USER]
 
-if len(my_lyx_procs) == 0:
-    print("No terminal found and no Lyx process running, trying an xterm anyway.")
-if len(my_lyx_procs) > 1:
-    print("Multiple Lyx processes running, trying an xterm anyway.")
+    if len(my_lyx_procs) == 0:
+        print("No terminal found and no Lyx process running, trying an xterm anyway.")
+    if len(my_lyx_procs) > 1:
+        print("Multiple Lyx processes running, trying an xterm anyway.")
 
-# Make a further sublist containing only the Lyx processes with terminals.
-my_lyx_procs_with_terminals = [p for p in my_lyx_procs if p[tty_col] != "?"]
+    # Make a further sublist containing only the Lyx processes with terminals.
+    my_lyx_procs_with_terminals = [p for p in my_lyx_procs if p[tty_col] != "?"]
 
-# Try opening ttys to select only a user-accessible one
-# (su to another user inside a terminal causes a fail, for example)
+    # Try opening ttys to select only a user-accessible one
+    # (su to another user inside a terminal causes a fail, for example)
 
-def tty_is_writeable(tty_name):
-    try:
-        test = open(tty_name, "r+")
-    except:
-        return False
-    test.close()
-    return True
+    def tty_is_writeable(tty_name):
+        try:
+            test = open(tty_name, "r+")
+        except:
+            return False
+        test.close()
+        return True
 
-my_lyx_procs_with_writeable_terminals = []
-for p in my_lyx_procs_with_terminals:
-    tty_name = "/dev/" + p[tty_col]
-    if tty_is_writeable(tty_name):
-        my_lyx_procs_with_writeable_terminals.append(p)
-    else:
-        print("Rejecting terminal", tty_name, "since it is not user-accessible.")
-        continue
+    my_lyx_procs_with_writeable_terminals = []
+    for p in my_lyx_procs_with_terminals:
+        tty_name = "/dev/" + p[tty_col]
+        if tty_is_writeable(tty_name):
+            my_lyx_procs_with_writeable_terminals.append(p)
+        else:
+            print("Rejecting terminal", tty_name, "since it is not user-accessible.")
+            continue
 
-# See if we found a usable tty.  Prefer the my_tty one, for the "self" process.
-# Only use the process associated with "lyx" in the ps output if it is unique
-# (so we don't dump stuff to the wrong terminal).
-if my_tty != "?":
-    terminal = "/dev/" + my_tty
-    if tty_is_writeable(terminal):
-        print("Sending output to the terminal associated with the "
-              + "lyxNotebookFromLFUN.py\n    process (should also be the Lyx "
-              + "process' terminal): " + terminal)
-    elif len(my_lyx_procs_with_writeable_terminals) == 1: # unique Lyx terminal
-        terminal = "/dev/" + my_lyx_procs_with_writeable_terminals[0][tty_col]
-        print("Sending output to the terminal associated with the running\n"
-              + "    LyX process: " + terminal)
+    # See if we found a usable tty.  Prefer the my_tty one, for the "self" process.
+    # Only use the process associated with "lyx" in the ps output if it is unique
+    # (so we don't dump stuff to the wrong terminal).
+    if my_tty != "?":
+        terminal = "/dev/" + my_tty
+        if tty_is_writeable(terminal):
+            print("Sending output to the terminal associated with the "
+                  + "lyxNotebookFromLFUN.py\n    process (should also be the Lyx "
+                  + "process' terminal): " + terminal)
+        elif len(my_lyx_procs_with_writeable_terminals) == 1: # unique Lyx terminal
+            terminal = "/dev/" + my_lyx_procs_with_writeable_terminals[0][tty_col]
+            print("Sending output to the terminal associated with the running\n"
+                  + "    LyX process: " + terminal)
+        else: terminal = "?" # none found, we'll need to start one
     else: terminal = "?" # none found, we'll need to start one
-else: terminal = "?" # none found, we'll need to start one
 
-# If a writeable terminal was found, use it, otherwise open an xterm window.
-if always_start_new_terminal or terminal == "?":
-    if operating_system_platform.startswith("linux"):
-        # Could recurse on this script, so debug info from here also goes to
-        # terminal, but then always_start_new_terminal causes problems
-        # since on second, recursive call it needs to *not* start with a
-        # new terminal (since one was created for it).  Could kluge some flag
-        # or file, but it doesn't seem worth it as of now.  So call lyxNotebook.
-        proc = subprocess.Popen(
-            ["xterm -e /bin/bash -l -c 'cd {} ; {}'".format(my_CWD, lyxNotebook_run_path)],
-            shell=True)
-    else:
-        pass # later add terminal for other platforms
-else: # got a unique terminal associated with current process or Lyx process
-    proc = subprocess.Popen(["{} >{} 2>&1".format(lyxNotebook_run_path, terminal)], shell=True)
+    # If a writeable terminal was found, use it, otherwise open an xterm window.
+    if always_start_new_terminal or terminal == "?":
+        if operating_system_platform.startswith("linux"):
+            # Could recurse on this script, so debug info from here also goes to
+            # terminal, but then always_start_new_terminal causes problems
+            # since on second, recursive call it needs to *not* start with a
+            # new terminal (since one was created for it).  Could kluge some flag
+            # or file, but it doesn't seem worth it as of now.  So call lyxNotebook.
+            proc = subprocess.Popen(
+                ["xterm -e /bin/bash -l -c 'cd {} ; {}'".format(my_CWD, lyxNotebook_run_path)],
+                shell=True)
+        else:
+            pass # later add terminal for other platforms
+    else: # got a unique terminal associated with current process or Lyx process
+        proc = subprocess.Popen(["{} >{} 2>&1".format(lyxNotebook_run_path, terminal)], shell=True)
 

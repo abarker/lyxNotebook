@@ -40,7 +40,7 @@ import time
 import pty
 import signal
 # import subprocess # for alternative where subprocess.call is used
-import interpreter_specs # only needed for testing code at end
+from . import interpreter_specs # only needed for testing code at end
 
 
 class ExternalInterpreter(object):

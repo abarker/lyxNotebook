@@ -42,8 +42,8 @@ import shutil
 import glob
 from os import path
 # import easygui
-import easygui_096 as easygui # Use a locally modified version of easygui.
-import lyxNotebook_user_settings
+from . import easygui_096 as easygui # Use a locally modified version of easygui.
+from . import lyxNotebook_user_settings
 
 def find_source_directory():
     """Find the Lyx Notebook source directory from the invoking pathname and cwd."""

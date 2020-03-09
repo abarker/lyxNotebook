@@ -555,10 +555,12 @@ print
 status open
 
 \begin_layout Plain Layout
+
 5
 \end_layout
 
 \begin_layout Plain Layout
+
 'A triple quote comment!
 \backslash
 n           across lines
@@ -569,6 +571,7 @@ n'
 \end_layout
 
 \begin_layout Plain Layout
+
 another print 5
 \end_layout
 
@@ -577,6 +580,7 @@ another print 5
 \end_layout
 
 \begin_layout Plain Layout
+
 print after blank line
 \end_layout
 

@@ -25,7 +25,6 @@ back, and then pushes the results to Lyx.
 
 from __future__ import print_function, division
 #import easygui as eg
-import easygui_096 as eg # Use a local, modified version.
 import re
 import sys
 import os
@@ -33,11 +32,12 @@ import time
 import signal
 
 # Local file imports.
-import lyxNotebook_user_settings
-from interact_with_lyx_cells import InteractWithLyxCells, Cell
-from external_interpreter import ExternalInterpreter
-import interpreter_specs # Specs for all the interpreters which are allowed.
-import keymap # The current mapping of keys to Lyx Notebook functions.
+from . import easygui_096 as eg # Use a local, modified version.
+from . import lyxNotebook_user_settings
+from .interact_with_lyx_cells import InteractWithLyxCells, Cell
+from .external_interpreter import ExternalInterpreter
+from . import interpreter_specs # Specs for all the interpreters which are allowed.
+from . import keymap # The current mapping of keys to Lyx Notebook functions.
 
 
 class IndentCalc(object):
