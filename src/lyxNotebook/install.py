@@ -47,11 +47,9 @@ from . import lyxNotebook_user_settings
 
 def find_source_directory():
     """Find the Lyx Notebook source directory from the invoking pathname and cwd."""
-    invoking_command = path.expanduser(sys.argv[0])
-    cwd = os.getcwd()
-    abs_path_to_setup_prog = path.join(cwd, invoking_command) # TODO see utilities.py
+    abs_path_to_setup_prog = os.path.abspath(__file__)
 
-    source_dir = path.dirname(path.normpath(abs_path_to_setup_prog))
+    source_dir = path.dirname(abs_path_to_setup_prog)
     print("The absolute path of the Lyx Notebook source directory is:\n   ", source_dir)
 
     source_dir_with_tilde = path.join("~", path.relpath(source_dir, path.expanduser("~")))
@@ -165,11 +163,12 @@ def run_setup():
     print("="*70)
     print("\nStarting the install and setup of LyX Notebook...\n")
 
-    user_home_lyx_directory_original = lyxNotebook_user_settings.user_home_lyx_directory
-    user_home_lyx_directory = path.abspath(path.expanduser(user_home_lyx_directory_original))
-
     # Find the Lyx Notebook source directory from the invoking pathname and cwd.
     source_dir = find_source_directory()
+    os.chdir(source_dir) # So the relevant directories can be located.
+
+    user_home_lyx_directory_original = lyxNotebook_user_settings.user_home_lyx_directory
+    user_home_lyx_directory = path.abspath(path.expanduser(user_home_lyx_directory_original))
 
     setup_key_binding_files(user_home_lyx_directory, source_dir)
 

@@ -59,7 +59,6 @@ always_start_new_terminal = lyxNotebook_user_settings.always_start_new_terminal
 
 # Get path of the lyxNotebook script and dir from calling command for this script.
 lyx_notebook_source_dir = os.path.dirname(__file__)
-lyxNotebook_run_path = os.path.join(lyx_notebook_source_dir, "lyxNotebook.py")
 os.chdir(lyx_notebook_source_dir) # Make relative paths work in user_settings file.
 
 my_PID = os.getpid()
@@ -69,6 +68,7 @@ operating_system_platform = sys.platform
 # Utility function to get command output, for portability and future development.
 
 def get_command_output(command_and_arg_list):
+    """Return the output of the passed-in command."""
     if int(python_version[0]) > 2 or int(python_version[1]) > 6:
         python2_7or_later = True
     if python2_7or_later:
@@ -79,7 +79,13 @@ def get_command_output(command_and_arg_list):
         f = os.popen(command_string)
         return f.read()
 
-def main():
+def main(lyxNotebook_run_script_path):
+    """Set up so that the program has a TTY associated with it.  Pass in the
+    path to the script to run LyxNotebook normally."""
+    if python_version[0] == 2:
+        script_run_command = "python2 " + lyxNotebook_run_script_path
+    else:
+        script_run_command = "python3 " + lyxNotebook_run_script_path
 
     # Call the tty command to see if it returns a terminal.  Note that it will
     # fail if current "self" process was started via a Lyx LFUN call.  (The ps
@@ -103,7 +109,7 @@ def main():
         print("Running LyX Notebook from terminal %s returned by tty command."
               % tty_command_output)
         try:
-            subprocess.call(lyxNotebook_run_path, shell=True)
+            subprocess.call(script_run_command, shell=True)
         except:
             sys.exit(0)
         sys.exit(0)
@@ -197,10 +203,10 @@ def main():
             # new terminal (since one was created for it).  Could kluge some flag
             # or file, but it doesn't seem worth it as of now.  So call lyxNotebook.
             proc = subprocess.Popen(
-                ["xterm -e /bin/bash -l -c 'cd {} ; {}'".format(my_CWD, lyxNotebook_run_path)],
+                ["xterm -e /bin/bash -l -c 'cd {} ; {}'".format(my_CWD, script_run_command)],
                 shell=True)
         else:
             pass # later add terminal for other platforms
     else: # got a unique terminal associated with current process or Lyx process
-        proc = subprocess.Popen(["{} >{} 2>&1".format(lyxNotebook_run_path, terminal)], shell=True)
+        proc = subprocess.Popen(["{} >{} 2>&1".format(script_run_command, terminal)], shell=True)
 

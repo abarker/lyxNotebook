@@ -9,7 +9,8 @@ import os
 import sys
 import argparse
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
+script_path = os.path.abspath(__file__)
+script_dir = os.path.dirname(script_path)
 sys.path.insert(0, os.path.join(script_dir, "..", "src"))
 
 import lyxNotebook
@@ -26,7 +27,7 @@ if args.install:
 
 elif args.LFUN:
     from lyxNotebook import lyxNotebookFromLFUN
-    lyxNotebookFromLFUN.main()
+    lyxNotebookFromLFUN.main(script_path)
 
 else:
     from lyxNotebook import run_lyxNotebook
