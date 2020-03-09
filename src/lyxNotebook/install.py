@@ -45,6 +45,7 @@ import tempfile
 # import easygui
 from . import easygui_096 as easygui # Use a locally modified version of easygui.
 from . import lyxNotebook_user_settings
+from .generate_module_files_from_template import generate_files_from_templates
 
 python_version = platform.python_version_tuple()
 
@@ -139,33 +140,30 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
 
 def setup_module_files(user_home_lyx_directory, source_dir):
     """Generate the .module files and copy to `user_home_lyx_directory`"""
-    # TODO: Use a temporary directory like in the binding code above.  Then delete
-    # the directory where the temp files have been saved (prepare for pip install).
-
     # Go to the directory for .module files.
-    modules_directory = path.join(source_dir, "files_for_dot_lyx_layouts_dir")
-    os.chdir(modules_directory)
+    #tmp_modules_dir = path.join(source_dir, "files_for_dot_lyx_layouts_dir")
+    with tempfile.TemporaryDirectory() as tmp_modules_dir:
+        os.chdir(tmp_modules_dir)
 
-    # First remove any old .module files in that directory.
-    print("Regenerating all the .module files:")
-    dot_module_files = glob.glob("*.module")
-    for oldModuleFile in dot_module_files: # Delete the old .module files.
-        os.remove(oldModuleFile)
-        installed = os.path.join(user_home_lyx_directory, "layouts", oldModuleFile)
-        if os.path.exists(installed):
-            os.remove(installed)
+        ## First remove any old .module files in that directory.
+        #print("Regenerating all the .module files:")
+        #dot_module_files = glob.glob("*.module")
+        #for oldModuleFile in dot_module_files: # Delete the old .module files.
+        #    os.remove(oldModuleFile)
+        #    installed = os.path.join(user_home_lyx_directory, "layouts", oldModuleFile)
+        #    if os.path.exists(installed):
+        #        os.remove(installed)
 
-    # Regenerate all the .module files, in case the user changed interpreter specs.
-    from .generate_module_files_from_template import generate_files_from_templates
-    generate_files_from_templates()
+        # Regenerate all the .module files, in case the user changed interpreter specs.
+        generate_files_from_templates() # This function writes to CWD, changed above.
 
-    # Copy all the .module files to the layouts directory.
-    print("\nCopying the regenerated .module files to the LyX layouts directory.")
-    dot_module_files = glob.glob("*.module")
-    for newModuleFile in dot_module_files:
-        path_in_layouts_dir = path.join(
-            user_home_lyx_directory, "layouts", newModuleFile)
-        shutil.copyfile(newModuleFile, path_in_layouts_dir)
+        # Copy all the .module files to the layouts directory.
+        print("\nCopying the regenerated .module files to the LyX layouts directory.")
+        dot_module_files = glob.glob("*.module")
+        for new_module_file in dot_module_files:
+            path_in_layouts_dir = path.join(
+                                    user_home_lyx_directory, "layouts", new_module_file)
+            shutil.copyfile(new_module_file, path_in_layouts_dir)
 
 def run_setup(lyxNotebook_run_script_path):
     """Main routine to run the setup.  Pass in the full path to the startup script
