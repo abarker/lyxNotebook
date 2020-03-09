@@ -1,4 +1,3 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 """
 
@@ -41,9 +40,12 @@ import os
 import shutil
 import glob
 from os import path
+import platform
 # import easygui
 from . import easygui_096 as easygui # Use a locally modified version of easygui.
 from . import lyxNotebook_user_settings
+
+python_version = platform.python_version_tuple()
 
 def find_source_directory():
     """Find the Lyx Notebook source directory from the invoking pathname and cwd."""
@@ -57,8 +59,15 @@ def find_source_directory():
           source_dir_with_tilde, "\n")
     return source_dir
 
-def setup_key_binding_files(user_home_lyx_directory, source_dir):
-    """Set up the user-modifiable key-binding file."""
+def setup_key_binding_files(user_home_lyx_directory, source_dir,
+                            lyxNotebook_run_script_path):
+    """Set up the user-modifiable key-binding file.  The `lyxNotebook_run_script_path`
+    path to the script that runs LyxNotebook must be an absolute path."""
+    if python_version[0] == 2:
+        # TODO: all just run directly with Python3... can't pass args in LyX call...
+        lyxNotebook_run_script_path = lyxNotebook_run_script_path
+    else:
+        lyxNotebook_run_script_path = lyxNotebook_run_script_path
 
     # Process the user-modifiable bind file to load the path of the Lyx Notebook bindings.
     bind_template_pathname = path.join(
@@ -102,8 +111,8 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir):
         source_dir, "filesForDotLyxDir", "lyxNotebookKeyBindings.template")
     with open(bind_template_pathname, "r") as bind_template:
         bind_contents_str = bind_template.read()
-    bind_contents_str = bind_contents_str.replace("<<abs_path_to_lyx_notebook_source_dir>>",
-                                              source_dir) # must be absolute path
+    bind_contents_str = bind_contents_str.replace("<<lyxNotebook_run_script_path>>",
+                                              lyxNotebook_run_script_path) # MUST be absolute path
 
     # Write out the final Lyx Notebook .bind file to the filesForDotLyxDir directory.
     bind_file_pathname = path.join(
@@ -157,8 +166,10 @@ def setup_module_files(user_home_lyx_directory, source_dir):
             user_home_lyx_directory, "layouts", newModuleFile)
         shutil.copyfile(newModuleFile, path_in_layouts_dir)
 
-def run_setup():
-    """Main routine to run the setup."""
+def run_setup(lyxNotebook_run_script_path):
+    """Main routine to run the setup.  Pass in the full path to the startup script
+    (which calls this routine) so it can be set to be called from a function key in
+    Lyx."""
     print()
     print("="*70)
     print("\nStarting the install and setup of LyX Notebook...\n")
@@ -170,7 +181,8 @@ def run_setup():
     user_home_lyx_directory_original = lyxNotebook_user_settings.user_home_lyx_directory
     user_home_lyx_directory = path.abspath(path.expanduser(user_home_lyx_directory_original))
 
-    setup_key_binding_files(user_home_lyx_directory, source_dir)
+    setup_key_binding_files(user_home_lyx_directory, source_dir,
+                            lyxNotebook_run_script_path)
 
     setup_module_files(user_home_lyx_directory, source_dir)
 
@@ -215,7 +227,4 @@ def run_setup():
     print("="*70)
     print("\n" + text)
     easygui.textbox(msg=msg, text=text, title="LyX Notebook Setup")
-
-if __name__ == "__main__":
-   run_setup()
 

@@ -1,4 +1,3 @@
-#! /usr/bin/python
 """
 =========================================================================
 This file is part of LyX Notebook, which works with LyX but is an
@@ -32,6 +31,8 @@ setting up the tty).  Call it from a stub shell script if you need to put an
 executable file somewhere else.
 
 """
+
+# TODO: Results are different under Python3 and Python2 for some reason...
 
 # TODO: Consider if using the sys.stdin.isatty() function would be helpful, and
 # similarly for sys.stdout.isatty().  sys.stdin and sys.stdout are file objects.
@@ -69,23 +70,16 @@ operating_system_platform = sys.platform
 
 def get_command_output(command_and_arg_list):
     """Return the output of the passed-in command."""
-    if int(python_version[0]) > 2 or int(python_version[1]) > 6:
-        python2_7or_later = True
-    if python2_7or_later:
-        # This is the "right" way, but only works in Python 2.7 and later.
-        return subprocess.check_output(command_and_arg_list)
-    else: # older system
-        command_string = " ".join(command_and_arg_list)
-        f = os.popen(command_string)
-        return f.read()
+    print("\nPROCESS CALL:", " ".join(command_and_arg_list))
+    output = subprocess.check_output(command_and_arg_list)
+    output = output.decode("utf-8")
+    print("OUTPUT:\n", output)
+    return output
 
-def main(lyxNotebook_run_script_path):
+def main(script_run_command):
     """Set up so that the program has a TTY associated with it.  Pass in the
-    path to the script to run LyxNotebook normally."""
-    if python_version[0] == 2:
-        script_run_command = "python2 " + lyxNotebook_run_script_path
-    else:
-        script_run_command = "python3 " + lyxNotebook_run_script_path
+    path to the script to run LyxNotebook normally (run as a process after a
+    TTY is set up)."""
 
     # Call the tty command to see if it returns a terminal.  Note that it will
     # fail if current "self" process was started via a Lyx LFUN call.  (The ps
@@ -98,7 +92,7 @@ def main(lyxNotebook_run_script_path):
     except:
         # If tty command fails, assume there is no associated tty and set
         # output the same as the output of the tty command when no tty.
-        print("Exception in tty command, assuming 'not a tty' as the response.")
+        print("\nException in tty command, assuming 'not a tty' as the response.")
         tty_command_output = "not a tty"
 
     #
@@ -162,11 +156,13 @@ def main(lyxNotebook_run_script_path):
     # (su to another user inside a terminal causes a fail, for example)
 
     def tty_is_writeable(tty_name):
+        """Test to see if the tty `tty_name` can be opened for writing."""
         try:
             test = open(tty_name, "r+")
         except:
             return False
-        test.close()
+        finally:
+            test.close()
         return True
 
     my_lyx_procs_with_writeable_terminals = []

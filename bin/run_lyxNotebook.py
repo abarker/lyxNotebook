@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 
 Run the program.
@@ -15,22 +16,22 @@ sys.path.insert(0, os.path.join(script_dir, "..", "src"))
 
 import lyxNotebook
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--LFUN", action="store_true", help="Run from a Lyx LFUN.")
-parser.add_argument("--install", action="store_true", help=
-                    "Install files in the Lyx directory specified in user_settings file.")
-args = parser.parse_args()
-
-if args.install:
-    from lyxNotebook import install
-    install.run_setup()
-
-elif args.LFUN:
+def run_from_lfun():
     from lyxNotebook import lyxNotebookFromLFUN
     lyxNotebookFromLFUN.main(script_path)
 
-else:
-    from lyxNotebook import run_lyxNotebook
-    run_lyxNotebook.main()
+if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--install", action="store_true", help=
+                        "Install files in the Lyx directory specified in user_settings file.")
+    args = parser.parse_args()
+
+    if args.install:
+        from lyxNotebook import install
+        install.run_setup(os.path.join(script_dir, "run_lyxNotebook_from_LFUN.py"))
+
+    else:
+        from lyxNotebook import run_lyxNotebook
+        run_lyxNotebook.main()
 
