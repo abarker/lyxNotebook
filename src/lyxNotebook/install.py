@@ -163,7 +163,6 @@ def setup_module_files(user_home_lyx_directory, source_dir):
         for new_module_file in dot_module_files:
             path_in_layouts_dir = path.join(
                                     user_home_lyx_directory, "layouts", new_module_file)
-            print("...................layout path:", path_in_layouts_dir)
             shutil.copyfile(new_module_file, path_in_layouts_dir)
 
 def run_setup(lyxNotebook_run_script_path):

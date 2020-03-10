@@ -19,8 +19,8 @@ UPDATE, Mar. 2020
       
       lyxnotebook --install
 
-   The program has only recently been updated again.  It mostly still works,
-   but some of the features are now broken.
+   The program has only recently been updated again.  Some of the features
+   still no longer work due to changes in Lyx versions.
 
 Earlier info
 ============

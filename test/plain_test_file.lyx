@@ -6,6 +6,10 @@
 \origin unavailable
 \textclass article
 \use_default_options true
+\begin_modules
+lyxNotebookCellPython
+lyxNotebookCellPythonTwo
+\end_modules
 \maintain_unincluded_children false
 \language english
 \language_package default
@@ -30,7 +34,10 @@
 \output_sync 0
 \bibtex_command default
 \index_command default
+\float_placement class
+\float_alignment class
 \paperfontsize default
+\spacing single
 \use_hyperref false
 \papersize default
 \use_geometry false
@@ -46,6 +53,7 @@
 \use_package undertilde 1
 \cite_engine basic
 \cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
@@ -137,6 +145,181 @@ for i in egg:
 \begin_layout Plain Layout
 
    pass
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Test some code cells
+\end_layout
+
+\begin_layout Standard
+Here is one.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex LyxNotebookCell:Init:Python
+status open
+
+\begin_layout Plain Layout
+
+print(
+\backslash
+begin_inset Quotes eld
+\backslash
+end_insetInit cell
+\backslash
+begin_inset Quotes erd
+\backslash
+end_inset)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:Python
+status open
+
+\begin_layout Plain Layout
+  File "<stdin>", line 1
+\end_layout
+
+\begin_layout Plain Layout
+    print(
+\backslash
+begin_inset Quotes eld
+\backslash
+end_insetInit cell
+\backslash
+begin_inset Quotes erd
+\backslash
+end_inset)
+\end_layout
+
+\begin_layout Plain Layout
+                                                                       
+              ^
+\end_layout
+
+\begin_layout Plain Layout
+SyntaxError: unexpected character after line continuation character
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+x
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex LyxNotebookCell:Standard:Python
+status open
+
+\begin_layout Plain Layout
+
+print(
+\backslash
+begin_inset Quotes eld
+\backslash
+end_insetStandard cell
+\backslash
+begin_inset Quotes erd
+\backslash
+end_inset)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:Python
+status open
+
+\begin_layout Plain Layout
+  File "<stdin>", line 1
+\end_layout
+
+\begin_layout Plain Layout
+    print(
+\backslash
+begin_inset Quotes eld
+\backslash
+end_insetStandard cell
+\backslash
+begin_inset Quotes erd
+\backslash
+end_inset)
+\end_layout
+
+\begin_layout Plain Layout
+                                                                       
+                  ^
+\end_layout
+
+\begin_layout Plain Layout
+SyntaxError: unexpected character after line continuation character
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here is Python2
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex LyxNotebookCell:Standard:PythonTwo
+status open
+
+\begin_layout Plain Layout
+
+print(
+\backslash
+begin_inset Quotes eld
+\backslash
+end_insetthis is Python2
+\backslash
+begin_inset Quotes erd
+\backslash
+end_inset)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:PythonTwo
+status open
+
+\begin_layout Plain Layout
+  File "<stdin>", line 1
+\end_layout
+
+\begin_layout Plain Layout
+    print(
+\backslash
+begin_inset Quotes eld
+\backslash
+end_insetthis is Python2
+\backslash
+begin_inset Quotes erd
+\backslash
+end_inset)
+\end_layout
+
+\begin_layout Plain Layout
+                                                                       
+                    ^
+\end_layout
+
+\begin_layout Plain Layout
+SyntaxError: unexpected character after line continuation character
 \end_layout
 
 \end_inset
