@@ -28,10 +28,72 @@ The server-notify events which are sent out from Lyx only have two fields::
        NOTIFY:<key pressed>
 
 For info on the Lyx LFUNs that can be sent over the Lyx server, see
-http://wiki.lyx.org/sourcedoc/svn/namespacelyx.html#5ae63e8160e98b54ad28f142ed40c202
+   https://www.lyx.org/sourcedoc/latest/namespacelyx.html#a5ae63e8160e98b54ad28f142ed40c202
 For similar technical notes, with raw newlines explicitly specified in the docs
 where they are required (e.g. search and replace), see
-http://www.koders.com/cpp/fidB982EF8F5299023FC858C1BB857347440F3A5302.aspx?s=vector
+   http://www.koders.com/cpp/fidB982EF8F5299023FC858C1BB857347440F3A5302.aspx?s=vector
+
+Some earlier notes:
+
+    Question on layouts: can one easily define separate layouts for inside insets,
+    as copies of existing layouts except with different names?  If so then that
+    could be used to tell exactly what sort of cell we are in, just by checking
+    layout.  Can a layout be defined such that the PassThru behavior does what is
+    wanted?  Note that Latex .sty style files are sometimes called layouts.  BUT,
+    in Lyx .layout files are used: http://wiki.lyx.org/LyX/Concepts
+
+
+    Some LFUNs which would have been useful, but currently aren't implemented in Lyx
+    (rough descriptions of functionality).  These aren't meant as criticism, but just
+    as a wish-list and notes about what kinds of things would have been (and still
+    would be) useful.
+       get-char, get-word, get-line      -- return the actual character string
+       get-inset                         -- maybe get whole contents of inset as string
+       export-inset, export-paragraph    -- export less than the full file
+       get-position, set-position        -- cursor position in the file get or set, e.g.,
+                                               <line> <char>
+                                            server-get-xy does something different
+       get-current-inset-type            -- the name of the inset type, i.e. Listings,
+                                            or Math (like a general LFUN_IN_IPA).
+       goto-next-inset <type>            -- go to next inset of that type
+       inset-begin and inset-end mod     -- versions that are idempotent and stay inside
+       get-lyx-version                   -- the version of Lyx in case it matters
+                                              (like if new lfuns become available)
+       get-lyx-dir                       -- the particular Lyx home dir
+       inset-begin and inset-end         -- option to do absolute motions, regardless
+                                            of the current position in the inset.
+
+    -- Some way to dynamically set parameters on flex-insert items; maybe like the
+    listings environment with "Settings" menu, even if just like the extra items
+    box on the "Advanced" page with "More Parameters."  Some way to pass them as
+    arguments to the flex-insert command would also be good.  (Even just
+    dynamically-settable labels on Lyx Listings insets could be useful, but we
+    still wouldn't have a way to inset-forall to only certain subtypes.  That would
+    also need the colon-separated naming convention to be extended.  Pre- and post-
+    processing could, however, be done: by redefining the Listings inset and
+    changing the Latex environment name to a lstnewenvironment.)
+
+    -- Some way to temporarily turn off user interactions, such as mouse clicks
+    which can change the cursor point in the middle of other operations.  That is,
+    a way to make Lyx temporarily only listen to Lyx server commands and not to
+    user interactions.
+
+    -- Some kind of "escaped passthru" might be nice, especially if things like math
+    insets could be set to invoke them (and the escape char could be chosen).
+    For example, allow color and style commands only.
+
+    -- Some way to bind server-notify to menu items might be useful, so that not
+    as many keys would need to be bound (especially for lesser-used functions).
+    But now the easyGUI menu does that.
+
+    -- Some way to detect which branch you are in, or to get current branch info
+    and specify branch-applicability in commands.  This might be useful, for
+    example, to have a branch for code where vpython was available, and a
+    branch where it wasn't.
+
+    -- Embedded Python would also be very nice, if that ever gets included (has been
+    discussed on the Lyx lists several times).  At least some kind of conditional
+    structure on LFUNs might be helpful in some instances.
 
 """
 
@@ -1433,159 +1495,6 @@ class InteractWithLyxCells(object):
             + most_recent
         self.process_lfun("inset-insert", graph_str)
 
-"""
-Reference Material
-
-Note that LFUNs can be tested and experimented with by typing them into the Lyx
-command buffer (View->Toolbars->CommandBuffer).
-
-
-Below are some possibly useful LFUNs which are implemented, with a few notes on
-their usage.  Comments refer to Lyx 2.0.3 behavior.
-
-   layout-module-add <MODULE>   # add a module.... maybe do auto, probably not...
-   repeat <count> <LFUNcommand>  # repeat LFUN count times
-   escape       # clears selection, if no selection then LFUN_FINISHED_FORWARD
-                # but there is no command finished-forward (or backward, etc.)
-   mark-off  # disable selection in region (with escape may get finished-forward)
-   mark-on   # enable selection in region
-       # neither mark-off or mark-on seem to do anything from command-buffer
-   layout <layout> # sets layout for current para; layouts are top-left menu things
-       # written there before dropping down; "Plain Layout" for listings and
-       # "Standard Layout" for ordinary text regions.
-   message <string>  # display the message in the status bar
-   inset-begin   # goto beginning unless already there, in that case go to outer begin
-   inset-end     # goto end unless already there, in that case go to outer end
-   inset-select-all    # select the entire contents of the inset
-   server-notify       # should be bound in Lyx, to command keys for external app
-   newline-insert
-   self-insert <STRING> # just inserts the string
-   flex-insert <TYPE NAME>    # insert a FLEX inset, but the name should leave off
-                              # the FLEX: prefix, since that is added automatically
-   inset-insert <TYPE NAME> <ARGS>    # insert an ordinary inset
-   char-delete-forward
-   char-delete-backward
-   line-delete
-   word-delete-forward
-   word-delete-backward
-   inset-forall <TYPE NAME> <LFUN-COMMAND>   # type is, e.g., Flex:WrapListings for
-               # a custom inset named Flex:WrapListings
-   command-sequence <semicolon separated commands>
-      # would this have problems semis in string arguments like in "self-insert xx;"?
-   server-goto-file-row <FILE[.ext]> <ROW_NUMBER>
-      # Examples from the docs:
-      #    server-goto-file-row /home/user/example.lyx 41
-      #    server-goto-file-row /tmp/lyx_tmpdir.XM3088/lyx_tmpbuf0/example.tex 41
-      # Note this LFUN can go right to the line with the begin{} statement for a
-      # cell, and positions to before the cell, but cannot go inside the insets
-      # (i.e., line numbers inside listings-type insets don't work).
-      # Note file *must* be in the Lyx temp dir, as far as I can get it to work,
-      # and the .tex suffix must be used.
-      # Adding lines earlier in Lyx files seems not to break it (i.e., doesn't
-      # seem to require re-export to Latex.)  What actions require re-export is
-      # unclear...
-   undo
-   redo
-   cut
-   copy
-   selection-paste
-   char-forward
-   word-forward
-   char-backward
-   word-backward
-   char-right          <--- arrow keys bound to these
-   char-left           <--- arrow keys bound to these
-   up
-   down
-   line-begin
-   line-end
-   buffer-begin
-   buffer-end
-   get-buf-name ???
-   server-set-xy     # refers to the "editing area" and seems to act strangely
-   server-get-xy     # BROKEN crashes Lyx 2.0.3 in some cases (reported as bug)
-   word-replace      # BROKEN cannot enter the required \n newline chars between items
-   word-find-forward
-   word-find-backward
-   paragraph-goto  # not well documented, works by "paragraph id"
-   paragraph-params-apply <INDENT> <SPACING> <ALIGN> <OTHERS>
-   inset-toggle <open|close|toggle|assign>    # applies to current cursor point
-   server-get-layout
-          # Get the name of the current layout (that is environment) at the cursor
-          # position.  Returns "Plain Layout" for listings-type insets, "Standard"
-          # for ordinary, "Enumerate" for enumerates.  This is very useful in
-          # faking LFUNs that don't exist.
-   layout <layout>  # Sets the layout (that is, environment) for the current paragraph
-   newline-insert <newline|linebreak>    # default is newline
-   file-insert [<FILE>]
-      # inserts another Lyx file... may be useful, depending on the details
-   file-insert-plaintext [<FILE>]      # these are good for insert, since one undo
-   file-insert-plaintext-para [<FILE>] # these are good for insert, since one undo
-       # The file-insert commands REQUIRE full pathname to work correctly!!!!!!!!
-       # ALSO, para becomes CR in listings, so files need to be written with blank
-       # lines (like double spacing).
-       # The plaintext-para version ignores empty lines in files, so use ordinary
-       # version to preserve them
-   unicode-insert <hex code>     # Sample: unicode-insert 0x0100
-       # this might be useful for a short and obscure cookie sequence....
-       # To insert a space: unicode-insert 0x0020
-
-Question on layouts: can one easily define separate layouts for inside insets,
-as copies of existing layouts except with different names?  If so then that
-could be used to tell exactly what sort of cell we are in, just by checking
-layout.  Can a layout be defined such that the PassThru behavior does what is
-wanted?  Note that Latex .sty style files are sometimes called layouts.  BUT,
-in Lyx .layout files are used: http://wiki.lyx.org/LyX/Concepts
-
-
-Some LFUNs which would have been useful, but currently aren't implemented in Lyx
-(rough descriptions of functionality).  These aren't meant as criticism, but just
-as a wish-list and notes about what kinds of things would have been (and still
-would be) useful.
-   get-char, get-word, get-line      -- return the actual character string
-   get-inset                         -- maybe get whole contents of inset as string
-   export-inset, export-paragraph    -- export less than the full file
-   get-position, set-position        -- cursor position in the file get or set, e.g.,
-                                           <line> <char>
-                                        server-get-xy does something different
-   get-current-inset-type            -- the name of the inset type, i.e. Listings
-   goto-next-inset <type>            -- go to next inset of that type
-   inset-begin and inset-end mod     -- versions that are idempotent and stay inside
-   get-lyx-version                   -- the version of Lyx in case it matters
-                                          (like if new lfuns become available)
-
--- Some way to dynamically set parameters on flex-insert items; maybe like the
-listings environment with "Settings" menu, even if just like the extra items
-box on the "Advanced" page with "More Parameters."  Some way to pass them as
-arguments to the flex-insert command would also be good.  (Even just
-dynamically-settable labels on Lyx Listings insets could be useful, but we
-still wouldn't have a way to inset-forall to only certain subtypes.  That would
-also need the colon-separated naming convention to be extended.  Pre- and post-
-processing could, however, be done: by redefining the Listings inset and
-changing the Latex environment name to a lstnewenvironment.)
-
--- Some way to temporarily turn off user interactions, such as mouse clicks
-which can change the cursor point in the middle of other operations.  That is,
-a way to make Lyx temporarily only listen to Lyx server commands and not to
-user interactions.
-
--- Some kind of "escaped passthru" might be nice, especially if things like math
-insets could be set to invoke them (and the escape char could be chosen).
-For example, allow color and style commands only.
-
--- Some way to bind server-notify to menu items might be useful, so that not
-as many keys would need to be bound (especially for lesser-used functions).
-But now the easyGUI menu does that.
-
--- Some way to detect which branch you are in, or to get current branch info
-and specify branch-applicability in commands.  This might be useful, for
-example, to have a branch for code where vpython was available, and a
-branch where it wasn't.
-
--- Embedded Python would also be very nice, if that ever gets included (has been
-discussed on the Lyx lists several times).  At least some kind of conditional
-structure on LFUNs might be helpful in some instances.
-"""
 
 #
 # Testing code for this module.
