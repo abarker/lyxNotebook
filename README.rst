@@ -24,12 +24,12 @@ UPDATE, Mar. 2020
 Earlier info
 ============
 
-It only works with interactive, interpreted languages.  The currently-supported
-languages are Python 2, Python 3, Sage, Scala, R, and Bash.  There are custom
-insets for code cells and output cells.  When a cell is evaluated the output is
-sent to the output cell.  The program keeps interpreter processes running,
-maintaining their state.  The Listings package is used to highlight the code in
-the code cells in the Latex-formatted printable output.
+Lyx Notebook only works with interactive, interpreted languages.  The
+currently-supported languages are Python 2, Python 3, Sage, Scala, R, and Bash.
+There are custom insets for code cells and output cells.  When a cell is
+evaluated the output is sent to the output cell.  The program keeps interpreter
+processes running, maintaining their state.  The Listings package is used to
+highlight the code in the code cells in the Latex-formatted printable output.
 
 See the file ``doc/lyxNotebookDocs.pdf`` for an overview, details of the install
 procedure, descriptions of all the available commands, and customization
