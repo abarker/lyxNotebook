@@ -65,11 +65,9 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
                             lyxNotebook_run_script_path):
     """Set up the user-modifiable key-binding file.  The `lyxNotebook_run_script_path`
     path to the script that runs LyxNotebook must be an absolute path."""
-    if python_version[0] == 2:
-        # TODO: all just run directly with Python... can't pass args in LyX call...
-        lyxNotebook_run_script_path = lyxNotebook_run_script_path
-    else:
-        lyxNotebook_run_script_path = lyxNotebook_run_script_path
+    if not os.path.isdir(user_home_lyx_directory):
+        print("No .lyx directory found at specified location.  Run LyX first to create it.")
+        sys.exit(1)
 
     # Process the user-modifiable bind file to load the path of the Lyx Notebook bindings.
     bind_template_pathname = path.join(
