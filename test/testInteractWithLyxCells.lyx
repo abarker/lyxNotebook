@@ -593,6 +593,35 @@ print after blank line
 Some text after in same para.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Flex LyxNotebookCell:Standard:Python
+status open
+
+\begin_layout Plain Layout
+
+x = 5
+\end_layout
+
+\begin_layout Plain Layout
+
+print('egg')
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:Python
+status open
+
+\begin_layout Plain Layout
+egg
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Other Cell Types
 \end_layout

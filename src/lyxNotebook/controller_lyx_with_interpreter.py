@@ -59,6 +59,8 @@ class IndentCalc(object):
     An instance of this object should be passed each physical line, one by one.
     It then makes calculations concerning the logical line structure.  There
     are no side effects, so results can be ignored for non-Python code."""
+    # TODO: Look into this Python library and consider if it's functionality could
+    # replace some of this code: https://docs.python.org/3.8/library/code.html
 
     def __init__(self):
         self.reset()
@@ -95,7 +97,7 @@ class IndentCalc(object):
         return self.indentation_level_down_to_zero
 
     def update_for_physical_line(self, code_line):
-        """The IndentCalc class should be sequentially passed physical lines, via
+        """The `IndentCalc` class should be sequentially passed physical lines, via
         this function."""
 
         # "indentation down to zero" is only considered true right after the first
@@ -198,8 +200,8 @@ class IndentCalc(object):
 
 class InterpreterProcess(object):
     """An instance of this class represents a data record for a running
-    interpreter process.  Contains an ExternalInterpreter instance for that
-    process, but also has an IndentCalc instance, and keeps track of the most
+    interpreter process.  Contains an `ExternalInterpreter` instance for that
+    process, but also has an `IndentCalc` instance, and keeps track of the most
     recent prompt received from the interpreter."""
 
     def __init__(self, spec):
@@ -210,10 +212,10 @@ class InterpreterProcess(object):
 
 
 class InterpreterProcessCollection(object):
-    """A class to hold multiple InterpreterProcess instances.  There will
+    """A class to hold multiple `InterpreterProcess` instances.  There will
     probably only be a single instance, but multiple instances should not cause
-    problems.  Basically a dict mapping (bufferName,inset_specifier) tuples to
-    InterpreterProcess class instances.  Starts processes when necessary."""
+    problems.  Basically a dict that maps (bufferName,inset_specifier) tuples to
+    `InterpreterProcess` class instances.  Starts processes when necessary."""
 
     def __init__(self, current_buffer):
         if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
@@ -288,7 +290,7 @@ class ControllerLyxWithInterpreter(object):
     """This class is the high-level controller class which deals with user
     interactions and which manages the Lyx process and the interpreter
     processes.  The interpreter specifications are read from the module
-    process_interpreter_specs.  The list process_interpreter_specs.all_specs in
+    `process_interpreter_specs`.  The list `process_interpreter_specs.all_specs` in
     that module is assumed to contains all the specs."""
 
     def __init__(self, clientname):
