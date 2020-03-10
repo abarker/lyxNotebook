@@ -8,7 +8,8 @@ COPYING.
 Copyright (c) 2012 Allen Barker
 =========================================================================
 
-Generate all the `.module` files from templates.
+Generate all the `.module` files from templates.  The function
+`generate_files_from_templates` performs the operations.
 
 This module is only used by `install.py` to generate `.module` files.  It only
 imports from `process_interpreter_specs`.
@@ -21,10 +22,10 @@ module expects that the CWD when it is run will be the
 
 from __future__ import print_function, division
 import sys
+import os
 
 # The interpreterSpecs module is loaded because it contains the string defining
 # the Listings formatting language for each type of interpreter it defines.
-sys.path.append("..")
 from .process_interpreter_specs import all_specs
 
 
@@ -434,7 +435,9 @@ End
 # ==========================================================================
 #
 
-def generate_files_from_templates():
+def generate_files_from_templates(dirname):
+    """Generate files, in the directory `dirname`."""
+    os.chdir(dirname)
 
     # first do the Listings redefinition, since it just needs to be written out
     with open("lyxNotebookListingsWithSmallFont.module", "w") as f:
@@ -510,5 +513,4 @@ def generate_files_from_templates():
         with open("lyxNotebookCell"+inset_specifier+".module", "w") as f:
             f.write(head + init + standard + output)
 
-generate_files_from_templates()
 

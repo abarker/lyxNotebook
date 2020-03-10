@@ -153,10 +153,9 @@ def main(script_run_command):
         """Test to see if the tty `tty_name` can be opened for writing."""
         try:
             test = open(tty_name, "r+")
+            test.close()
         except:
             return False
-        finally:
-            test.close()
         return True
 
     my_lyx_procs_with_writeable_terminals = []

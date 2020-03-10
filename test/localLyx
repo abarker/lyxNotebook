@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEST_LYX_HOME_PATH="$lyxnotebook/../../test/.lyx" # Home dir for the test version of lyx.
+TEST_LYX_HOME_PATH="$lyxn/../../test/.lyx" # Home dir for the test version of lyx.
 
 #SYSDIR="-sysdir $noback/compile_lyx/lyx/lib" # For compiled version, set up with path.
 

@@ -14,7 +14,7 @@ User-modifiable settings for the Lyx Notebook program.
 
 # The LyX user home directory.
 user_home_lyx_directory = "~/.lyx"
-user_home_lyx_directory = "../../test/.lyx"
+user_home_lyx_directory = "~/programming/python/lyxNotebook/project_root/test/.lyx"
 #user_home_lyx_directory = "~/.lyx-2.1.0svn"
 #user_home_lyx_directory = "~/.lyx-2.0.4svn"
 

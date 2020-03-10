@@ -155,7 +155,7 @@ def setup_module_files(user_home_lyx_directory, source_dir):
         #        os.remove(installed)
 
         # Regenerate all the .module files, in case the user changed interpreter specs.
-        generate_files_from_templates() # This function writes to CWD, changed above.
+        generate_files_from_templates(tmp_modules_dir)
 
         # Copy all the .module files to the layouts directory.
         print("\nCopying the regenerated .module files to the LyX layouts directory.")
@@ -163,6 +163,7 @@ def setup_module_files(user_home_lyx_directory, source_dir):
         for new_module_file in dot_module_files:
             path_in_layouts_dir = path.join(
                                     user_home_lyx_directory, "layouts", new_module_file)
+            print("...................layout path:", path_in_layouts_dir)
             shutil.copyfile(new_module_file, path_in_layouts_dir)
 
 def run_setup(lyxNotebook_run_script_path):

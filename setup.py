@@ -57,11 +57,10 @@ setup(
     #                        "PyMuPDF>=1.14.5",],
     #                },
     url="https://github.com/abarker/lyxNotebook",
-    # TODO: Setup entry points.
-    #entry_points = {
-    #    "console_scripts": ["pdf-crop-margins = pdfCropMargins.pdfCropMargins:main"]
-    #    "console_scripts": ["lyxnotebook = pdfCropMargins.pdfCropMargins:main"]
-    #    },
+    entry_points = {
+         "console_scripts": ["lyxnotebook = lyxNotebook.entry_points:run_lyxNotebook",
+                             "lyxnotebook-from-lfun = lyxNotebook.entry_points:run_lyxNotebook_from_LFUN",]
+        },
     #scripts=['bin/funniest-joke'],
     license="GPL",
     classifiers=[
