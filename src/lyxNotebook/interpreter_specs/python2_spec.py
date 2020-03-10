@@ -11,7 +11,7 @@ python2.params = {
     "prog_name": "Python",# name of the prog, used in formatted label
     "main_prompt": ">>> ",   # the main prompt
     "cont_prompt": "... ",   # the continuation prompt
-    "run_command": "python", # command to run the interpreter, in path
+    "run_command": "python2", # command to run the interpreter, in path
     "run_arguments": ["-u"],   # arguments to the run_command
     "file_suffix": ".py",    # suffix for code in interpreter language
     "comment_line": "#",      # char which starts a comment line

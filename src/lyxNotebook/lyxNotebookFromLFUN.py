@@ -71,15 +71,18 @@ def get_command_output(command_and_arg_list):
     return output
 
 def main(script_run_command):
-    """Set up so that the program has a TTY associated with it.  Pass in the
-    path to the script to run LyxNotebook normally (run as a process after a
-    TTY is set up)."""
+    """Set up so that the program has a TTY associated with it.  The
+    `script_run_command` parameter should be the passed path to the script to
+    run LyxNotebook normally (in order to run as a process after a TTY is
+    detected or set up)."""
 
+    #
     # Call the tty command to see if it returns a terminal.  Note that it will
     # fail if current "self" process was started via a Lyx LFUN call.  (The ps
     # output can give a tty even in that case, but we need to differentiate
     # since to work correctly when called from inside Lyx the stdout and
     # stderr must be explicitly redirected to a terminal.)
+    #
 
     try:
         tty_command_output = get_command_output(["tty"]).strip()
@@ -99,39 +102,40 @@ def main(script_run_command):
         try:
             subprocess.call(script_run_command, shell=True)
         except:
-            sys.exit(0)
+            sys.exit(1)
         sys.exit(0)
 
     #
-    # Parse the output of the ps command to find a tty.  Use "ps -f" and parse
-    # according to labels on the first line, for portability (to Cygwin).
+    # No tty identified yet; parse the output of the ps command to find a tty.
+    # Use "ps -f" and parse according to labels on the first line (for
+    # portability to Cygwin).
     #
 
     process_data = get_command_output(["ps", "-f"])
     process_data = process_data.splitlines()
 
-    column_labels = process_data[0].split() # split on whitespace
+    column_labels = process_data[0].split()
     for i in range(len(column_labels)):
         if column_labels[i].strip() == "PID": pid_col = i
         if column_labels[i].strip() == "UID": uid_col = i
         if column_labels[i].strip() == "CMD": cmd_col = i
         if column_labels[i].strip() == "TTY": tty_col = i
-    del process_data[0] # remove the first line of the output, with column labels
+    del process_data[0] # Remove the first line of the output, with column labels.
 
     # Go through process_data to find user ID and TTY for the current "self" process.
     # Also, delete all but the basename in the CMD column.
     for i in range(len(process_data)):
-        process_data[i] = process_data[i].split() # split on whitespace
+        process_data[i] = process_data[i].split()
         pid = int(process_data[i][pid_col].strip())
         if pid == my_PID:
-            # note the tty can be set in ps even if the tty command earlier failed
+            # Note the tty can be set in ps even if the tty command earlier failed.
             my_tty = process_data[i][tty_col].strip()
-            # get user of the current running "self" process
+            # Get user of the current running "self" process.
             my_USER = process_data[i][uid_col].strip()
         process_data[i][cmd_col] = os.path.basename(process_data[i][cmd_col]) # only base
 
     #
-    # Find the tty associated with Lyx, or create one with xterm.
+    # Find the tty associated with Lyx, or create one with xterm if that fails.
     #
 
     # Make a sublist containing only the Lyx processes.
@@ -151,12 +155,7 @@ def main(script_run_command):
 
     def tty_is_writeable(tty_name):
         """Test to see if the tty `tty_name` can be opened for writing."""
-        try:
-            test = open(tty_name, "r+")
-            test.close()
-        except:
-            return False
-        return True
+        return os.access(tty_name, os.W_OK)
 
     my_lyx_procs_with_writeable_terminals = []
     for p in my_lyx_procs_with_terminals:
