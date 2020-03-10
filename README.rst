@@ -6,6 +6,10 @@ notebook).
 UPDATE, Mar. 2020
 =================
 
+   Note that Lyx 2.4.0 may provide a mechanism to improve the program and
+   eliminate the currently-necessary inserting of magic-cookie strings to get
+   cell text.
+
    Lyx Notebook has recently been updated to install with ``setup.py`` and
    ``pip``.  It then creates the entry point script ``lyxnotebook`` and another
    one which works when called from a Lyx lfun bound to F12 by default.  The
@@ -19,8 +23,8 @@ UPDATE, Mar. 2020
       
       lyxnotebook --install
 
-   The program has only recently been updated again.  Some of the features
-   still no longer work due to changes in Lyx versions.
+   The program has only recently been updated again.  Most features still work,
+   but some may no longer work due to changes in Lyx versions.
 
 Earlier info
 ============
