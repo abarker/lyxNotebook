@@ -19,7 +19,8 @@ UPDATE, Mar. 2020
       pip install -e . --user
 
    For non-development use the ``-e`` option is not needed.  Inside a virtualenv
-   the ``--user`` option is not needed.  Then type::
+   the ``--user`` option is not needed.  Then run this and follow the instructions
+   it gives::
       
       lyxnotebook --install
 
