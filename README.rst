@@ -12,9 +12,10 @@ UPDATE, Mar. 2020
    older installation methods no longer work.  To install for development,
    goto the root directory of the project and run::
 
-      pip install -e .
+      pip install -e . --user
 
-   For non-development use the ``-e`` option is not needed.  Then type::
+   For non-development use the ``-e`` option is not needed.  Inside a virtualenv
+   the ``--user`` option is not needed.  Then type::
       
       lyxnotebook --install
 
