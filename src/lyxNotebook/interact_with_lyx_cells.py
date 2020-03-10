@@ -816,7 +816,8 @@ class InteractWithLyxCells(object):
                              "lyx mv $$FName " + full_tmp_name, warn_error=True)
             time.sleep(0.05) # let write get a slight head start before any reading
             all_cells = self.get_all_cell_text_from_lyx_file(full_tmp_name)
-            if os.path.exists(tmp_saved_lyx_file_name): os.remove(tmp_saved_lyx_file_name)
+            if os.path.exists(tmp_saved_lyx_file_name):
+                os.remove(tmp_saved_lyx_file_name)
             """
             # old below, delete soon
             if autoSaveFileName != "": # there is an auto-save file
@@ -890,7 +891,7 @@ class InteractWithLyxCells(object):
         """
         in_file = TerminatedFile(filename, r"\end_document",
                                 "getAllCellTextFromLyxFile")
-        cell_list = []
+        cell_list = [] # A list of lines in the cell.
         inside_cell = False
         inside_cell_layout = False
         set_next_cell_cookie_line_before = -1
@@ -901,6 +902,7 @@ class InteractWithLyxCells(object):
             # search lines starting with something like
             #    \begin_inset Flex LyxNotebookCell:Standard:PythonTwo
             # or a cookie at the start of a cell line or anywhere in an ordinary line
+
             elif line.find(r"\begin_inset Flex LyxNotebookCell:") == 0:
                 inside_cell = True
                 inside_cell_layout = False
@@ -911,33 +913,54 @@ class InteractWithLyxCells(object):
                 if set_next_cell_cookie_line_before >= 0:
                     cell_list[-1].cookie_line_before = set_next_cell_cookie_line_before
                     set_next_cell_cookie_line_before = -1
+
             elif inside_cell and line.rstrip() == r"\end_inset":
                 cell_list[-1].end_line = line
                 cell_list[-1].end_line_number = in_file.number
                 inside_cell = False
+
             elif (inside_cell and not inside_cell_layout
                   and line.rstrip() == r"\begin_layout Plain Layout"):
                 inside_cell_layout = True
+
             elif inside_cell_layout: # actual line of cell text on several lines
                 cell_line_components = [line]
                 while True:
                     next_line = in_file.readline().rstrip("\n") # drop trailing \n
+
+                    # Lyx 2.3 introduced quote insets even inside listings; convert to '"' char.
+                    if next_line.startswith(r"\begin_inset Quotes"):
+                        cell_line_components.append('"')
+                        while in_file.readline().rstrip("\n") != r"\end_inset":
+                            continue
+                        continue
+
                     # translate some Lyx codes to ordinary text
-                    if next_line.rstrip() == r"\backslash": next_line = "\\"
+                    if next_line.rstrip() == r"\backslash":
+                        next_line = "\\"
+
                     # append the translated text
                     cell_line_components.append(next_line)
-                    if next_line.rstrip() == r"\end_layout": break
+
+                    if next_line.rstrip() == r"\end_layout":
+                        break
+
                 inside_cell_layout = False
                 line = "".join(cell_line_components[1:-1]) + "\n" # components to one line
+
                 # TODO: detect multiple cookies inside a cell (here and above routine)
                 if line.find(self.magic_cookie) == 0: # cell cookies must begin lines, too
                     cell_list[-1].has_cookie_inside = True
                     line = line.replace(self.magic_cookie, "", 1) # replace one occurence
                 cell_list[-1].append(line) # got a line from the cell, append it
+
             else: # got an ordinary text line
                 if line.find(self.magic_cookie) != -1: # found cookie anywhere on line
-                    if len(cell_list) > 0: cell_list[-1].cookie_line_after = in_file.number # TODO see next line
-                    set_next_cell_cookie_line_before = in_file.number # TODO was = lineNumber, but undefined, make = in_file.number, but double check
+                    if len(cell_list) > 0:
+                        cell_list[-1].cookie_line_after = in_file.number # TODO see next line
+                    # TODO below was = lineNumber, but undefined, make = in_file.number, but double check
+                    set_next_cell_cookie_line_before = in_file.number
+
         return cell_list
 
     def replace_all_cell_text_in_lyx_file(self, from_file_name, to_file_name, all_cells,
@@ -1116,22 +1139,27 @@ class InteractWithLyxCells(object):
         return num_init_cells, num_standard_cells, num_output_cells
 
     def get_current_cell_text(self, use_latex_export=False):
-        r"""Returns a Cell data structure containing the current text of the cell,
-        as lines.  Returns None if the cursor is not currently inside a cell.
+        r"""Returns a `Cell` data structure containing the current text of the cell,
+        as lines.  Returns `None` if the cursor is not currently inside a cell.
         The \begin and \end Latex markers (or Lyx markers) for the cell type are not
         included as lines of a Cell, but they are saved as additional fields.
         This currently works by putting a cookie in the current cell, updating the
         save/export, removing the cookie, and then reading all the cells in from
         that file and looking for which one has the cookie.  (This routine is
         nontrivial due to a lack of LFUNs to do it more directly.)"""
-        # This routine is similar to getAllCellText() except the current cell has
-        # to be singled out (identified with a cookie).
+        # This routine is similar to get_all_cell_text() except the current cell has
+        # to be singled out (identified with a cookie).  It calls that routine
+        # after setting the cookie, searches for it, then deletes the cookie.
         if not self.inside_cell():
             return None # return None if not in a cell
+
         self.insert_magic_cookie_inside_current(assert_inside_cell=True,
                                                 on_current_line=True)
+
         all_cells = self.get_all_cell_text(use_latex_export=use_latex_export)
+
         self.delete_magic_cookie_inside_current(assert_cursor_at_cookie_end=True)
+
         found_cookie = False
         for cell in all_cells:
             if cell.has_cookie_inside:

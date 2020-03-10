@@ -166,15 +166,7 @@ status open
 
 \begin_layout Plain Layout
 
-print(
-\backslash
-begin_inset Quotes eld
-\backslash
-end_insetInit cell
-\backslash
-begin_inset Quotes erd
-\backslash
-end_inset)
+print("Init cell")
 \end_layout
 
 \end_inset
@@ -184,28 +176,8 @@ end_inset)
 status open
 
 \begin_layout Plain Layout
-  File "<stdin>", line 1
-\end_layout
 
-\begin_layout Plain Layout
-    print(
-\backslash
-begin_inset Quotes eld
-\backslash
-end_insetInit cell
-\backslash
-begin_inset Quotes erd
-\backslash
-end_inset)
-\end_layout
-
-\begin_layout Plain Layout
-                                                                       
-              ^
-\end_layout
-
-\begin_layout Plain Layout
-SyntaxError: unexpected character after line continuation character
+Init cell
 \end_layout
 
 \end_inset
@@ -223,15 +195,17 @@ status open
 
 \begin_layout Plain Layout
 
-print(
-\backslash
-begin_inset Quotes eld
-\backslash
-end_insetStandard cell
-\backslash
-begin_inset Quotes erd
-\backslash
-end_inset)
+" Doc "
+\end_layout
+
+\begin_layout Plain Layout
+
+print("Standard cell")
+\end_layout
+
+\begin_layout Plain Layout
+
+print("Another line")
 \end_layout
 
 \end_inset
@@ -241,28 +215,18 @@ end_inset)
 status open
 
 \begin_layout Plain Layout
-  File "<stdin>", line 1
+
+' Doc '
 \end_layout
 
 \begin_layout Plain Layout
-    print(
-\backslash
-begin_inset Quotes eld
-\backslash
-end_insetStandard cell
-\backslash
-begin_inset Quotes erd
-\backslash
-end_inset)
+
+Standard cell
 \end_layout
 
 \begin_layout Plain Layout
-                                                                       
-                  ^
-\end_layout
 
-\begin_layout Plain Layout
-SyntaxError: unexpected character after line continuation character
+Another line
 \end_layout
 
 \end_inset
@@ -280,15 +244,12 @@ status open
 
 \begin_layout Plain Layout
 
-print(
-\backslash
-begin_inset Quotes eld
-\backslash
-end_insetthis is Python2
-\backslash
-begin_inset Quotes erd
-\backslash
-end_inset)
+print("this is Python2 with parens")
+\end_layout
+
+\begin_layout Plain Layout
+
+print "this is Python2 without parens"
 \end_layout
 
 \end_inset
@@ -298,28 +259,13 @@ end_inset)
 status open
 
 \begin_layout Plain Layout
-  File "<stdin>", line 1
+
+this is Python2 with parens
 \end_layout
 
 \begin_layout Plain Layout
-    print(
-\backslash
-begin_inset Quotes eld
-\backslash
-end_insetthis is Python2
-\backslash
-begin_inset Quotes erd
-\backslash
-end_inset)
-\end_layout
 
-\begin_layout Plain Layout
-                                                                       
-                    ^
-\end_layout
-
-\begin_layout Plain Layout
-SyntaxError: unexpected character after line continuation character
+this is Python2 without parens
 \end_layout
 
 \end_inset
