@@ -19,8 +19,13 @@ UPDATE, Mar. 2020
       pip3 install -e . --user
 
    For non-development use the ``-e`` option is not needed.  Inside a
-   virtualenv the ``--user`` option is not needed.  Then run this command and
-   follow the instructions it gives::
+   virtualenv the ``--user`` option is not needed.  The ``tkinter`` module is
+   also required.  If it is not already installed, you can install it
+   on Ubuntu with::
+   
+      sudo apt install python3-tk
+
+   Now run this command and follow the instructions it gives::
       
       lyxnotebook --install
 
@@ -29,7 +34,8 @@ UPDATE, Mar. 2020
    and ``.bind`` files in the ``.lyx`` directory.
 
    The program has only recently been updated again.  Most features still work,
-   but some may no longer work due to changes in Lyx versions.
+   but some may no longer work due to changes in Lyx versions.  Bash cells
+   don't seem to be working.
 
 Earlier info
 ============
