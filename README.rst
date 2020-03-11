@@ -11,18 +11,22 @@ UPDATE, Mar. 2020
    cell text.
 
    Lyx Notebook has recently been updated to install with ``setup.py`` and
-   ``pip``.  It then creates the entry point script ``lyxnotebook`` and another
-   one which works when called from a Lyx lfun bound to F12 by default.  The
+   ``pip``.  This creates the entry point script ``lyxnotebook`` (and another
+   one which works when called from a Lyx lfun bound to F12 by default).  The
    older installation methods no longer work.  To install for development,
    goto the root directory of the project and run::
 
-      pip install -e . --user
+      pip3 install -e . --user
 
-   For non-development use the ``-e`` option is not needed.  Inside a virtualenv
-   the ``--user`` option is not needed.  Then run this and follow the instructions
-   it gives::
+   For non-development use the ``-e`` option is not needed.  Inside a
+   virtualenv the ``--user`` option is not needed.  Then run this command and
+   follow the instructions it gives::
       
       lyxnotebook --install
+
+   To uninstall the program, use ``pip uninstall lyxNotebook``.  Reset the bind
+   file to its previous value.  Delete the Lyx Notebook ``.module`` files
+   and ``.bind`` files in the ``.lyx`` directory.
 
    The program has only recently been updated again.  Most features still work,
    but some may no longer work due to changes in Lyx versions.
