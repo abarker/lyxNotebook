@@ -155,6 +155,7 @@ InsetLayout Flex:LyxNotebookCell:<<basic_cell_type>>:<<inset_specifier>>
    ForceLTR             true # not sure why, but similar modules set it
    MultiPar             true
    ForcePlain           true # force Plain Layout, so user cannot change
+   EditExternal         true # enable inset-edit to work
    # custompars false stops blue highlighting on update, inset-select-all still works
    # CustomPars           false # cannot use "paragraph settings" dialog inside inset
    #
@@ -301,6 +302,7 @@ InsetLayout Flex:LyxNotebookCell:Output:<<inset_specifier>>
    ForceLTR             true # not sure why, but similar modules set it
    MultiPar             true
    ForcePlain           true # force Plain Layout, so user cannot change
+   EditExternal         true # enable inset-edit to work
    # custompars false stops blue highlighting on update, inset-select-all still works
    # CustomPars           false # cannot use "paragraph settings" dialog inside inset
    #
