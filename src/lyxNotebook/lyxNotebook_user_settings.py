@@ -14,14 +14,14 @@ User-modifiable settings for the Lyx Notebook program.
 
 # The LyX user home directory.
 user_home_lyx_directory = "~/.lyx"
-#user_home_lyx_directory = "~/programming/python/lyxNotebook/project_root/test/.lyx"
+user_home_lyx_directory = "~/programming/python/lyxNotebook/project_root/test/.lyx"
 #user_home_lyx_directory = "~/.lyx-2.1.0svn"
 #user_home_lyx_directory = "~/.lyx-2.0.4svn"
 
 # This setting must match: Tools->Preferences->Paths->LyXServerPipe
 lyx_server_pipe = "~/.lyx/lyxpipe"
-#import os
-#lyx_server_pipe = os.path.join(user_home_lyx_directory, "lyxpipe")
+import os
+lyx_server_pipe = os.path.join(user_home_lyx_directory, "lyxpipe")
 #lyx_server_pipe = "~/.lyx-2.1.0svn/lyxpipe"
 #lyx_server_pipe = "~/.lyx-2.0.4svn/lyxpipe"
 

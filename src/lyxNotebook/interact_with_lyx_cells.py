@@ -105,6 +105,8 @@ Some earlier notes:
 # it works, unless there is some way to detect failure in word-find-forward
 # in which case you can just do that part again until it fails.
 
+# TODO: Define a process_command_sequence convenience method and use it.
+
 from __future__ import print_function, division
 import sys
 import os
@@ -1027,7 +1029,7 @@ class InteractWithLyxCells(object):
 
     def replace_all_cell_text_in_lyx_file(self, from_file_name, to_file_name, all_cells,
                                     init=True, standard=True):
-        """Given a .lyx file fromFile, write out another .lyx file which has the
+        """Given a .lyx file `from_file`, write out another .lyx file which has the
         same text but in which all cells are replaced by the cells in all_cells.
         Currently only the selected code cells are replaced, and the code cells
         are assumed to have already been evaluated with output in their

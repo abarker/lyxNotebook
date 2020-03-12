@@ -1009,7 +1009,7 @@ class ControllerLyxWithInterpreter(object):
         return
 
     def reload_buffer_file(self, dont_ask_first=True):
-        """Reload the current buffer file.  If dont_ask_first is True a method is used
+        """Reload the current buffer file.  If `dont_ask_first` is true a method is used
         which simply does the reload without asking the user."""
         if dont_ask_first:
             # This command does not ask and always reloads:
@@ -1017,7 +1017,7 @@ class ControllerLyxWithInterpreter(object):
             # TODO: Bug if we do not modify file and write it back out as below!  Why?
             # Cells are not read back in right, otherwise, until a save is done.
             self.lyx_process.process_lfun("command-sequence",
-                                        "self-insert x;char-delete-backward;buffer-write")
+                                          "self-insert x;char-delete-backward;buffer-write")
         else:
             # This LFUN will ask the user before reloading:
             self.lyx_process.process_lfun("buffer-reload")
@@ -1072,18 +1072,4 @@ class ControllerLyxWithInterpreter(object):
             print(msg)
         return
 
-#
-# Testing code below, not usually run from this file as __main__.  The lyxNotebook
-# script is now used to start up (after making sure another process isn't running).
-#
-
-if __name__ == "__main__":
-
-    print("===================================================")
-    print()
-    print("Starting the Lyx Notebook program...")
-
-    # start the controller
-
-    controller = ControllerLyxWithInterpreter("lyxNotebookClient")
 

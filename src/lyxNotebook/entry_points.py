@@ -34,4 +34,3 @@ def run_lyxNotebook_from_LFUN():
     from . import lyxNotebookFromLFUN
     lyxNotebookFromLFUN.main("lyxnotebook") # Pass regular script name to call after setup.
 
-
