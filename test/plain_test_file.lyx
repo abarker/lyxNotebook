@@ -108,7 +108,7 @@ status open
 
 \begin_layout Plain Layout
 
-ERT test inset updated
+ ERT test inset  FINALLY
 \end_layout
 
 \begin_layout Plain Layout
@@ -126,6 +126,7 @@ Code:
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python"
 inline false
 status open
 
@@ -144,6 +145,14 @@ for i in egg:
 
 \end_layout
 
+\begin_layout Standard
+Math is not editable in cells: 
+\begin_inset Formula $x^{2}-5$
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Test some code cells
 \end_layout
@@ -153,6 +162,7 @@ Here is one.
 \end_layout
 
 \begin_layout Standard
+zz
 \begin_inset Flex LyxNotebookCell:Init:Python
 status open
 
@@ -174,20 +184,17 @@ Init cell
 
 \end_inset
 
-
+zz
 \end_layout
 
 \begin_layout Standard
-x
-\end_layout
-
-\begin_layout Standard
+x:
 \begin_inset Flex LyxNotebookCell:Standard:Python
 status open
 
 \begin_layout Plain Layout
 
-" Doc "
+" A string test "
 \end_layout
 
 \begin_layout Plain Layout
@@ -208,7 +215,7 @@ status open
 
 \begin_layout Plain Layout
 
-' Doc '
+' A string test '
 \end_layout
 
 \begin_layout Plain Layout
@@ -228,9 +235,6 @@ Another line
 
 \begin_layout Standard
 Here is Python2
-\end_layout
-
-\begin_layout Standard
 \begin_inset Flex LyxNotebookCell:Standard:PythonTwo
 status open
 
@@ -258,6 +262,19 @@ this is Python2 with parens
 \begin_layout Plain Layout
 
 this is Python2 without parens
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex LyxNotebookCell:Standard:Python
+status open
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset

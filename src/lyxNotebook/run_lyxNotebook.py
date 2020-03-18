@@ -37,7 +37,7 @@ lyxNotebook_user_settings.lyx_notebook_source_dir = lyx_notebook_source_dir
 os.chdir(lyx_notebook_source_dir) # Makes relatives paths work in user_settings.
 
 # Do below import *after* the calculations above, since implicitly import process_interpreter_specs
-from .controller_lyx_with_interpreter import ControllerLyxWithInterpreter
+from .controller_of_lyx_and_interpreters import ControllerLyxWithInterpreter
 
 # Set the lockfile location to be in the user's local Lyx directory.
 user_home_lyx_directory = lyxNotebook_user_settings.user_home_lyx_directory
