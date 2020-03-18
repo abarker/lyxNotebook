@@ -74,7 +74,7 @@ def main(script_run_command):
     """Set up so that the program has a TTY associated with it.  The
     `script_run_command` parameter should be the passed path to the script to
     run LyxNotebook normally (in order to run as a process after a TTY is
-    detected or set up)."""
+    detected or set up). Normally the command is the entry point `lyxnotebook`."""
 
     #
     # Call the tty command to see if it returns a terminal.  Note that it will
@@ -185,13 +185,8 @@ def main(script_run_command):
     # If a writeable terminal was found, use it, otherwise open an xterm window.
     if always_start_new_terminal or terminal == "?":
         if operating_system_platform.startswith("linux"):
-            # Could recurse on this script, so debug info from here also goes to
-            # terminal, but then always_start_new_terminal causes problems
-            # since on second, recursive call it needs to *not* start with a
-            # new terminal (since one was created for it).  Could kluge some flag
-            # or file, but it doesn't seem worth it as of now.  So call lyxNotebook.
             proc = subprocess.Popen(
-                ["xterm -e /bin/bash -l -c 'cd {} ; {}'".format(my_CWD, script_run_command)],
+                ["xterm -e 'cd {} ; {}'".format(my_CWD, script_run_command)],
                 shell=True)
         else:
             pass # later add terminal for other platforms
