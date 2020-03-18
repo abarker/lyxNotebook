@@ -124,7 +124,7 @@ tmp_saved_lyx_file_name = "tmp_save_file_lyx_notebook_xxxxx.lyxnotebook"
 class Cell(list):
     """Simple container class derived from a list.  It is meant to hold lines
     of text corresponding to the contents of a cell.  The line numbers are
-    relative to Latex files (when the cell text is extracted from such files)."""
+    relative to Lyx/Latex files (when the cell text is extracted from such files)."""
     # TODO: maybe go back to list as internal, using composition.  Inheriting
     # from list isn't a great idea.  General list-returning operations return lists,
     # not Cell subclasses.
@@ -1175,6 +1175,20 @@ class InteractWithLyxCells(object):
         if not self.inside_cell() or self.inside_empty_cell(assert_inside_cell=True):
             return None # return None if not in a cell or empty cell
 
+        # TODO: Still blocked because need to set the begin_line of the cell to the
+        # raw beginning line to find the language associated with the file in the
+        # Cell's get_cell_type routine.  May need to restrict to ONLY Python!
+        has_flex_inset_edit_mod = False
+        if has_flex_inset_edit_mod:
+            filename = self.process_lfun("inset-edit", argument="noeditor")
+            print("filename is", filename)
+            text_cell = Cell()
+            with open(filename, "r") as f:
+                text_cell[:] = f.readlines()
+                print("cell line is:", text_cell)
+            self.process_lfun("inset-end-edit")
+            return text_cell
+
         self.insert_magic_cookie_inside_current(assert_inside_cell=True,
                                                 on_current_line=True)
 
@@ -1271,7 +1285,8 @@ class InteractWithLyxCells(object):
                 return
 
         # After this point, we know we are inside the output cell.
-        self.server_set_xy(100, 100) # Move cursor to optimize later inside_empty_cell call.
+        #self.server_set_xy(1, 0) # Move cursor to optimize later inside_empty_cell call.
+        self.goto_cell_end() # Move cursor to optimize later inside_empty_cell call.
 
         # Note this test and `empty_cell` flag was added in Mar. 2017 to fix
         # bug that was introduced by a change in how Lyx handles the
