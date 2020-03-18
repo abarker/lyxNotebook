@@ -74,7 +74,8 @@ def main(script_run_command):
     """Set up so that the program has a TTY associated with it.  The
     `script_run_command` parameter should be the passed path to the script to
     run LyxNotebook normally (in order to run as a process after a TTY is
-    detected or set up). Normally the command is the entry point `lyxnotebook`."""
+    detected or set up). The normal command is usually the entry point
+    `lyxnotebook`."""
 
     #
     # Call the tty command to see if it returns a terminal.  Note that it will
@@ -173,7 +174,7 @@ def main(script_run_command):
         terminal = "/dev/" + my_tty
         if tty_is_writeable(terminal):
             print("Sending output to the terminal associated with the "
-                  + "lyxNotebookFromLFUN.py\n    process (should also be the Lyx "
+                  + "lyxnotebook-from-lfun\n    process (should also be the Lyx "
                   + "process' terminal): " + terminal)
         elif len(my_lyx_procs_with_writeable_terminals) == 1: # unique Lyx terminal
             terminal = "/dev/" + my_lyx_procs_with_writeable_terminals[0][tty_col]

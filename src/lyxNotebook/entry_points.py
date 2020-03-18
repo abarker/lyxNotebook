@@ -31,6 +31,6 @@ def run_lyxNotebook():
 def run_lyxNotebook_from_LFUN():
     """Run LyxNotebook from a Lyx LFUN.  This requires associating it with a terminal
     if it is not already associated with one."""
-    from . import lyxNotebookFromLFUN
-    lyxNotebookFromLFUN.main("lyxnotebook") # Pass regular script name to call after setup.
+    from . import lyxnotebook_from_LFUN
+    lyxnotebook_from_LFUN.main("lyxnotebook") # Pass regular script name to call after setup.
 

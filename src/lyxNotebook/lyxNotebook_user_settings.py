@@ -46,7 +46,7 @@ lyx_command_string = "lyx"
 #lyx_command_string = "lyx-2.0.4svn"
 
 # Whether to always start a new terminal window for Lyx Notebook output.
-# This only applies when the program is run as lyxNotebookFromLFUN.py, such
+# This only applies when the program is run as lyxnotebook_from_LFUN.py, such
 # as when it is run from inside Lyx.
 always_start_new_terminal = False
 
