@@ -90,7 +90,7 @@ setup(
     author_email="Allen.L.Barker@gmail.com",
 
     #include_package_data=True, # Not set True when package_data is set.
-    package_data={"lyxNotebook":[lyxnotebook_bindings, user_customizable_bindings]},
+    package_data={"lyxnotebook":[lyxnotebook_bindings, user_customizable_bindings]},
     zip_safe=False,
 
     # Automated stuff below

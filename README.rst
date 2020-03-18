@@ -29,7 +29,7 @@ UPDATE, Mar. 2020
       
       lyxnotebook --install
 
-   To uninstall the program, use ``pip uninstall lyxNotebook``.  Reset the bind
+   To uninstall the program, use ``pip uninstall lyxnotebook``.  Reset the bind
    file to its previous value.  Delete the Lyx Notebook ``.module`` files
    and ``.bind`` files in the ``.lyx`` directory.
 

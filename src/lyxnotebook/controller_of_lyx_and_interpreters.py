@@ -9,7 +9,7 @@ COPYING.
 Copyright (c) 2012 Allen Barker
 =========================================================================
 
-This is the main module of the Lyx Notebook program; the `lyxNotebook.py` script
+This is the main module of the Lyx Notebook program; the entry point script
 just does basic startup stuff like making sure a Lyx Notebook process is not
 already running.
 

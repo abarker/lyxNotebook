@@ -14,7 +14,7 @@ User-modifiable settings for the Lyx Notebook program.
 
 # The LyX user home directory.
 user_home_lyx_directory = "~/.lyx"
-user_home_lyx_directory = "~/programming/python/lyxNotebook/project_root/test/.lyx"
+user_home_lyx_directory = "~/programming/python/lyxnotebook/project_root/test/.lyx"
 #user_home_lyx_directory = "~/.lyx-2.1.0svn"
 #user_home_lyx_directory = "~/.lyx-2.0.4svn"
 
@@ -78,7 +78,7 @@ separate_interpreters_for_each_buffer = True
 # ===============================================================================
 
 
-# The source directory of the Lyx Notebook program, where the command lyxNotebook
-# lives (the directory is calculated in that command's code, from argv[0]).
+# The source directory of the Lyx Notebook program, where some data is found.
+# (the directory is calculated in that command's code, from argv[0]).
 lyx_notebook_source_dir = "__dummy__"
 

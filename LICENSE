@@ -25,7 +25,7 @@ SOFTWARE.
 =============================================================================
 
 This software is currently distributed with a copy of EasyGUI, in
-lyxNotebook/easygui_0.96.py.  See also the distribution terms for that software
+lyxnotebook/easygui_0.96.py.  See also the distribution terms for that software
 (if it is to be included).  That code was released under the permissive
 "modified BSD license."
 

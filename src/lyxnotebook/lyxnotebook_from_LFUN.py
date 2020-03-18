@@ -7,7 +7,7 @@ COPYING.
 Copyright (c) 2012 Allen Barker
 =========================================================================
 
-Python will not run the lyxNotebook program correctly unless it has stdout
+Python will not run the lyxnotebook program correctly unless it has stdout
 associated with some tty.  So we have to make that happen.
 
 The Lyx Notebook program can be started in one of three ways.  It can 1) be run
@@ -53,7 +53,7 @@ python_version = platform.python_version_tuple()
 lyx_command_string = lyxNotebook_user_settings.lyx_command_string
 always_start_new_terminal = lyxNotebook_user_settings.always_start_new_terminal
 
-# Get path of the lyxNotebook script and dir from calling command for this script.
+# Get path of the source dir from calling command for this script.
 lyx_notebook_source_dir = os.path.dirname(__file__)
 os.chdir(lyx_notebook_source_dir) # Make relative paths work in user_settings file.
 
