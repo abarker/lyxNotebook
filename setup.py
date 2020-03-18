@@ -17,7 +17,7 @@ import shutil
 import re
 
 # Get the version data from the __init__.py file __version__ variable.
-with open(os.path.join("src", "lyxNotebook", "__init__.py")) as f:
+with open(os.path.join("src", "lyxnotebook", "__init__.py")) as f:
     __version__ = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read()).group(1)
 
 # To package external data, which includes an executable, the package_dir
@@ -45,21 +45,15 @@ with codecs.open(os.path.join(current_dir, "README.rst"), encoding="utf-8") as f
     long_description = f.read()
 
 setup(
-    name="lyxNotebook",
+    name="lyxnotebook",
     version=__version__, # <majorVersion>.<minorVersion>.<patch> format, (see PEP440)
     description="Use LyX like a code-executing notebook.",
     keywords=["LyX", "LaTeX", "TeX", "notebook"],
-    install_requires=["wheel"],
-    #extras_require={
-    #                "gui": ["PySimpleGUI>=4.0.0;python_version>='3.0'",
-    #                        "PySimpleGUI27>=2.2.0;python_version<'3.0'",
-    #                        #"typing;python_version<='3.4'", # PySimpleGUI on Python2 needed this...
-    #                        "PyMuPDF>=1.14.5",],
-    #                },
+    install_requires=["wheel", "PySimpleGUI>=4.16.0"],
     url="https://github.com/abarker/lyxNotebook",
     entry_points = {
-         "console_scripts": ["lyxnotebook = lyxNotebook.entry_points:run_lyxNotebook",
-                             "lyxnotebook-from-lfun = lyxNotebook.entry_points:run_lyxNotebook_from_LFUN",]
+         "console_scripts": ["lyxnotebook = lyxnotebook.entry_points:run_lyxNotebook",
+                             "lyxnotebook-from-lfun = lyxnotebook.entry_points:run_lyxNotebook_from_LFUN",]
         },
     #scripts=['bin/funniest-joke'],
     license="GPL",
@@ -76,7 +70,6 @@ setup(
         "Operating System :: POSIX",
         #"Operating System :: Microsoft :: Windows",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
