@@ -107,7 +107,6 @@ Some earlier notes:
 
 # TODO: Define a process_command_sequence convenience method and use it.
 
-from __future__ import print_function, division
 import sys
 import os
 import time

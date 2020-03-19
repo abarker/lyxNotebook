@@ -13,7 +13,6 @@ Simple GUI elements used by the program.
 
 """
 
-from __future__ import print_function, division
 import pathlib
 import PySimpleGUI as sg
 

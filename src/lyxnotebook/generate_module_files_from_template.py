@@ -20,7 +20,6 @@ module expects that the CWD when it is run will be the
 
 """
 
-from __future__ import print_function, division
 import sys
 import os
 

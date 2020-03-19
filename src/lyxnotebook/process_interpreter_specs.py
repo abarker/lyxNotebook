@@ -78,7 +78,6 @@ of different interpreters.
 
 """
 
-from __future__ import print_function, division
 import os
 import sys
 from . import lyxNotebook_user_settings # in case any of these settings are needed

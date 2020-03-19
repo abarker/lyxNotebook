@@ -36,7 +36,6 @@ in the latter case we run the program in a new terminal window.
 # Consider also using psutil or a similar program to get running-program info.
 # https://github.com/giampaolo/psutil
 
-from __future__ import print_function, division
 import subprocess
 # import time
 import os

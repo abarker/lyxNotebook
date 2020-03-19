@@ -21,7 +21,6 @@ from the source directory if you want a version in, say `~/bin`.
 
 """
 
-from __future__ import print_function, division
 import os
 import sys
 import time

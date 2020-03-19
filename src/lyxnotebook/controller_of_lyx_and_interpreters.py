@@ -30,7 +30,6 @@ back, and then pushes the results to Lyx.
 # TODO: The buffer-reload command apparently takes a parameter "dump" which causes
 # it to not ask.  Maybe use that instead of current method (if still relevant).
 
-from __future__ import print_function, division
 #import easygui as eg
 import re
 import sys

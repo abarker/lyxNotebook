@@ -56,14 +56,14 @@ Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
 
     1. Redistributions of source code must retain the above copyright notice,
-       this list of conditions and the following disclaimer. 
-    
+       this list of conditions and the following disclaimer.
+
     2. Redistributions in binary form must reproduce the above copyright notice,
        this list of conditions and the following disclaimer in the documentation and/or
-       other materials provided with the distribution. 
-    
+       other materials provided with the distribution.
+
     3. The name of the author may not be used to endorse or promote products derived
-       from this software without specific prior written permission. 
+       from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -89,7 +89,7 @@ See http://en.wikipedia.org/wiki/License_compatibility
 See http://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
 
 The BSD License is less restrictive than GPL.
-It allows software released under the license to be incorporated into proprietary products. 
+It allows software released under the license to be incorporated into proprietary products.
 Works based on the software may be released under a proprietary license or as closed source software.
 http://en.wikipedia.org/wiki/BSD_licenses#3-clause_license_.28.22New_BSD_License.22.29
 
@@ -125,7 +125,6 @@ import sys, os
 import string
 import pickle
 import traceback
-
 
 #--------------------------------------------------
 # check python version and take appropriate action
@@ -964,21 +963,21 @@ def __fillablebox(msg
 
 def __enterboxGetText(event):
     global __enterboxText
-    
+
     __enterboxText = entryWidget.get()
     boxRoot.quit()
 
 
 def __enterboxRestore(event):
     global entryWidget
-    
+
     entryWidget.delete(0,len(entryWidget.get()))
     entryWidget.insert(0, __enterboxDefaultText)
 
 
 def __enterboxCancel(event):
     global __enterboxText
-    
+
     __enterboxText = None
     boxRoot.quit()
 
@@ -1287,7 +1286,7 @@ def __choicebox(msg
 
 def __choiceboxGetChoice(event):
     global boxRoot, __choiceboxResults, choiceboxWidget
-    
+
     if __choiceboxMultipleSelect:
         __choiceboxResults = [choiceboxWidget.get(index) for index in choiceboxWidget.curselection()]
 
@@ -1302,19 +1301,19 @@ def __choiceboxGetChoice(event):
 
 def __choiceboxSelectAll(event):
     global choiceboxWidget, choiceboxChoices
-    
+
     choiceboxWidget.selection_set(0, len(choiceboxChoices)-1)
 
 def __choiceboxClearAll(event):
     global choiceboxWidget, choiceboxChoices
-    
+
     choiceboxWidget.selection_clear(0, len(choiceboxChoices)-1)
 
 
 
 def __choiceboxCancel(event):
     global boxRoot, __choiceboxResults
-    
+
     __choiceboxResults = None
     boxRoot.quit()
 
@@ -2333,7 +2332,7 @@ for someItem in myListOfStuff:
 
 def _demo_buttonbox_with_image():
 
-    msg   = "Do you like this picture?\nIt is "  
+    msg   = "Do you like this picture?\nIt is "
     choices = ["Yes","No","No opinion"]
 
     for image in [

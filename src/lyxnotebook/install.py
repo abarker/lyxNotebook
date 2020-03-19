@@ -34,7 +34,6 @@ are made to the inset_specifier interpreter_spec for an interpreter.)
 
 """
 
-from __future__ import print_function, division
 import sys
 import os
 import shutil
