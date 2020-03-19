@@ -30,7 +30,6 @@ back, and then pushes the results to Lyx.
 # TODO: The buffer-reload command apparently takes a parameter "dump" which causes
 # it to not ask.  Maybe use that instead of current method (if still relevant).
 
-#import easygui as eg
 import re
 import sys
 import os
@@ -38,7 +37,7 @@ import time
 import signal
 
 # Local file imports.
-from . import easygui_096 as eg # Use a local, modified version.
+from . import gui_elements as gui
 from . import lyxNotebook_user_settings
 from .lyx_server_API_wrapper import InteractWithLyxCells, Cell
 from .external_interpreter import ExternalInterpreter
@@ -364,16 +363,10 @@ class ControllerLyxWithInterpreter(object):
                     else:
                         key = " "*5
                     choices.append(key + " " + command)
-                choice_str = eg.choicebox(
-                    msg="Choose an action or click 'cancel'...",
-                    title="LyX Notebook Submenu",
-                    choices=choices,
-                    sort_choices=False,
-                    monospace_font=True,
-                    lines_to_show=len(choices))
+                choice_str = gui.menu_box_popup(menu_items_list=choices)
                 if choice_str is None:
                     continue
-                choice_str = choice_str[5:].strip() # EasyGUI returns whole line.
+                choice_str = choice_str[5:].strip() # Fun returns the whole line.
                 key_action = choice_str
 
             # ====================================================================
@@ -630,9 +623,8 @@ class ControllerLyxWithInterpreter(object):
             self.lyx_process.get_server_event(info=False, error=False, notify=False)
             if self.lyx_process.ignored_server_notify_event:
                 msg = "Halt multi-cell evaluation at the current point?"
-                choices = (["Yes", "No"])
-                reply = eg.buttonbox(msg, choices=choices)
-                if reply == "Yes":
+                reply = gui.yesno_popup(msg)
+                if reply:
                     return True
                 self.lyx_process.ignored_server_notify_event = False
             return False
@@ -943,26 +935,6 @@ class ControllerLyxWithInterpreter(object):
         or modified and renamed to do any sort of processing or formatting."""
         return line_list
 
-    def display_popup_message(self, message, text=None, seconds=3):
-        """Briefly display a message in a text window.  Will use a textbox if
-        text is not None, otherwise a msgbox.  This is a kludge using a fork
-        to work around the limitations of EasyGUI.  BEWARE if an exit handler is
-        later added... killing child might kill the running interpreters.
-        Works, but is not currently used; messages are sent to the Lyx status
-        bar instead."""
-        newpid = os.fork()
-        if newpid == 0:
-            # child displays text message until killed by parent
-            if text is None:
-                eg.msgbox(msg=message, title="LyX Notebook", ok_button="")
-            else:
-                eg.textbox(msg=message, title="LyX Notebook", text=text)
-            sys.exit(0) # in case user closes window before kill
-        else:
-            time.sleep(seconds)
-            os.kill(newpid, signal.SIGHUP)
-        return
-
     def replace_current_buffer_file(self, newfile, reload_buffer=True, messages=True):
         """Replace the current buffer file with the file newfile, saving
         a backup of the old file.  If reload_buffer=True then the Lyx buffer is
@@ -1038,8 +1010,7 @@ class ControllerLyxWithInterpreter(object):
         if not os.path.exists(most_recent_backup_full):
             if messages:
                 msg = "Error: No backup file to recover."
-                choices = (["OK"])
-                eg.buttonbox(msg, choices=choices)
+                gui.text_info_popup(msg)
                 self.lyx_process.show_message(msg)
                 print(msg)
             return
@@ -1051,9 +1022,9 @@ class ControllerLyxWithInterpreter(object):
         msg += " the most recent backup?"
         msg += "\nBuffer's time is:\n   " + buffer_time
         msg += "\nBackup's time is:\n   " + back_time
-        choices = (["Yes", "No"])
-        reply = eg.buttonbox(msg, choices=choices)
-        if reply != "Yes": return
+        reply = gui.yesno_popup(msg)
+        if not reply:
+            return
 
         os.remove(current_buffer_full)
         os.rename(most_recent_backup_full, current_buffer_full)

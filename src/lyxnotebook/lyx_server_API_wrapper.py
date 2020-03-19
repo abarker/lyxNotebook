@@ -84,7 +84,7 @@ Some earlier notes:
 
     -- Some way to bind server-notify to menu items might be useful, so that not
     as many keys would need to be bound (especially for lesser-used functions).
-    But now the easyGUI menu does that.
+    But now the gui menu does that.
 
     -- Some way to detect which branch you are in, or to get current branch info
     and specify branch-applicability in commands.  This might be useful, for
@@ -114,7 +114,6 @@ import datetime
 import getpass
 import random
 import string # just for generating random filenames
-from . import easygui_096 as eg
 from . import lyxNotebook_user_settings
 
 # This file is repeatedly written temporarily to current dir, then deleted.
@@ -1204,7 +1203,7 @@ class InteractWithLyxCells(object):
                           "\ncookie string " + self.magic_cookie + " from the"
                           " document and try again.\n")
                     print(err_msg, file=sys.stderr)
-                    eg.msgbox(msg=err_msg, title="LyX Notebook", ok_button="OK")
+                    gui.text_info_popup(err_msg)
                     return None
                 found_cookie = True
                 return_cell = cell

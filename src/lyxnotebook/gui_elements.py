@@ -20,7 +20,9 @@ sg.theme("SystemDefault")
 
 popup_location = 100, 100 # Display is nicer with fixed popup location.
 
-def yesno_popup(message, title):
+default_title = "LyX Notebook"
+
+def yesno_popup(message, title=default_title):
     """A simple blocking popup asking for confirmation."""
     yesno = sg.popup_yes_no(message,
                             title=title,
@@ -35,7 +37,7 @@ def yesno_popup(message, title):
                             location=popup_location)
     return yesno == "Yes"
 
-def text_info_popup(text, title):
+def text_info_popup(text, title=default_title):
     """A simple blocking popup displaying text for the user to read and confirm."""
     sg.popup(text,
         title=title,
@@ -53,7 +55,7 @@ def text_info_popup(text, title):
         keep_on_top=False,
         location=popup_location)
 
-def get_path_popup(message, title, default_path, *, directory=False):
+def get_path_popup(message, default_path, *, title=default_title, directory=False):
     """Query to get a pathname.  If `directory` is true then it browses for directories
     instead of files."""
     if not directory:
@@ -94,8 +96,10 @@ def get_path_popup(message, title, default_path, *, directory=False):
                                  initial_folder=pathlib.Path.home())
     return path
 
-def menu_box_popup(menu_items_list, title):
+def menu_box_popup(menu_items_list, title=default_title):
     """Pop up a menu with a list of choices."""
+    height = len(menu_items_list)
+    width = max(len(line) for line in menu_items_list)
 
     listbox = sg.Listbox(values=menu_items_list,
                          default_values=None,
@@ -103,10 +107,10 @@ def menu_box_popup(menu_items_list, title):
                          change_submits=False,
                          enable_events=True, # Return the user's click immediately.
                          bind_return_key=False,
-                         size=(20, len(menu_items_list)),
+                         size=(width, height),
                          disabled=False,
                          auto_size_text=None,
-                         font=None,
+                         font="TkFixedFont", # Tkinter monospace.
                          no_scrollbar=False,
                          background_color=None,
                          text_color=None,
@@ -160,4 +164,3 @@ def menu_box_popup(menu_items_list, title):
         return None
     return values[0][0]
 
-print(menu_box_popup(["item1", "item2"], title="LyX test"))
