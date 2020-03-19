@@ -42,12 +42,17 @@ import glob
 from os import path
 import platform
 import tempfile
-# import easygui
-from . import easygui_096 as easygui # Use a locally modified version of easygui.
+import PySimpleGUI as sg
 from . import lyxNotebook_user_settings
 from .generate_module_files_from_template import generate_files_from_templates
+from .gui_elements import get_path_popup, yesno_popup, text_info_popup
 
 python_version = platform.python_version_tuple()
+
+# TODO: Later query the lyx home directory.
+#testpath = get_path_popup("Enter the home LyX directory to install into:", "Query LyX home directory", "~/.lyx", directory=True)
+
+print("testpath is", testpath)
 
 def find_source_directory():
     """Find the Lyx Notebook source directory from the invoking pathname and cwd."""
@@ -91,8 +96,8 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
         yesno = 1
         if os.path.exists(bind_file_dest):
             msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
-            yesno = easygui.ynbox(msg, "LyX Notebook Setup")
-        if yesno == 1:
+            yesno = yesno_popup(msg, "LyX Notebook Setup")
+        if yesno:
             shutil.copyfile(bind_file_pathname, bind_file_dest)
             print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
                   bind_file_dest, "\n")
@@ -127,8 +132,8 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
         yesno = 1
         if os.path.exists(bind_file_dest):
             msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
-            yesno = easygui.ynbox(msg, "LyX Notebook Setup")
-        if yesno == 1:
+            yesno = yesno_popup(msg, "LyX Notebook Setup")
+        if yesno:
             shutil.copyfile(bind_file_pathname, bind_file_dest)
             print("\nCopied the generated key-binding file to the home LyX directory:\n   ",
                   bind_file_dest, "\n")
@@ -184,7 +189,6 @@ def run_setup(lyxNotebook_run_script_path):
     setup_module_files(user_home_lyx_directory, source_dir)
 
     # Finished the first phase.
-    msg = "Finished the first phase of the setup."
     text = """Finished the first phase of the LyX Notebook setup.  Next do the following
     steps to finish the setup.  (You can keep this window open as a reminder.)
 
@@ -216,12 +220,12 @@ def run_setup(lyxNotebook_run_script_path):
     document.  The cells themselves can then be found on the menu:
          Insert > Custom Insets
 
-    Press F12 in LyX to start the LyX Notebook program (Shift+F12 to kill it)
+    Press F12 in LyX to start the LyX Notebook program (Shift+F12 to kill it).
     Press F1 for a menu of all the commands and their current key bindings.
     See the documentation file lyxNotebookDocs.pdf for further information.
 
     """
     print("="*70)
     print("\n" + text)
-    easygui.textbox(msg=msg, text=text, title="LyX Notebook Setup")
+    text_info_popup(text, title="LyX Notebook Setup")
 
