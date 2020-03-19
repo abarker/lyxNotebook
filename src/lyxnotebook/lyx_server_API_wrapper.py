@@ -128,7 +128,10 @@ class Cell(list):
     # not Cell subclasses.
 
     def __init__(self):
-        # TODO call __init__ method from base class list, or don't inherit from list
+        """Initialize the data stored for the cell.  As a subclass of a list, the
+        list elements are the lines of text."""
+        # NOTE: Remember this is a list subclass with lines as elements.
+        # TODO call __init__ method from base class list? or don't inherit from list
         self.has_cookie_inside = False  # is there a cookie inside this cell?
         self.cookie_line_before = -1    # cookie between cell and prev? line number if so
         self.cookie_line_after = -1     # cookie between cell and next? line number if so
@@ -756,7 +759,7 @@ class InteractWithLyxCells(object):
         for cell_type in cell_type_list:
             self.delete_magic_cookie_inside_forall(cell_type=cell_type)
 
-        # Note on goToNextCell() for mixed open and closed cells.
+        # Note on goto_next_cell() for mixed open and closed cells.
         # We might want to have the next cell opened if it is closed, and no
         # others.... not easy to implement, though, so currently all are opened.
         # Forward goto as above ends up inside cell if open, but after the cell
@@ -771,7 +774,7 @@ class InteractWithLyxCells(object):
         #   self.process_lfun("command-sequence",
         #         self.back_cookie_string+"char-left;inset-toggle open;char-right")
 
-        self.goto_cell_begin() # this also checks for insideCell(), last may be outside
+        self.goto_cell_begin() # this also checks for inside_cell(), last may be outside
         return
 
     def goto_prev_cell(self, standard=True, init=True, output=True):
@@ -788,74 +791,6 @@ class InteractWithLyxCells(object):
         except in experimental gotoNextCell2 routine."""
         return self.process_lfun("server-goto-file-row",
                                 filename + " " + str(linenum))
-
-    def goto_next_cell2(self, reverse=False):
-        """An alternate implementation, using server-goto-file-row, not cookies.
-        For now just a demo of how to do things that way.  The routines to
-        write text to the cells could be done similarly.
-
-        This routine once worked somewhat, but has not been kept updated.
-        At the least it would have to be modified to use the Lyx temp directory
-        latex export (which the main program no longer uses) since otherwise
-        server-goto-file-row doesn't work.
-
-        This code is kept as a reminder of how to use server-goto-file row.  It
-        is not used because server-goto-file-row is not especially accurate.  It
-        seems to almost always end up before the target cell, though, so we can
-        "walk" forward the rest of the way with charRight().  Slow, and using a
-        search on a global cookie insert would just be the standard
-        implementation above.
-
-        Even assuming the walking version, the serverGotoFileRow operation fails
-        when between two empty cells are on the same line, and in some other
-        cases.  Note that we still need to know where we are in Lyx, which
-        currently seems to require a cookie (given the available LFUNs).  But
-        deleting the cookie may also shift the text and make some line numbers
-        invalid... maybe insert, say, a cookie in a comment and assume three file
-        lines?
-
-        In summary, this method does not seem as promising as the current method
-        using inset-forall of cookies and then search.  At the least it would
-        need some work."""
-
-        #layout = self.getServerLayout() # later maybe check layout, Plain or Standard
-        self.process_lfun("command-sequence", "escape;escape;escape") # escape any insets
-
-        # insert cookie at cursor point, note that this cookie goes into regular text
-        self.process_lfun("self-insert", self.magic_cookie)
-
-        # save the Latex and get the filename
-        dir_info = self.get_updated_lyx_directory_data()
-
-        # Why not just do a search on the cookie in the first place,
-        # from beginning of file or known earlier point?  Because we can't insert a
-        # cookie in Lyx if we don't know where the cell is in Lyx!  We only know
-        # some previous point, which may not even be in a cell.  We can only do
-        # a global cookie insert and find forward or backward from there.  That is
-        # what the ordinary version of this function does.  There seems to be no
-        # real advantage to the serverGotoFileRow version without some new LFUNs
-        # (actual or faked with other LFUNs).
-
-        # remove cookie
-        # we'd like to remove it later, but we will lose the positioning information
-        # if we do it after the serverGoToFileRow...
-        #self.process_lfun("command-sequence", self.del_cookie_backward_string)
-        self.process_lfun("undo") # only need undo here, update doesn't count as change
-
-        # now read the Latex data for all the cells
-        all_cells = self.get_all_cell_text_from_latex_file(dir_info[2])
-        # look at the cookie_line_before and cookie_line_after numbers to choose cell
-        line_to_goto = -1
-        for cell in all_cells:
-            if reverse: cookie_line_num = cell.cookie_line_after
-            else: cookie_line_num = cell.cookie_line_before
-            if cookie_line_num >= 0:
-                line_to_goto = cell.begin_line_number
-                break
-        if line_to_goto < 0:
-            return # no cells to go to, do nothing
-        self.server_goto_file_row(dir_info[2], line_to_goto)
-        while not self.inside_cell(): self.char_right() # walk to inside the next cell
 
     def get_global_cell_info(self, use_latex_export=False):
         """This routine returns a tuple:
@@ -941,26 +876,27 @@ class InteractWithLyxCells(object):
         To save the file and then get the most recent data from the .lyx save
         file, call getUpdatedCellText() with flag useLatexExport=False.
         """
-        in_file = TerminatedFile(filename, r"\end_document",
+        saved_lyx_file = TerminatedFile(filename, r"\end_document",
                                 "getAllCellTextFromLyxFile")
         cell_list = [] # A list of lines in the cell.
         inside_cell = False
         inside_cell_layout = False
         set_next_cell_cookie_line_before = -1
         while True:
-            line = in_file.readline();
+            line = saved_lyx_file.readline();
             if line == "":
                 break
-            # search lines starting with something like
+
+            # Search for lines starting with something like
             #    \begin_inset Flex LyxNotebookCell:Standard:PythonTwo
-            # or a cookie at the start of a cell line or anywhere in an ordinary line
+            # or for a cookie at the start of a cell line (or anywhere in an ordinary line).
 
             elif line.find(r"\begin_inset Flex LyxNotebookCell:") == 0:
                 inside_cell = True
                 inside_cell_layout = False
                 cell_list.append(Cell()) # create a new cell
                 cell_list[-1].begin_line = line # begin{} may have meaningful args later
-                cell_list[-1].begin_line_number = in_file.number
+                cell_list[-1].begin_line_number = saved_lyx_file.number
                 # did we find a cookie earlier that needs to be recorded with new cell?
                 if set_next_cell_cookie_line_before >= 0:
                     cell_list[-1].cookie_line_before = set_next_cell_cookie_line_before
@@ -968,7 +904,7 @@ class InteractWithLyxCells(object):
 
             elif inside_cell and line.rstrip() == r"\end_inset":
                 cell_list[-1].end_line = line
-                cell_list[-1].end_line_number = in_file.number
+                cell_list[-1].end_line_number = saved_lyx_file.number
                 inside_cell = False
 
             elif (inside_cell and not inside_cell_layout
@@ -976,29 +912,27 @@ class InteractWithLyxCells(object):
                 inside_cell_layout = True
 
             elif inside_cell_layout: # actual line of cell text on several lines
-                cell_line_components = [line]
+                cell_line_chars = []
                 while True:
-                    next_line = in_file.readline().rstrip("\n") # drop trailing \n
+                    cell_line = saved_lyx_file.readline().rstrip("\n") # drop trailing \n
 
-                    # Lyx 2.3 introduced quote insets even inside listings; convert to '"' char.
-                    if next_line.startswith(r"\begin_inset Quotes"):
-                        cell_line_components.append('"')
-                        while in_file.readline().rstrip("\n") != r"\end_inset":
-                            continue
-                        continue
-
-                    # translate some Lyx codes to ordinary text
-                    if next_line.rstrip() == r"\backslash":
-                        next_line = "\\"
-
-                    # append the translated text
-                    cell_line_components.append(next_line)
-
-                    if next_line.rstrip() == r"\end_layout":
+                    if cell_line.rstrip() == r"\end_layout":
                         break
+                    elif cell_line.startswith(r"\begin_inset Quotes"):
+                        # Lyx 2.3 introduced quote insets even inside listings; convert to '"' char.
+                        # The corresponding \end_inset will be ignored in condition below.
+                        cell_line_chars.append('"')
+                    elif cell_line.rstrip() == r"\backslash":
+                        cell_line_chars.append("\\")
+                    elif cell_line.startswith("\\"):
+                        # Skip all other markup starting with \, including `\end_inset` markers.
+                        # This includes anything like `\lang english` which Unicode can cause.
+                        pass
+                    else: # Got a line of actual text.
+                        cell_line_chars.append(cell_line)
 
                 inside_cell_layout = False
-                line = "".join(cell_line_components[1:-1]) + "\n" # components to one line
+                line = "".join(cell_line_chars) + "\n"
 
                 # TODO: detect multiple cookies inside a cell (here and above routine)
                 if line.find(self.magic_cookie) == 0: # cell cookies must begin lines, too
@@ -1006,12 +940,13 @@ class InteractWithLyxCells(object):
                     line = line.replace(self.magic_cookie, "", 1) # replace one occurence
                 cell_list[-1].append(line) # got a line from the cell, append it
 
-            else: # got an ordinary text line
+            else: # got an ordinary Lyx file line.
+                # Cookies outside cells can still mess up navigation with inset-forall and search.
                 if line.find(self.magic_cookie) != -1: # found cookie anywhere on line
                     if len(cell_list) > 0:
-                        cell_list[-1].cookie_line_after = in_file.number # TODO see next line
+                        cell_list[-1].cookie_line_after = saved_lyx_file.number # TODO see next line
                     # TODO below was = lineNumber, but undefined, make = in_file.number, but double check
-                    set_next_cell_cookie_line_before = in_file.number
+                    set_next_cell_cookie_line_before = saved_lyx_file.number
 
         return cell_list
 
@@ -1173,19 +1108,62 @@ class InteractWithLyxCells(object):
         if not self.inside_cell() or self.inside_empty_cell(assert_inside_cell=True):
             return None # return None if not in a cell or empty cell
 
-        # TODO: Still blocked because need to set the begin_line of the cell to the
-        # raw beginning line to find the language associated with the file in the
-        # Cell's get_cell_type routine.  May need to restrict to ONLY Python!
-        has_flex_inset_edit_mod = False
+
+        # TODO
+        # TODO TODO: parsing needs to ignore all '\lang english' directives...
+        # Code cells are getting corrupted somehow, with that added.... in ALL modes,
+        # problem is Lyx parsing... stop deleting the export file to test.
+        # ----> open the file in Lyx to make sure it isn't corrupted by a Lyx bug!!!!
+        # Give up on unicode in cells?????
+
+        has_flex_inset_edit_mod = True
         if has_flex_inset_edit_mod:
+            # Get all the cells from the Lyx or Latex output, because we need to
+            # know the language associated with the current cell.  We will compare
+            # text.
+            all_cells = self.get_all_cell_text(use_latex_export=use_latex_export)
+            print("all cells are", all_cells)
+            print()
+
+            # Get the text from the current cell.
+            #self.process_lfun("inset-end-edit") # In case there was an open edit already.
+            #self.process_lfun("inset-select-all") # Just for blue selection, but may slow down...
             filename = self.process_lfun("inset-edit", argument="noeditor")
             print("filename is", filename)
-            text_cell = Cell()
             with open(filename, "r") as f:
-                text_cell[:] = f.readlines()
-                print("cell line is:", text_cell)
+                cell_text = f.readlines()
+            if cell_text[-1][-1] != "\n":
+                cell_text[-1] += "\n" # This is needed for cells that end without any whitespace.
+            print("\ncell text is", cell_text)
+            # TODO: below line causes fail when no extra at end??
+            #cell_text[-1] = cell_text[-1] + "\n" # Lyx currently writes files without final newline!
             self.process_lfun("inset-end-edit")
-            return text_cell
+            # TODO: word-right below would skip a few steps in replace_current_output cells, need flag...
+            self.process_lfun("char-right") # inset-edit leaves cursor outside cell
+            #self.process_lfun("escape") # Goto just after the inset.
+
+            # TODO:  Loop over all lines.   Restrict to only code cells (std or init).
+            # When single match found, return the one from the list read from Lyx file.
+            # When multiple print error.
+            cell_match_indices = []
+            for count, cell in enumerate(all_cells):
+                print("======================= cell", count)
+                print("cell text is", cell)
+                lines_match = True
+                for target_line, line in zip(cell_text, cell): # TODO IGNORES extras, test they are all empty later...
+                    if target_line != line:
+                        print("\n\nfailed match:\n", target_line, "\n", line, sep="")
+                        lines_match = False
+                        break
+                if lines_match:
+                    print(".........................MATCH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                    cell_match_indices.append(count)
+            print("match indices:", cell_match_indices)
+            if not cell_match_indices:
+                # TODO warning notice...
+                return None
+            matched_index = cell_match_indices[0] # TODO, handle duplicates.
+            return all_cells[matched_index]
 
         self.insert_magic_cookie_inside_current(assert_inside_cell=True,
                                                 on_current_line=True)
@@ -1219,7 +1197,9 @@ class InteractWithLyxCells(object):
         or `Init` cell.  The cell should immediately follow.  If it doesn't and
         `create_if_necessary` is true then an output cell will be created/inserted.  The
         default is a Python cell; this can be changed by setting `inset_specifier` to a
-        value from one of the other interpreter specs."""
+        value from one of the other interpreter specs.
+
+        The cursor is assumed to be inside the code inset."""
         if not assert_inside_cell and not self.inside_cell():
             return # Not even in a cell.
 
@@ -1579,6 +1559,79 @@ class InteractWithLyxCells(object):
         prefer absolute pathnames, especially when Lyx notebook is running
         without a terminal (for some reason)."""
         self.process_lfun("buffer-export-custom", "latex cat $$FName >" + filename)
+
+    #
+    # Dead code below, but parts might still be usable.
+    #
+
+    def goto_next_cell2(self, reverse=False):
+        """An alternate implementation, using server-goto-file-row, not cookies.
+        For now just a demo of how to do things that way.  The routines to
+        write text to the cells could be done similarly.
+
+        This routine once worked somewhat, but has not been kept updated.
+        At the least it would have to be modified to use the Lyx temp directory
+        latex export (which the main program no longer uses) since otherwise
+        server-goto-file-row doesn't work.
+
+        This code is kept as a reminder of how to use server-goto-file row.  It
+        is not used because server-goto-file-row is not especially accurate.  It
+        seems to almost always end up before the target cell, though, so we can
+        "walk" forward the rest of the way with charRight().  Slow, and using a
+        search on a global cookie insert would just be the standard
+        implementation above.
+
+        Even assuming the walking version, the serverGotoFileRow operation fails
+        when between two empty cells are on the same line, and in some other
+        cases.  Note that we still need to know where we are in Lyx, which
+        currently seems to require a cookie (given the available LFUNs).  But
+        deleting the cookie may also shift the text and make some line numbers
+        invalid... maybe insert, say, a cookie in a comment and assume three file
+        lines?
+
+        In summary, this method does not seem as promising as the current method
+        using inset-forall of cookies and then search.  At the least it would
+        need some work."""
+
+        #layout = self.getServerLayout() # later maybe check layout, Plain or Standard
+        self.process_lfun("command-sequence", "escape;escape;escape") # escape any insets
+
+        # insert cookie at cursor point, note that this cookie goes into regular text
+        self.process_lfun("self-insert", self.magic_cookie)
+
+        # save the Latex and get the filename
+        dir_info = self.get_updated_lyx_directory_data()
+
+        # Why not just do a search on the cookie in the first place,
+        # from beginning of file or known earlier point?  Because we can't insert a
+        # cookie in Lyx if we don't know where the cell is in Lyx!  We only know
+        # some previous point, which may not even be in a cell.  We can only do
+        # a global cookie insert and find forward or backward from there.  That is
+        # what the ordinary version of this function does.  There seems to be no
+        # real advantage to the serverGotoFileRow version without some new LFUNs
+        # (actual or faked with other LFUNs).
+
+        # remove cookie
+        # we'd like to remove it later, but we will lose the positioning information
+        # if we do it after the serverGoToFileRow...
+        #self.process_lfun("command-sequence", self.del_cookie_backward_string)
+        self.process_lfun("undo") # only need undo here, update doesn't count as change
+
+        # now read the Latex data for all the cells
+        all_cells = self.get_all_cell_text_from_latex_file(dir_info[2])
+        # look at the cookie_line_before and cookie_line_after numbers to choose cell
+        line_to_goto = -1
+        for cell in all_cells:
+            if reverse: cookie_line_num = cell.cookie_line_after
+            else: cookie_line_num = cell.cookie_line_before
+            if cookie_line_num >= 0:
+                line_to_goto = cell.begin_line_number
+                break
+        if line_to_goto < 0:
+            return # no cells to go to, do nothing
+        self.server_goto_file_row(dir_info[2], line_to_goto)
+        while not self.inside_cell(): self.char_right() # walk to inside the next cell
+
 
 #
 # Testing code for this module.
