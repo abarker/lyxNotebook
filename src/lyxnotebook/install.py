@@ -50,8 +50,7 @@ python_version = platform.python_version_tuple()
 
 # TODO: Later query the lyx home directory.
 #testpath = get_path_popup("Enter the home LyX directory to install into:", "Query LyX home directory", "~/.lyx", directory=True)
-
-print("testpath is", testpath)
+#print("testpath is", testpath)
 
 def find_source_directory():
     """Find the Lyx Notebook source directory from the invoking pathname and cwd."""

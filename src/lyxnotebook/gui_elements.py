@@ -94,3 +94,70 @@ def get_path_popup(message, title, default_path, *, directory=False):
                                  initial_folder=pathlib.Path.home())
     return path
 
+def menu_box_popup(menu_items_list, title):
+    """Pop up a menu with a list of choices."""
+
+    listbox = sg.Listbox(values=menu_items_list,
+                         default_values=None,
+                         select_mode=None,
+                         change_submits=False,
+                         enable_events=True, # Return the user's click immediately.
+                         bind_return_key=False,
+                         size=(20, len(menu_items_list)),
+                         disabled=False,
+                         auto_size_text=None,
+                         font=None,
+                         no_scrollbar=False,
+                         background_color=None,
+                         text_color=None,
+                         key=None,
+                         pad=None,
+                         tooltip=None,
+                         right_click_menu=None,
+                         visible=True,
+                         metadata=None)
+
+    window = sg.Window(title=title,
+                       layout=[ [listbox], [sg.Cancel()] ],
+                       default_element_size=(45, 1),
+                       default_button_element_size=(None, None),
+                       auto_size_text=None,
+                       auto_size_buttons=None,
+                       location=popup_location,
+                       size=(None, None),
+                       element_padding=None,
+                       margins=(None, None),
+                       button_color=None,
+                       font=None,
+                       progress_bar_color=(None, None),
+                       background_color=None,
+                       border_depth=None,
+                       icon=None,
+                       force_toplevel=False,
+                       alpha_channel=1,
+                       return_keyboard_events=False,
+                       use_default_focus=True,
+                       text_justification=None,
+                       no_titlebar=False,
+                       grab_anywhere=False,
+                       keep_on_top=True,
+                       resizable=False,
+                       disable_close=False,
+                       disable_minimize=False,
+                       right_click_menu=None,
+                       transparent_color=None,
+                       debugger_enabled=True,
+                       finalize=False,
+                       element_justification="left",
+                       ttk_theme=None,
+                       use_ttk_buttons=None,
+                       metadata=None)
+
+    event, values = window.Read()
+    window.close()
+
+    if event == "Cancel":
+        return None
+    return values[0][0]
+
+print(menu_box_popup(["item1", "item2"], title="LyX test"))
