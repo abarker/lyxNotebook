@@ -902,43 +902,44 @@ class InteractWithLyxCells(object):
                     cell_list[-1].cookie_line_before = set_next_cell_cookie_line_before
                     set_next_cell_cookie_line_before = -1
 
-            elif inside_cell and line.rstrip() == r"\end_inset":
-                cell_list[-1].end_line = line
-                cell_list[-1].end_line_number = saved_lyx_file.number
-                inside_cell = False
+            elif inside_cell:
+                if line.rstrip() == r"\end_inset":
+                    cell_list[-1].end_line = line
+                    cell_list[-1].end_line_number = saved_lyx_file.number
+                    inside_cell = False
 
-            elif (inside_cell and not inside_cell_layout
-                  and line.rstrip() == r"\begin_layout Plain Layout"):
-                inside_cell_layout = True
+                elif line.rstrip() == r"\begin_layout Plain Layout":
+                    inside_cell_layout = True
 
-            elif inside_cell_layout: # actual line of cell text on several lines
-                cell_line_chars = []
-                while True:
-                    cell_line = saved_lyx_file.readline().rstrip("\n") # drop trailing \n
+                elif inside_cell_layout: # actual line of cell text on several lines
+                    cell_line_chars = []
+                    while True:
+                        cell_line = saved_lyx_file.readline().rstrip("\n") # drop trailing \n
 
-                    if cell_line.rstrip() == r"\end_layout":
-                        break
-                    elif cell_line.startswith(r"\begin_inset Quotes"):
-                        # Lyx 2.3 introduced quote insets even inside listings; convert to '"' char.
-                        # The corresponding \end_inset will be ignored in condition below.
-                        cell_line_chars.append('"')
-                    elif cell_line.rstrip() == r"\backslash":
-                        cell_line_chars.append("\\")
-                    elif cell_line.startswith("\\"):
-                        # Skip all other markup starting with \, including `\end_inset` markers.
-                        # This includes anything like `\lang english` which Unicode can cause.
-                        pass
-                    else: # Got a line of actual text.
-                        cell_line_chars.append(cell_line)
+                        if cell_line.rstrip() == r"\end_layout":
+                            break
+                        elif cell_line.startswith(r"\begin_inset Quotes"):
+                            # Lyx 2.3 introduced quote insets even inside listings; convert to '"' char.
+                            # The corresponding \end_inset will be ignored in condition below.
+                            cell_line_chars.append('"')
+                        elif cell_line.rstrip() == r"\backslash":
+                            cell_line_chars.append("\\")
+                        elif cell_line.startswith("\\"):
+                            # Skip all other markup starting with \, including `\end_inset` markers.
+                            # This includes anything like `\lang english` which Unicode can cause.
+                            pass
+                        else: # Got a line of actual text.
+                            cell_line_chars.append(cell_line)
 
-                inside_cell_layout = False
-                line = "".join(cell_line_chars) + "\n"
+                    inside_cell_layout = False
+                    line = "".join(cell_line_chars) + "\n"
 
-                # TODO: detect multiple cookies inside a cell (here and above routine)
-                if line.find(self.magic_cookie) == 0: # cell cookies must begin lines, too
-                    cell_list[-1].has_cookie_inside = True
-                    line = line.replace(self.magic_cookie, "", 1) # replace one occurence
-                cell_list[-1].append(line) # got a line from the cell, append it
+                    # TODO: detect multiple cookies inside a cell (here and above routine)
+                    if line.find(self.magic_cookie) == 0: # cell cookies must begin lines, too
+                        cell_list[-1].has_cookie_inside = True
+                        line = line.replace(self.magic_cookie, "", 1) # replace one occurence
+
+                    cell_list[-1].append(line) # got a line from the cell, append it
 
             else: # got an ordinary Lyx file line.
                 # Cookies outside cells can still mess up navigation with inset-forall and search.
@@ -1108,88 +1109,68 @@ class InteractWithLyxCells(object):
         if not self.inside_cell() or self.inside_empty_cell(assert_inside_cell=True):
             return None # return None if not in a cell or empty cell
 
-
-        # TODO
-        # TODO TODO: parsing needs to ignore all '\lang english' directives...
-        # Code cells are getting corrupted somehow, with that added.... in ALL modes,
-        # problem is Lyx parsing... stop deleting the export file to test.
-        # ----> open the file in Lyx to make sure it isn't corrupted by a Lyx bug!!!!
-        # Give up on unicode in cells?????
-
         has_flex_inset_edit_mod = True
         if has_flex_inset_edit_mod:
             # Get all the cells from the Lyx or Latex output, because we need to
             # know the language associated with the current cell.  We will compare
             # text.
             all_cells = self.get_all_cell_text(use_latex_export=use_latex_export)
-            print("all cells are", all_cells)
-            print()
 
             # Get the text from the current cell.
+            # Note below, we cannot enter cells with open edits, anyway...
             #self.process_lfun("inset-end-edit") # In case there was an open edit already.
-            #self.process_lfun("inset-select-all") # Just for blue selection, but may slow down...
             filename = self.process_lfun("inset-edit", argument="noeditor")
-            print("filename is", filename)
             with open(filename, "r") as f:
                 cell_text = f.readlines()
             if cell_text[-1][-1] != "\n":
-                cell_text[-1] += "\n" # This is needed for cells that end without any whitespace.
-            print("\ncell text is", cell_text)
-            # TODO: below line causes fail when no extra at end??
-            #cell_text[-1] = cell_text[-1] + "\n" # Lyx currently writes files without final newline!
+                cell_text[-1] += "\n" # Needed for cells with no blank lines at the end.
             self.process_lfun("inset-end-edit")
             # TODO: word-right below would skip a few steps in replace_current_output cells, need flag...
-            self.process_lfun("char-right") # inset-edit leaves cursor outside cell
-            #self.process_lfun("escape") # Goto just after the inset.
+            self.process_lfun("char-right") # inset-end-edit leaves the cursor just before cell
 
-            # TODO:  Loop over all lines.   Restrict to only code cells (std or init).
-            # When single match found, return the one from the list read from Lyx file.
-            # When multiple print error.
+            # TODO: Restrict to only code cells (std or init).
+            # TODO: When single match found, return the one from the list read from Lyx file.  When multiple print error.
             cell_match_indices = []
             for count, cell in enumerate(all_cells):
-                print("======================= cell", count)
-                print("cell text is", cell)
                 lines_match = True
                 for target_line, line in zip(cell_text, cell): # TODO IGNORES extras, test they are all empty later...
                     if target_line != line:
-                        print("\n\nfailed match:\n", target_line, "\n", line, sep="")
                         lines_match = False
                         break
                 if lines_match:
-                    print(".........................MATCH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                     cell_match_indices.append(count)
-            print("match indices:", cell_match_indices)
             if not cell_match_indices:
                 # TODO warning notice...
                 return None
             matched_index = cell_match_indices[0] # TODO, handle duplicates.
             return all_cells[matched_index]
 
-        self.insert_magic_cookie_inside_current(assert_inside_cell=True,
-                                                on_current_line=True)
+        else: # Don't have flex_inset_edit_mod, use the older magic cookie way.
+            self.insert_magic_cookie_inside_current(assert_inside_cell=True,
+                                                    on_current_line=True)
 
-        all_cells = self.get_all_cell_text(use_latex_export=use_latex_export)
+            all_cells = self.get_all_cell_text(use_latex_export=use_latex_export)
 
-        self.delete_magic_cookie_inside_current(assert_cursor_at_cookie_end=True)
+            self.delete_magic_cookie_inside_current(assert_cursor_at_cookie_end=True)
 
-        found_cookie = False
-        for cell in all_cells:
-            if cell.has_cookie_inside:
-                if found_cookie:
-                    err_msg = ("\n\nWARNING: multiple cells have cookies inside them."
-                          "\nNot performing the operation.  Globally delete the"
-                          "\ncookie string " + self.magic_cookie + " from the"
-                          " document and try again.\n")
-                    print(err_msg, file=sys.stderr)
-                    gui.text_info_popup(err_msg)
-                    return None
-                found_cookie = True
-                return_cell = cell
-        # return Cell() # Was causing bugs in ordinary Listings cells, now return None.
-        if found_cookie:
-            return return_cell
-        else:
-            return None
+            found_cookie = False
+            for cell in all_cells:
+                if cell.has_cookie_inside:
+                    if found_cookie:
+                        err_msg = ("\n\nWARNING: multiple cells have cookies inside them."
+                              "\nNot performing the operation.  Globally delete the"
+                              "\ncookie string " + self.magic_cookie + " from the"
+                              " document and try again.\n")
+                        print(err_msg, file=sys.stderr)
+                        gui.text_info_popup(err_msg)
+                        return None
+                    found_cookie = True
+                    return_cell = cell
+            # return Cell() # Was causing bugs in ordinary Listings cells, now return None.
+            if found_cookie:
+                return return_cell
+            else:
+                return None
 
     def replace_current_output_cell_text(self, line_list, create_if_necessary=True,
                goto_begin_after=False, assert_inside_cell=False, inset_specifier="Python"):
@@ -1633,74 +1614,4 @@ class InteractWithLyxCells(object):
         while not self.inside_cell(): self.char_right() # walk to inside the next cell
 
 
-#
-# Testing code for this module.
-#
-
-if __name__ == "__main__":
-    print("------------- starting tests ------------------------")
-
-    lyx_process = InteractWithLyxCells("interpreterCellsApp")
-
-    #print("started the interact, now get and print Lyx's filename")
-    #print(lyx_process.server_get_filename())
-    #print(lyx_process.server_get_filename())
-
-    #print(lyx_process.process_lfun("server-get-layout"))
-
-    #print(lyx_process.goto_cell_begin())
-    #print(lyx_process.insertMagicCookie())
-    #print(lyx_process.export_latex_to_lyx_temp_dir())
-
-    #print(lyx_process.insertMagicCookieForall())
-    #print(lyx_process.deleteAll("egg"))
-    #print(lyx_process.wait_for_server_notify())
-    #print(lyx_process.goto_next_cell())
-    #print(lyx_process.insertMagicCookieForall())
-    #print(lyx_process.deleteMagicCookieForall())
-    #print(lyx_process.insert_magic_cookie_inside_forall())
-    #print(lyx_process.delete_magic_cookie_inside_forall())
-
-    #print("Are we inside a cell?", lyx_process.inside_cell())
-    #print(lyx_process.self_insert_line("eggbert"))
-    #print(lyx_process.get_updated_lyx_directory_data())
-
-    #lyx_process.get_all_cell_text_from_latex()
-    #lyx_process.get_current_cell_text()
-    """
-   while True:
-      print(lyx_process.wait_for_server_notify())
-      #lyx_process.write_all_cell_code_to_file() # needs more args now
-   """
-
-    filename = "testInteractWithLyxCells.lyx"
-    lyx_process.get_all_cell_text_from_lyx_file(filename)
-
-    """
-   while True:
-      print(lyx_process.wait_for_server_notify())
-      lineList = ["I am the first line\n", "\n", "and I am the third line.\n", "four\n"]
-      #lineList = ["\n"]
-      lyx_process.replace_current_cell_text(lineList)
-   """
-    """
-   while True:
-      print(lyx_process.wait_for_server_notify())
-      print(lyx_process.insert_magic_cookie_inside_current(onCurrentLine = True))
-      print(lyx_process.wait_for_server_notify())
-      #print(lyx_process.delete_magic_cookie_inside_current(onCurrentLine = True))
-      #print(lyx_process.delete_magic_cookie_inside_current(assertCursorAtCookieEnd = True))
-   """
-    """
-   while True:
-      print(lyx_process.wait_for_server_notify())
-      print(lyx_process.goto_next_cell())
-   """
-    """
-   while True:
-      print(lyx_process.wait_for_server_notify())
-      #print("xy coordinates:", lyx_process.process_lfun("server-get-xy")) # crash!
-      # prints, but seemingly meaningless...
-      print("xy coordinates:", lyx_process.process_lfun("server-set-xy", "10 10"))
-   """
 

@@ -901,42 +901,34 @@ print # can we print a blank line at the end of an output cell? Yes, but
 status open
 
 \begin_layout Plain Layout
-
 >>> 
 \end_layout
 
 \begin_layout Plain Layout
-
 egg
 \end_layout
 
 \begin_layout Plain Layout
-
 25
 \end_layout
 
 \begin_layout Plain Layout
-
 ['a', 'b', 'c']
 \end_layout
 
 \begin_layout Plain Layout
-
 paren line continuation
 \end_layout
 
 \begin_layout Plain Layout
-
 0 1 2
 \end_layout
 
 \begin_layout Plain Layout
-
 done
 \end_layout
 
 \begin_layout Plain Layout
-
 continued colon line
 \end_layout
 
