@@ -60,10 +60,11 @@ num_backup_buffer_copies = 5
 
 # The cookie string which is temporarily inserted.  Only alphanumeric
 # strings have been tested.  Definitely cannot contain a semicolon.
+# Unicode foreign language symbols can cause problems, especially mixed.
 magic_cookie_string = "zZ3Qq"
 magic_cookie_string = "œ" # Ligature OE (Latin).
 magic_cookie_string = "»" # Right-pointing double angle quotation mark.
-magic_cookie_string = "»»" # Right-pointing double angle quotation mark.
+magic_cookie_string = ">==> "
 
 # Whether Lyx Notebook should start up separate interpreter processes for the same
 # cell types in different buffers.

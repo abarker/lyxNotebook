@@ -674,7 +674,8 @@ class InteractWithLyxCells:
         return self.process_lfun("self-insert", self.magic_cookie)
 
     def delete_magic_cookie_inside_current(self, assert_inside_cell=False,
-                                 assert_cursor_at_cookie_end=False, on_current_line=False):
+                                 assert_cursor_at_cookie_end=False,
+                                 on_current_line=False):
         """Assumes the cookie is present as the first chars of the special inset type
         (unless on_current_line is True, in which case the beginning of the current
         line is assumed).  Assertion args can be used for efficiency if the conditions
@@ -683,7 +684,7 @@ class InteractWithLyxCells:
         if assert_cursor_at_cookie_end:
             return self.process_lfun("word-delete-backward")
         if not assert_inside_cell and not self.inside_cell():
-            return None # we're not even in a cell
+            return None # We're not even in a cell.
         if on_current_line:
             self.process_lfun("line-begin")
         else:
@@ -808,7 +809,7 @@ class InteractWithLyxCells:
     #
     #
 
-    def get_all_cell_text(self, use_latex_export=False):
+    def get_all_cell_text(self, use_latex_export=False, nodelete_tmpfile=False):
         """Returns a list of `Cell` data structures containing the text for each
         cell in the current buffer.  Always updates the file before reading it.
         It can read either from a locally exported .tex Latex file (with
@@ -824,13 +825,14 @@ class InteractWithLyxCells:
 
         if use_latex_export:
             return self.get_all_cell_text_via_latex_file(bufferDirName)
-        return self.get_all_cell_text_via_lyx_file(bufferDirName)
+        return self.get_all_cell_text_via_lyx_file(bufferDirName,
+                                              nodelete_tmpfile=nodelete_tmpfile)
 
     #
     # Get cell and modify cell info from the Lyx source file.
     #
 
-    def get_all_cell_text_via_lyx_file(self, bufferDirName):
+    def get_all_cell_text_via_lyx_file(self, bufferDirName, nodelete_tmpfile=False):
         """Get all Lyx cell text using the method of writing and parsing the `.lyx`
         file."""
         # Export temporarily to a local file.
@@ -839,7 +841,7 @@ class InteractWithLyxCells:
                          "lyx mv $$FName " + full_tmp_name, warn_error=True)
         time.sleep(0.05) # let write get a slight head start before any reading
         all_cells = self.get_all_cell_text_from_lyx_file(full_tmp_name)
-        if os.path.exists(tmp_saved_lyx_file_name):
+        if not nodelete_tmpfile and os.path.exists(tmp_saved_lyx_file_name):
             os.remove(tmp_saved_lyx_file_name)
         return all_cells
 
@@ -859,14 +861,18 @@ class InteractWithLyxCells:
         inside_cell = False
         inside_cell_layout = False
         set_next_cell_cookie_line_before = -1
+        DEBUG = False
         while True:
             line = saved_lyx_file.readline()
+            if DEBUG: print("RAW LINE:", line.rstrip())
             if line == "":
                 break
 
-            # Search for lines starting with something like
+            # To get code cells search for lines starting with something like
             #    \begin_inset Flex LyxNotebookCell:Standard:PythonTwo
-            # or for a cookie at the start of a cell line (or anywhere in an ordinary line).
+            # Those begin the inset, but individual lines of the inset are each
+            # spread across several lines as substrings, between a
+            # `\begin_layout Plain Layout` line and an `\end_layout` line.
 
             elif line.find(r"\begin_inset Flex LyxNotebookCell:") == 0:
                 inside_cell = True
@@ -874,10 +880,11 @@ class InteractWithLyxCells:
                 cell_list.append(Cell()) # create a new cell
                 cell_list[-1].begin_line = line # begin{} may have meaningful args later
                 cell_list[-1].begin_line_number = saved_lyx_file.number
-                # did we find a cookie earlier that needs to be recorded with new cell?
+                # Did we find a cookie earlier that needs to be recorded with new cell?
                 if set_next_cell_cookie_line_before >= 0:
                     cell_list[-1].cookie_line_before = set_next_cell_cookie_line_before
                     set_next_cell_cookie_line_before = -1
+                if DEBUG: print("INSIDE_CELL")
 
             elif inside_cell:
                 if line.rstrip() == r"\end_inset":
@@ -887,29 +894,35 @@ class InteractWithLyxCells:
 
                 elif line.rstrip() == r"\begin_layout Plain Layout":
                     inside_cell_layout = True
+                    if DEBUG: print("INSIDE CELL LAYOUT")
 
-                elif inside_cell_layout: # actual line of cell text on several lines
-                    cell_line_chars = []
+                elif inside_cell_layout: # An actual line of cell text, on several lines.
+                    cell_line = line.rstrip("\n")
+                    cell_line_substrings = []
                     while True:
-                        cell_line = saved_lyx_file.readline().rstrip("\n") # drop trailing \n
+                        if DEBUG: print("   RAW CELL LINE:", cell_line)
 
                         if cell_line.rstrip() == r"\end_layout":
                             break
                         elif cell_line.startswith(r"\begin_inset Quotes"):
                             # Lyx 2.3 introduced quote insets even inside listings; convert to '"' char.
                             # The corresponding \end_inset will be ignored in condition below.
-                            cell_line_chars.append('"')
+                            cell_line_substrings.append('"')
                         elif cell_line.rstrip() == r"\backslash":
-                            cell_line_chars.append("\\")
+                            cell_line_substrings.append("\\")
                         elif cell_line.startswith("\\"):
                             # Skip all other markup starting with \, including `\end_inset` markers.
                             # This includes anything like `\lang english` which Unicode can cause.
+                            if DEBUG: print("   IGNORED:", cell_line)
                             pass
                         else: # Got a line of actual text.
-                            cell_line_chars.append(cell_line)
+                            if DEBUG: print("   APPENDING:", cell_line)
+                            cell_line_substrings.append(cell_line)
+
+                        cell_line = saved_lyx_file.readline().rstrip("\n") # drop trailing \n
 
                     inside_cell_layout = False
-                    line = "".join(cell_line_chars) + "\n"
+                    line = "".join(cell_line_substrings) + "\n"
 
                     # TODO: detect multiple cookies inside a cell (here and above routine)
                     if line.find(self.magic_cookie) == 0: # cell cookies must begin lines, too
@@ -917,6 +930,7 @@ class InteractWithLyxCells:
                         line = line.replace(self.magic_cookie, "", 1) # replace one occurence
 
                     cell_list[-1].append(line) # got a line from the cell, append it
+                    if DEBUG: print("FINAL LINE:", line)
 
             else: # got an ordinary Lyx file line.
                 # Cookies outside cells can still mess up navigation with inset-forall and search.
@@ -1149,7 +1163,7 @@ class InteractWithLyxCells:
 
         else: # Don't have modified inset-edit, use the older magic cookie way.
             self.insert_magic_cookie_inside_current(assert_inside_cell=True,
-                                                    on_current_line=True)
+                                                    on_current_line=False)
 
             all_cells = self.get_all_cell_text(use_latex_export=use_latex_export)
 

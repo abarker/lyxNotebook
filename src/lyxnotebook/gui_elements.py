@@ -20,7 +20,7 @@ import PySimpleGUI as sg
 # for getting and executing commands is in the method `server_notify_loop` of
 # the main `ControllerOfLyxAndInterpreters` instance.
 
-sg.theme("SystemDefault")
+sg.theme("SystemDefaultForReal")
 
 popup_location = 100, 100 # Display is nicer with fixed popup location.
 
