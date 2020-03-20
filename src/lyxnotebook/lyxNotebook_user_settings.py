@@ -11,7 +11,6 @@ User-modifiable settings for the Lyx Notebook program.
 # They are initially set to the Lyx default values.
 # ===============================================================================
 
-
 # The LyX user home directory.
 user_home_lyx_directory = "~/.lyx"
 user_home_lyx_directory = "~/programming/python/lyxnotebook/project_root/test/.lyx"
@@ -28,11 +27,9 @@ lyx_server_pipe = os.path.join(user_home_lyx_directory, "lyxpipe")
 # This setting should match: Tools->Preferences->Paths->TemporaryDirectory
 lyx_temporary_directory = "/tmp"
 
-
 # ===============================================================================
 # General settings.
 # ===============================================================================
-
 
 # The maximum number of lines written to an output cell (before truncation).
 max_lines_in_output_cell = 1000
@@ -72,6 +69,9 @@ magic_cookie_string = "»»" # Right-pointing double angle quotation mark.
 # cell types in different buffers.
 separate_interpreters_for_each_buffer = True
 
+# Whether to use the newer inset-edit lfun (2.4) or a mod of it or cookie method.
+has_inset_edit_noeditor_mod = True
+has_inset_edit = True
 
 # ===============================================================================
 # Values calculated on-the-fly by the program, saved and shared in this namespace.

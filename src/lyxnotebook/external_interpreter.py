@@ -42,7 +42,7 @@ import signal
 from . import process_interpreter_specs # only needed for testing code at end
 
 
-class ExternalInterpreter(object):
+class ExternalInterpreter:
     """This class runs a single external interpreter.  There can be multiple
     instances, each running a possibly different interpreter application.  The
     interpreter is forked as a process connected to a pseudo-tty, so
@@ -117,7 +117,7 @@ class ExternalInterpreter(object):
                           *self.run_arguments)
                 # below line also works in place of above (with exit below and import)
                 #subprocess.call([self.run_command]+self.run_arguments, shell=True)
-            except:
+            except: # TODO: What specific exceptions?
                 print("Cannot spawn execlp...")
             # sys.exit(0) # needed when subprocess.call is used above
         #
@@ -140,7 +140,6 @@ class ExternalInterpreter(object):
             self.spawn_time = time.time()
 
             # self.read_interpreter_init_message() # wait and do this on-demand (read/write)
-        return
 
     def read_interpreter_init_message(self):
         """Read the initialization message from the interpreter, and the first
@@ -162,7 +161,8 @@ class ExternalInterpreter(object):
             self.read_interpreter_init_message()
         # write string to fd, returns # bytes
         string_byte_array = string.encode("utf-8") # encode for Python3 compatibility
-        num_bytes_written = os.write(self.fd, string_byte_array) # return val currently unused
+        # Return val below currently unused, but write must be called.
+        num_bytes_written = os.write(self.fd, string_byte_array)
         sys.stdout.flush()
         # Before the first self.read we must read back the writes, or they will
         # produce a double echo effect... just how it works.  We don't need this
@@ -262,12 +262,10 @@ class ExternalInterpreter(object):
         os.waitpid(self.child_pid, 0)
         os.close(self.fd)
         self.running = False
-        return
 
     def __del__(self):
         if self.running:
             self.kill(True, True)
-        return
 
     def report_read_error(self):
         self.read_error_found = True
@@ -275,7 +273,6 @@ class ExternalInterpreter(object):
               "\nstarted with this command string:\n   ", self.run_command,
               "\nNo output can be read.  Are you sure the path to the"
               "\ninterpreter's executable is correct?", file=sys.stderr)
-        return
 
 #
 # ====================== module tests =========================================

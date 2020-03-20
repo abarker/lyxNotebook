@@ -442,11 +442,11 @@ def generate_files_from_templates(dirname):
     """Generate files, in the directory `dirname`."""
     os.chdir(dirname)
 
-    # first do the Listings redefinition, since it just needs to be written out
+    # First do the Listings redefinition, since it just needs to be written out.
     with open("lyxNotebookListingsWithSmallFont.module", "w") as f:
         f.write(listings_with_small_font)
 
-    # now do all the other modules, one for each interpreter specification
+    # Now do all the other modules, one for each interpreter specification.
     for spec in all_specs:
         preamble_latex_code = spec.preamble_latex_code
         inset_specifier = spec.params["inset_specifier"]
@@ -462,7 +462,7 @@ def generate_files_from_templates(dirname):
         standard = standard_template
         output = output_template
 
-        # replace meta-vars in the common header section
+        # Replace meta-vars in the common header section.
         head_common = head_common.replace("<<triple_quote>>", "\"\"\"")
         head_common = head_common.replace("<<inset_specifier>>", inset_specifier)
         head_common = head_common.replace("<<prog_name>>", prog_name)
@@ -470,7 +470,7 @@ def generate_files_from_templates(dirname):
 
         head = head_common
 
-        # replace meta-vars in dependent header, one copy for each basic_cell_type
+        # Replace meta-vars in dependent header, one copy for each basic_cell_type.
         # NOTE that we could have just treated the sections as <<...>> vars in head_common
         for basic_cell_type in ["Init", "Standard", "Output"]:
             head_tmp = head_dependent
@@ -481,13 +481,13 @@ def generate_files_from_templates(dirname):
             head_tmp = head_tmp.replace("<<basic_cell_type>>", basic_cell_type)
             head += head_tmp
 
-        # replace certain meta-vars in preamble_latex_code
+        # Replace certain meta-vars in preamble_latex_code.
         preamble_latex_code = preamble_latex_code.replace("<<triple_quote>>", "\"\"\"")
         preamble_latex_code = preamble_latex_code.replace("<<inset_specifier>>", inset_specifier)
         preamble_latex_code = preamble_latex_code.replace("<<prog_name>>", prog_name)
         preamble_latex_code = preamble_latex_code.replace("<<lst_language>>", lst_language)
 
-        # now we have the full .module file header (stuff before any InsetLayout commands)
+        # Now we have the full .module file header (stuff before any InsetLayout commands).
         head += preamble_latex_code + module_header_template_end
 
         # replace meta-vars in standard template
@@ -498,7 +498,7 @@ def generate_files_from_templates(dirname):
         standard = standard.replace("<<lst_language>>", lst_language)
         standard = standard.replace("<<basic_cell_type>>", "Standard")
 
-        # replace meta-vars in init template
+        # Replace meta-vars in init template.
         # init cells are currently identical to standard cells except for the frame spec
         init = init.replace("<<triple_quote>>", "\"\"\"")
         init = init.replace("<<inset_specifier>>", inset_specifier)
@@ -507,12 +507,12 @@ def generate_files_from_templates(dirname):
         init = init.replace("<<lst_language>>", lst_language)
         init = init.replace("<<basic_cell_type>>", "Init")
 
-        # replace meta-vars in output template
+        # Replace meta-vars in output template.
         output = output.replace("<<inset_specifier>>", inset_specifier)
         output = output.replace("<<prog_name>>", prog_name)
         output = output.replace("<<basic_cell_type>>", "Output")
 
-        # write concat of all templates to correct output file
+        # Write concat of all templates to correct output file.
         with open("lyxNotebookCell"+inset_specifier+".module", "w") as f:
             f.write(head + init + standard + output)
 

@@ -44,12 +44,11 @@ lockfile_path = os.path.abspath(os.path.expanduser(
     os.path.join(user_home_lyx_directory, "lyxNotebook.lockfile")))
 
 def main():
-    #
-    # Make sure this script is not already running in an existing process.
-    # This method uses a lock file containing the PID, and was modified from code at
-    # http://shoaibmir.wordpress.com/2009/12/14/pid-lock-file-in-python/
-    #
-
+    """
+    Make sure this script is not already running in an existing process.
+    This method uses a lock file containing the PID, and was modified from code at
+    http://shoaibmir.wordpress.com/2009/12/14/pid-lock-file-in-python/
+    """
     # First check if a lock file already exists.
     if os.path.exists(lockfile_path):
         # If the lockfile is already there then check the PID number in the lock file.
@@ -81,4 +80,6 @@ def main():
           lyxNotebook_user_settings.lyx_notebook_source_dir)
 
     controller = ControllerOfLyxAndInterpreters("lyxNotebookClient")
+    controller.server_notify_loop()
+
 

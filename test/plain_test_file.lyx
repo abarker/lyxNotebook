@@ -176,7 +176,11 @@ int_x ^y z")
 \end_inset
 
 
-\begin_inset Formula $\int_{x}^{y}z$
+\begin_inset Formula 
+\[
+\int_{x}^{y}z
+\]
+
 \end_inset
 
 zz
@@ -247,6 +251,16 @@ print("this is Python2 with parens")
 print "this is Python2 without parens"
 \end_layout
 
+\begin_layout Plain Layout
+
+for i in "xy":
+\end_layout
+
+\begin_layout Plain Layout
+
+   print(i)
+\end_layout
+
 \end_inset
 
 
@@ -261,6 +275,16 @@ this is Python2 with parens
 \begin_layout Plain Layout
 
 this is Python2 without parens
+\end_layout
+
+\begin_layout Plain Layout
+
+x
+\end_layout
+
+\begin_layout Plain Layout
+
+y
 \end_layout
 
 \end_inset

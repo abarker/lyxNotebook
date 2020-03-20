@@ -34,17 +34,16 @@ import re
 import sys
 import os
 import time
-import signal
 
 from . import gui_elements as gui
 from . import lyxNotebook_user_settings
-from .lyx_server_API_wrapper import InteractWithLyxCells, Cell
+from .lyx_server_API_wrapper import InteractWithLyxCells
 from .external_interpreter import ExternalInterpreter
 from . import process_interpreter_specs # Specs for all implemented interpreters.
 from . import keymap # The current mapping of keys to Lyx Notebook functions.
 
 
-class IndentCalc(object):
+class IndentCalc:
     """A class that is used for Python cells, to calculate the indentation
     levels.  This is used so that users can write code like in a file, without
     the extra blank lines which are often required in the interpreter.  A blank
@@ -111,7 +110,7 @@ class IndentCalc(object):
         if len(stripped_line) == 0:
             self.backslash_continuation = False # assume blanks unset explicit continuation
             return
-        first_nonwhitespace = re.search("\S", stripped_line)
+        first_nonwhitespace = re.search(r"\S", stripped_line)
         if first_nonwhitespace == "#":
             self.backslash_continuation = False
             return
@@ -200,7 +199,7 @@ class IndentCalc(object):
                 self.indentation_level += 3
 
 
-class InterpreterProcess(object):
+class InterpreterProcess:
     """An instance of this class represents a data record for a running
     interpreter process.  Contains an `ExternalInterpreter` instance for that
     process, but also has an `IndentCalc` instance, and keeps track of the most
@@ -215,7 +214,7 @@ class InterpreterProcess(object):
         self.external_interp = ExternalInterpreter(self.spec)
 
 
-class InterpreterProcessCollection(object):
+class InterpreterProcessCollection:
     """A class to hold multiple `InterpreterProcess` instances.  There will
     probably only be a single instance, but multiple instances should not cause
     problems.  Basically a dict that maps (bufferName,inset_specifier) tuples to
@@ -267,7 +266,7 @@ class InterpreterProcessCollection(object):
         if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
             buffer_name = "___dummy___" # Force all to use same buffer if not set.
         key = (buffer_name, inset_specifier)
-        if not key in self.main_dict:
+        if key not in self.main_dict:
             msg = "Starting interpreter for " + inset_specifier
             if lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
                 msg += ", for buffer:\n   " + buffer_name
@@ -291,7 +290,7 @@ class InterpreterProcessCollection(object):
         print(start_msg)
 
 
-class ControllerOfLyxAndInterpreters(object):
+class ControllerOfLyxAndInterpreters:
     """This class is the high-level controller class which deals with user
     interactions and which manages the Lyx process and the interpreter
     processes.  The interpreter specifications are read from the module
@@ -318,24 +317,6 @@ class ControllerOfLyxAndInterpreters(object):
         self.lyx_process.show_message(message)
         #self.display_popup_message(message=message, text=startMsg, seconds=3)
 
-        # Start up the command loop.
-        self.server_notify_loop()
-        return # never executed; command loop above continues until sys.exit
-
-    def reset_interpreters_for_buffer(self, buffer_name=""):
-        """Reset all the interpreters for the buffer, starting completely new processes
-        for them.  If buffer_name is empty the current buffer is used."""
-        if buffer_name == "": buffer_name = self.lyx_process.server_get_filename()
-        self.all_interps.reset_for_buffer(buffer_name)
-        return
-
-    def reset_all_interpreters_for_all_buffers(self):
-        """Reset all the interpreters for all buffers, starting not-on-demand
-        interpreters for the current buffer."""
-        current_buffer = self.lyx_process.server_get_filename()
-        self.all_interps.reset_all_interpreters_for_all_buffers(current_buffer)
-        return
-
     def server_notify_loop(self):
         """This is the main command/event loop, getting commands from Lyx and executing
         them."""
@@ -345,7 +326,7 @@ class ControllerOfLyxAndInterpreters(object):
         while True:
             # Wait for a bound key in Lyx to be pressed, and get it when it is.
             key_pressed = self.lyx_process.wait_for_server_notify()
-            if not key_pressed in self.keymap:
+            if key_pressed not in self.keymap:
                 continue # Key to ignore.
 
             # Eat any buffered events (notify or otherwise): avoid annoying user.
@@ -554,11 +535,11 @@ class ControllerOfLyxAndInterpreters(object):
                     file_suffix = spec["file_suffix"]
                     # data tuple format is (filename, inset_specifier, commentBeginChar)
                     data_tuple_list.append((
-                                         file_prefix + ".allcells." +
-                                         inset_specifier + file_suffix,
-                                         inset_specifier,
-                                         spec["comment_line"]
-                                         ))
+                                           file_prefix + ".allcells." +
+                                           inset_specifier + file_suffix,
+                                           inset_specifier,
+                                           spec["comment_line"]
+                                           ))
                 self.lyx_process.write_all_cell_code_to_file(data_tuple_list)
                 self.lyx_process.show_message("all code cells were written to files")
 
@@ -603,6 +584,18 @@ class ControllerOfLyxAndInterpreters(object):
             else:
                 pass # ignore command from server-notify if it is not recognized
         return # Never executed; loop forever or sys.exit.
+
+    def reset_interpreters_for_buffer(self, buffer_name=""):
+        """Reset all the interpreters for the buffer, starting completely new processes
+        for them.  If buffer_name is empty the current buffer is used."""
+        if buffer_name == "": buffer_name = self.lyx_process.server_get_filename()
+        self.all_interps.reset_for_buffer(buffer_name)
+
+    def reset_all_interpreters_for_all_buffers(self):
+        """Reset all the interpreters for all buffers, starting not-on-demand
+        interpreters for the current buffer."""
+        current_buffer = self.lyx_process.server_get_filename()
+        self.all_interps.reset_all_interpreters_for_all_buffers(current_buffer)
 
     def evaluate_all_code_cells(self, init=True, standard=True):
         """Evaluate all cells.  Quits evaluation between cells if any Lyx Notebook
@@ -853,7 +846,7 @@ class ControllerOfLyxAndInterpreters(object):
         list as the new most recently saved prompt (to prepend next time).  Any
         autoindenting after prompts is stripped off."""
         if len(interp_result) == 0:
-            return
+            return None
         interp_result[0] = interpreter_process.most_recent_prompt + interp_result[0]
         most_recent_prompt = interp_result[-1]
         # Remove any autoindent from most_recent_prompt; note main and continuation
@@ -926,8 +919,7 @@ class ControllerOfLyxAndInterpreters(object):
         # line at the beginning).
         if self.no_echo and len(interp_result) > 0:
             return first_results + interp_result[1:]
-        else:
-            return first_results + interp_result
+        return first_results + interp_result
 
     def wrap_long_lines(self, line_list):
         """A stub which later can be used to do line-wrapping on long lines,
@@ -979,7 +971,7 @@ class ControllerOfLyxAndInterpreters(object):
             self.reload_buffer_file()
         if messages:
             self.lyx_process.show_message(
-            "Replaced current buffer with newly evaluated output cells.")
+                           "Replaced current buffer with newly evaluated output cells.")
 
     def reload_buffer_file(self, dont_ask_first=True):
         """Reload the current buffer file.  If `dont_ask_first` is true a method is used
@@ -990,8 +982,9 @@ class ControllerOfLyxAndInterpreters(object):
             self.lyx_process.process_lfun("vc-command", 'R $$p "/bin/echo reloading..."')
             # TODO: Bug if we do not modify file and write it back out as below!  Why?
             # Cells are not read back in right, otherwise, until a save is done.
-            self.lyx_process.process_lfun("command-sequence", argument=
-                                          "self-insert x;char-delete-backward;buffer-write")
+            self.lyx_process.process_lfun_seq("self-insert x",
+                                              "char-delete-backward",
+                                              "buffer-write")
         else:
             # This LFUN will ask the user before reloading:
             self.lyx_process.process_lfun("buffer-reload")

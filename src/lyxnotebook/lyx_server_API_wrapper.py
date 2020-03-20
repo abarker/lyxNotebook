@@ -105,8 +105,6 @@ Some earlier notes:
 # it works, unless there is some way to detect failure in word-find-forward
 # in which case you can just do that part again until it fails.
 
-# TODO: Define a process_command_sequence convenience method and use it.
-
 import sys
 import os
 import time
@@ -115,6 +113,7 @@ import getpass
 import random
 import string # just for generating random filenames
 from . import lyxNotebook_user_settings
+from . import gui_elements as gui
 
 # This file is repeatedly written temporarily to current dir, then deleted.
 tmp_saved_lyx_file_name = "tmp_save_file_lyx_notebook_xxxxx.lyxnotebook"
@@ -131,7 +130,8 @@ class Cell(list):
         """Initialize the data stored for the cell.  As a subclass of a list, the
         list elements are the lines of text."""
         # NOTE: Remember this is a list subclass with lines as elements.
-        # TODO call __init__ method from base class list? or don't inherit from list
+        super().__init__()
+
         self.has_cookie_inside = False  # is there a cookie inside this cell?
         self.cookie_line_before = -1    # cookie between cell and prev? line number if so
         self.cookie_line_after = -1     # cookie between cell and next? line number if so
@@ -145,7 +145,7 @@ class Cell(list):
 
     def get_cell_type(self):
         """Note this depends on the naming convention in the .module files.
-        Returns an ordered pair (<basictype>,<language>).  For example,
+        Returns a tuple (<basictype>,<language>).  For example,
         ("Standard", "Python")."""
         if self.begin_line == -1:
             return None
@@ -172,7 +172,7 @@ class Cell(list):
         return basic_type, language
 
 
-class TerminatedFile(object):
+class TerminatedFile:
     """A class to read lines from a file with a known termination line, which may
     not be finished writing by a writer process.  This is to deal with possible
     race conditions.  The EOF line "" will be returned only after the file
@@ -231,24 +231,27 @@ def convert_text_line_to_lyx_file_inset_format(text_line):
             if len(line) <= break_len: # at most break_len chars in line
                 wrapped_line_new.append(line + "\n")
                 break
-            else: # more than break_len chars len(line) > break_len
-                def calc_break_point(break_str, min_val):
-                    place = line[:break_len].rfind(break_str)
-                    if place > min_val:
-                        return place
-                    return break_len
-                break_point = min(calc_break_point("\t", 70),
-                                 calc_break_point(" ", 70),
-                                 calc_break_point(".\t", 10),
-                                 calc_break_point(". ", 10))
-                wrapped_line_new.append(line[:break_point] + "\n")
-                line = line[break_point:]
+
+            # More than break_len chars len(line) > break_len
+            def calc_break_point(line, break_len, break_str, min_val):
+                place = line[:break_len].rfind(break_str)
+                if place > min_val:
+                    return place
+                return break_len
+
+            break_point = min(calc_break_point(line, break_len, "\t", 70),
+                              calc_break_point(line, break_len, " ", 70),
+                              calc_break_point(line, break_len, ".\t", 10),
+                              calc_break_point(line, break_len, ". ", 10))
+            wrapped_line_new.append(line[:break_point] + "\n")
+            line = line[break_point:]
+
     wrapped_line_new.append("\\end_layout\n\n")
     result += "".join(wrapped_line_new)
     return result
 
 
-class InteractWithLyxCells(object):
+class InteractWithLyxCells:
     """The main class for handling interactions with a running Lyx process
     via the Lyx server.  Also handles writing and reading data from files in
     the user's home Lyx directory."""
@@ -304,12 +307,10 @@ class InteractWithLyxCells(object):
 
         # Magic cookie initializations.
 
-        # Magic cookies CANNOT contain ";" or the command-sequence LFUN will fail,
-        # and the program has only been tested with alphanumeric cookies.
+        # Magic cookies CANNOT contain ";" or the command-sequence LFUN will fail.
         self.magic_cookie = lyxNotebook_user_settings.magic_cookie_string
 
         # not all of these LFUN strings are currently used, but they may be at some time
-        cookie_len = len(self.magic_cookie)
         self.del_cookie_forward_command = "repeat {} char-delete-forward;"
         self.del_cookie_backward_command = "repeat {} char-delete-backward;"
 
@@ -333,6 +334,13 @@ class InteractWithLyxCells(object):
         """Do the special Lyx named pipe files exist?  True or False."""
         return (os.path.exists(self.lyx_server_pipe_in_filename)
                 and os.path.exists(self.lyx_server_pipe_out_filename))
+
+    def process_lfun_seq(self, *lfun_list, warn_error=True, warn_not_info=True):
+        """Run all the separate commands on `lfun_list` as a command-sequence.
+        No output is returned."""
+        lfun_string = ";".join(lfun_list)
+        self.process_lfun("command-sequence", argument=lfun_string,
+                          warn_error=warn_error, warn_not_info=warn_not_info)
 
     def process_lfun(self, lfun_name, argument="", warn_error=True, warn_not_info=True):
         """Process the Lyx LFUN in the currently running Lyx via the server."""
@@ -422,13 +430,15 @@ class InteractWithLyxCells(object):
                     self.ignored_server_notify_event = True
                     #print("debug =============================== IGNORED NOTIFY")
                     continue
-                else: break
+                break
             elif parsed_list[0] == "ERROR":
-                if not error: continue
-                else: break
+                if not error:
+                    continue
+                break
             elif parsed_list[0] == "INFO":
-                if not info: continue
-                else: break
+                if not info:
+                    continue
+                break
             else: # ignore unknown, but print warning
                 print("Warning: getServerEvent() read an unknown message type" +
                       " from LyX Server:", parsed_list)
@@ -480,8 +490,8 @@ class InteractWithLyxCells(object):
         return self.process_lfun("server-get-layout")
 
     def server_get_xy(self):
-        """Get the x,y position.  Note that the top left of INSETS are always (0,0), so this
-        isn't an absolute position."""
+        """Get the x,y position.  Note that the top left of INSETS are always (0,0), so
+        this isn't an absolute position."""
         pos = self.process_lfun("server-get-xy")
         pos = pos.split(" ")
         x = int(pos[0].strip())
@@ -517,13 +527,12 @@ class InteractWithLyxCells(object):
         it fails."""
         # Insert a math space, see if command works.  If so then in math mode
         # then delete it).
-        test_string = self.process_lfun("math-space")
+        test_string = self.process_lfun("math-space", warn_error=False, warn_not_info=False)
         inside_math = not test_string.strip() == "Command disabled"
         if inside_math:
             # Just deleting here backward doesn't always leave the cursor at the
             # very beginning, which messes up inset-select-all.
-            test_string = self.process_lfun("command-sequence",
-                                      argument="char-left;char-delete-forward")
+            self.process_lfun_seq("char-left", "char-delete-forward")
         return inside_math
 
     def goto_line_begin(self):
@@ -633,7 +642,6 @@ class InteractWithLyxCells(object):
         elif output:
             cell_type = "Flex:LyxNotebookCell:Output"
         self.process_lfun("inset-forall", cell_type+" inset-toggle open")
-        return
 
     def close_all_cells_but_current(self, init=True, standard=True, output=True):
         """Open all cells of the type associated with this class.  Only implemented
@@ -648,10 +656,9 @@ class InteractWithLyxCells(object):
         elif output:
             cell_type = "Flex:LyxNotebookCell:Output"
         self.process_lfun("inset-forall", cell_type+" inset-toggle close")
-        return
 
     def insert_magic_cookie_inside_current(self, on_current_line=False,
-                                       assert_inside_cell=False):
+                                           assert_inside_cell=False):
         """Inserts the magic cookie into the cell.  By default the position is at
         the top left of the inset.  Using the option to put it on the current line
         saves a few operations, since we don't have to find the inset beginning,
@@ -659,7 +666,7 @@ class InteractWithLyxCells(object):
         cannot change in the meantime (or someother assertion like undo or
         cursor-end must be made on delete)."""
         if not assert_inside_cell and not self.inside_cell():
-            return # not even in a cell, do nothing
+            return None # not even in a cell, do nothing
         if on_current_line:
             self.process_lfun("line-begin")
         else:
@@ -676,13 +683,12 @@ class InteractWithLyxCells(object):
         if assert_cursor_at_cookie_end:
             return self.process_lfun("word-delete-backward")
         if not assert_inside_cell and not self.inside_cell():
-            return # we're not even in a cell
+            return None # we're not even in a cell
         if on_current_line:
             self.process_lfun("line-begin")
         else:
             self.goto_cell_begin(assert_inside_cell=True)
         self.process_lfun("command-sequence", self.del_cookie_forward_command)
-        return
 
     def insert_magic_cookie_inside_forall(self, cell_type="Flex:LyxNotebookCell"):
         """Inserts the cookie inside all the selected insets, as beginning chars."""
@@ -818,8 +824,7 @@ class InteractWithLyxCells(object):
 
         if use_latex_export:
             return self.get_all_cell_text_via_latex_file(bufferDirName)
-        else:
-            return self.get_all_cell_text_via_lyx_file(bufferDirName)
+        return self.get_all_cell_text_via_lyx_file(bufferDirName)
 
     #
     # Get cell and modify cell info from the Lyx source file.
@@ -855,7 +860,7 @@ class InteractWithLyxCells(object):
         inside_cell_layout = False
         set_next_cell_cookie_line_before = -1
         while True:
-            line = saved_lyx_file.readline();
+            line = saved_lyx_file.readline()
             if line == "":
                 break
 
@@ -1081,8 +1086,12 @@ class InteractWithLyxCells(object):
         if not self.inside_cell() or self.inside_empty_cell(assert_inside_cell=True):
             return None # return None if not in a cell or empty cell
 
-        has_flex_inset_edit_mod = True
-        if has_flex_inset_edit_mod:
+        has_inset_edit_noeditor_mod = lyxNotebook_user_settings.has_inset_edit_noeditor_mod
+        has_inset_edit = lyxNotebook_user_settings.has_inset_edit
+
+        if has_inset_edit and has_inset_edit_noeditor_mod:
+            # TODO: Later implement searching for the file from unmodified inset-edit.
+
             # Get all the cells from the Lyx or Latex output, because we need to
             # know the language associated with the current cell.  We will compare
             # text.
@@ -1103,26 +1112,42 @@ class InteractWithLyxCells(object):
             # `rewrite_code_cells` made false.  Using word-right leaves cursor
             # just after the inset, and using char-right leaves it inside the
             # inset.
-            self.process_lfun("command-sequence", argument="inset-end-edit;char-right")
+            self.process_lfun_seq("inset-end-edit", "char-right")
 
-            # TODO: Restrict to only code cells (std or init).
-            # TODO: When single match found, return the one from the list read from Lyx file.  When multiple print error.
             cell_match_indices = []
             for count, cell in enumerate(all_cells):
+                basic_type, language = cell.get_cell_type()
+                if basic_type not in ["Standard", "Init"]:
+                    continue
                 lines_match = True
-                for target_line, line in zip(cell_text, cell): # TODO IGNORES extras, test they are all empty later...
+                for target_line, line in zip(cell_text, cell):
                     if target_line != line:
                         lines_match = False
                         break
                 if lines_match:
                     cell_match_indices.append(count)
             if not cell_match_indices:
-                # TODO warning notice...
+                gui.text_info_popup(
+                       "Warning: No cells in the .lyx file matched the text extracted\n"
+                       "from the inset via the inset-edit LFUN.")
                 return None
-            matched_index = cell_match_indices[0] # TODO, handle duplicates.
+            if len(cell_match_indices) > 1:
+                first_match = all_cells[cell_match_indices[0]]
+                # Empty cells don't reach here as of now, but line below checks anyway.
+                if len(first_match) != 1 or first_match[0] != "": # If cells not empty.
+                    languages = {all_cells[i].get_cell_type()[1]
+                                                       for i in cell_match_indices}
+                    msg = ("Warning: Cell numbered {} contain identical code for \n"
+                          "different languages.  Don't know which interpreter to run..."
+                          .format(cell_match_indices))
+                    if len(languages) != 1:
+                        print(msg)
+                        gui.text_info_popup(msg)
+                        return None
+            matched_index = cell_match_indices[0]
             return all_cells[matched_index]
 
-        else: # Don't have flex_inset_edit_mod, use the older magic cookie way.
+        else: # Don't have modified inset-edit, use the older magic cookie way.
             self.insert_magic_cookie_inside_current(assert_inside_cell=True,
                                                     on_current_line=True)
 
@@ -1146,8 +1171,7 @@ class InteractWithLyxCells(object):
             # return Cell() # Was causing bugs in ordinary Listings cells, now return None.
             if found_cookie:
                 return return_cell
-            else:
-                return None
+            return None
 
     def replace_current_output_cell_text(self, line_list, create_if_necessary=True,
                goto_begin_after=False, assert_inside_cell=False, inset_specifier="Python",
@@ -1183,26 +1207,21 @@ class InteractWithLyxCells(object):
             self.process_lfun("inset-toggle-open") # Run alone because can be ERROR?
             self.process_lfun("char-right")
         else: # Cursor is inside the inset.
-            command_sequence = ["inset-select-all;", # Select all.
-                                "escape;" # This turns off selection.
-                                "escape;" # This leaves the inset to the right.
-                                "word-backward;" # Goto before inset.
-                                "inset-toggle open;" # Open the inset.
-                                "word-forward;" # Goto after inset.
-                                "inset-toggle open;" # Open output inset if there.
-                                "char-right"] # Enter the output inset if there.
-            self.process_lfun("command-sequence", argument="".join(command_sequence))
+            self.process_lfun_seq("inset-select-all", # Select all.
+                                  "escape", # This turns off selection.
+                                  "escape", # This leaves the inset to the right.
+                                  "word-backward", # Goto before inset.
+                                  "inset-toggle open", # Open the inset.
+                                  "word-forward", # Goto after inset.
+                                  "inset-toggle open", # Open output inset if there.
+                                  "char-right") # Enter the output inset if there.
 
+        # Check if there is a math inset just after the code inset.
         if self.inside_math_inset():
-            self.process_lfun("char-right")
+            self.process_lfun_seq("inset-select-all")
             # Delete all text in existing inset, so we know it is empty.
-            if self.inside_math_inset():
-                self.process_lfun("command-sequence", argument="char-left;inset-select-all;word-delete-forward")
-            else:
-                self.process_lfun("char-left")
             line_list = [li.strip("\n") for li in line_list] # Only a single line allowed.
             line_string = "".join(line_list)
-            print("........................................string to insert is", line_string)
             self.process_lfun("math-insert", argument=line_string)
             return
 
@@ -1220,9 +1239,8 @@ class InteractWithLyxCells(object):
                 # Note that flex-insert adds the "Flex:" prefix on the cell name.
                 # Note this puts you inside the new Flex cell (so inset-toggle-open may
                 #    be unnecessary).
-                self.process_lfun("command-sequence",
-                                 argument="flex-insert LyxNotebookCell:Output:"
-                                           + inset_specifier+";inset-toggle open")
+                self.process_lfun_seq("flex-insert LyxNotebookCell:Output:"+inset_specifier,
+                                      "inset-toggle open")
                 empty_cell = True
             else:
                 # If we don't create a new cell, go back inside the previous cell.
@@ -1390,7 +1408,7 @@ class InteractWithLyxCells(object):
         for dirpath, subdirs, files in os.walk(dir_data[0]):
             for fname in files:
                 fnameRoot, extension = os.path.splitext(fname)
-                if not (extension in graphic_extensions):
+                if extension not in graphic_extensions:
                     continue
                 full_path = os.path.join(dirpath, fname)
                 mtime = os.stat(full_path).st_mtime # or can use os.path.getmtime()
@@ -1499,7 +1517,8 @@ class InteractWithLyxCells(object):
         # This function is now UNUSED; it was mainly for server-goto-file-row
         # experiments which didn't turn out well.  If needed it could be made more
         # portable in a way similar to the insertMostRecentGraphicsFile code.
-        # It is BROKEN, for example, retData is undefined.
+
+        # BROKEN, for example, retData is undefined.
 
         # (Note that the last ls option is the number 1, not the letter l.)
         ls_cmd = "ls -ct1 "+self.lyx_temporary_directory+"/lyx*/*/"+retData[1][:-4]+".tex"
@@ -1562,7 +1581,7 @@ class InteractWithLyxCells(object):
         need some work."""
 
         #layout = self.getServerLayout() # later maybe check layout, Plain or Standard
-        self.process_lfun("command-sequence", argument="escape;escape;escape") # escape any insets
+        self.process_lfun_seq("escape", "escape", "escape") # escape any insets
 
         # insert cookie at cursor point, note that this cookie goes into regular text
         self.process_lfun("self-insert", self.magic_cookie)
