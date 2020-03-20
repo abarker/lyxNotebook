@@ -16,6 +16,10 @@ Simple GUI elements used by the program.
 import pathlib
 import PySimpleGUI as sg
 
+# For persistent GUI inside an event loop, note that the current main event loop
+# for getting and executing commands is in the method `server_notify_loop` of
+# the main `ControllerOfLyxAndInterpreters` instance.
+
 sg.theme("SystemDefault")
 
 popup_location = 100, 100 # Display is nicer with fixed popup location.

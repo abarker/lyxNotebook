@@ -168,20 +168,15 @@ status open
 
 \begin_layout Plain Layout
 
-print("Init cell")
+print(r"
+\backslash
+int_x ^y z")
 \end_layout
 
 \end_inset
 
 
-\begin_inset Flex LyxNotebookCell:Output:Python
-status open
-
-\begin_layout Plain Layout
-
-Init cell
-\end_layout
-
+\begin_inset Formula $\int_{x}^{y}z$
 \end_inset
 
 zz
@@ -193,14 +188,17 @@ x
 status open
 
 \begin_layout Plain Layout
+
 " A string test È¢"
 \end_layout
 
 \begin_layout Plain Layout
+
 print("Standard cell")
 \end_layout
 
 \begin_layout Plain Layout
+
 print("Another line")
 \end_layout
 

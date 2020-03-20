@@ -14,7 +14,7 @@ just does basic startup stuff like making sure a Lyx Notebook process is not
 already running.
 
 This module contains the implementation of the high-level controller class
-`ControllerLyxWithInterpreter`.  This class mediates between the Lyx program
+`ControllerOfLyxAndInterpreters`.  This class mediates between the Lyx program
 and one or more interpreters for interpreting code.  It gets basic commands
 from Lyx, executes them, and pushes the appropriate actions back to Lyx.  Some
 of these actions involve running code in an interpreter.  In these cases, the
@@ -23,7 +23,7 @@ back, and then pushes the results to Lyx.
 
 """
 
-# TODO: Look into this Python library and consider if it's functionality could
+# TODO: Look into this Python library and consider if its functionality could
 # replace some of this code (such as IndentCalc and the whole interpreter
 # interaction stuff with pttys): https://docs.python.org/3.8/library/code.html
 
@@ -36,12 +36,11 @@ import os
 import time
 import signal
 
-# Local file imports.
 from . import gui_elements as gui
 from . import lyxNotebook_user_settings
 from .lyx_server_API_wrapper import InteractWithLyxCells, Cell
 from .external_interpreter import ExternalInterpreter
-from . import process_interpreter_specs # Specs for all the interpreters which are allowed.
+from . import process_interpreter_specs # Specs for all implemented interpreters.
 from . import keymap # The current mapping of keys to Lyx Notebook functions.
 
 
@@ -104,10 +103,10 @@ class IndentCalc(object):
 
         # "indentation down to zero" is only considered true right after the first
         # non-continued physical line which has indentation level zero when the
-        # previous line had a higher level, so always reset for each physical line
+        # previous line had a higher level, so always reset for each physical line.
         self.indentation_level_down_to_zero = False
 
-        # detect a blank line (possibly with a comment) and do nothing else
+        # Detect a blank line (possibly with a comment) and do nothing else.
         stripped_line = code_line.rstrip() # strip off trailing whitespace
         if len(stripped_line) == 0:
             self.backslash_continuation = False # assume blanks unset explicit continuation
@@ -117,21 +116,20 @@ class IndentCalc(object):
             self.backslash_continuation = False
             return
 
-        # update the indentation level (unless line is continued)
+        # Update the indentation level (unless line is continued).
         if not self.in_line_continuation():
             new_level = first_nonwhitespace.start()
             if self.indentation_level > 0 and new_level == 0:
                 self.indentation_level_down_to_zero = True
             self.indentation_level = new_level
 
-        # backslash continuation only holds for one line (unless reset later at end)
-        # this was already used in calculating self.in_line_continuation() above
+        # Backslash continuation only holds for one line (unless reset later at end)
+        # this was already used in calculating self.in_line_continuation() above.
         self.backslash_continuation = False
 
-        # go through each char in the line, updating paren counts, etc.
-        # note that i is the index into the line stripped_line
+        # Go through each char in the line, updating paren counts, etc.
+        # Note that i is the index into the line stripped_line.
         backslash_escape = False
-        # fake a C-style loop, so we can jump ahead easily by resetting i
         i = -1
         while True:
 
@@ -139,44 +137,46 @@ class IndentCalc(object):
             if i >= len(stripped_line): break
             char = stripped_line[i]
 
-            # first handle backslash escape mode... we always ignore the next char,
+            # First handle backslash escape mode... we always ignore the next char,
             # and the only cases we care about are one-character backslash escapes
-            # (let Python worry about any syntax errors with backslash outside strings)
+            # (let Python worry about any syntax errors with backslash outside strings).
             if backslash_escape:
                 backslash_escape = False
                 continue
 
-            # handle the backslash char, either line continuation or escape
+            # Handle the backslash char, either line continuation or escape.
             if char == "\\":
-                if i == len(stripped_line) - 1: # line continuation
+                if i == len(stripped_line) - 1: # Line continuation.
                     self.backslash_continuation = True
                     continue # could also break, since at end of line
-                else: # start a backslash escape
-                    # this is only valid in strings, but let Python catch any errors there
+                else: # Start a backslash escape.
+                    # This is only valid in strings, but let Python catch any errors there.
                     backslash_escape = True
                     continue
 
-            # look for string delimiters and toggle string modes
+            # Look for string delimiters and toggle string modes.
             if char == "\"":
-                # if in a string, then we got the closing quote
+                # If in a string, then we got the closing quote.
                 if self.in_string1: self.in_string1 = False
-                # check if this is part of a triple-quote string
+                # Check if this is part of a triple-quote string.
                 elif (i <= len(stripped_line) - 3 and
                       stripped_line[i+1] == "\"" and stripped_line[i+2] == "\""):
                     if self.in_string2: self.in_string2 = False
                     else: self.in_string2 = True
-                    i += 2 # increment past the second two quotes of the triple-quote
-                # otherwise we start a new single-quote string
-                else: self.in_string1 = True
+                    i += 2 # Increment past the second two quotes of the triple-quote.
+                # Otherwise we start a new single-quote string.
+                else:
+                    self.in_string1 = True
                 continue
 
-            # ignore all else inside strings
-            if self.in_string_literal(): continue
+            # Ignore all else inside strings.
+            if self.in_string_literal():
+                continue
 
-            # if at a comment begin then nothing more to do
+            # If at a comment begin then nothing more to do.
             if char == "#": break
 
-            # update counts for general delimiters
+            # Update counts for general delimiters.
             if char == "(": self.parens += 1
             elif char == ")": self.parens -= 1
             elif char == "[": self.brackets += 1
@@ -196,8 +196,8 @@ class IndentCalc(object):
             # but the "down to zero" will work.  This could be improved, if necessary,
             # by checking whether the colon is at the end of the line (except for
             # whitespace and comments) and not incrementing in those cases.
-            if char == ":" and not self.in_paren_bracket_curly(): self.indentation_level += 3
-        return
+            if char == ":" and not self.in_paren_bracket_curly():
+                self.indentation_level += 3
 
 
 class InterpreterProcess(object):
@@ -207,6 +207,8 @@ class InterpreterProcess(object):
     recent prompt received from the interpreter."""
 
     def __init__(self, spec):
+        """Create a data record for the given interpreter, based on the
+        specification `spec`."""
         self.spec = spec
         self.most_recent_prompt = self.spec["main_prompt"]
         self.indent_calc = IndentCalc()
@@ -249,9 +251,9 @@ class InterpreterProcessCollection(object):
         Restarts the whole process.  If inset_specifier is the empty string then
         reset for all inset specifiers."""
         if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
-            buffer_name = "___dummy___" # force all to use same buffer if not set
+            buffer_name = "___dummy___" # Force all to use same buffer if not set.
         inset_specifier_list = [inset_specifier]
-        if inset_specifier == "": # do all if empty string
+        if inset_specifier == "": # Do all if empty string.
             inset_specifier_list = self.all_inset_specifiers
         for inset_specifier in inset_specifier_list:
             key = (buffer_name, inset_specifier)
@@ -263,7 +265,7 @@ class InterpreterProcessCollection(object):
     def get_interpreter_process(self, buffer_name, inset_specifier):
         """Get interpreter process, creating/starting one if one not there already."""
         if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
-            buffer_name = "___dummy___" # force all to use same buffer if not set
+            buffer_name = "___dummy___" # Force all to use same buffer if not set.
         key = (buffer_name, inset_specifier)
         if not key in self.main_dict:
             msg = "Starting interpreter for " + inset_specifier
@@ -275,6 +277,7 @@ class InterpreterProcessCollection(object):
         return self.main_dict[key]
 
     def print_start_message(self):
+        """Printed out the startup message with info on the current interpreters."""
         start_msg = "Running for " + str(self.num_specs) + \
             " possible interpreters (cell languages):\n"
         interp_str = ""
@@ -288,7 +291,7 @@ class InterpreterProcessCollection(object):
         print(start_msg)
 
 
-class ControllerLyxWithInterpreter(object):
+class ControllerOfLyxAndInterpreters(object):
     """This class is the high-level controller class which deals with user
     interactions and which manages the Lyx process and the interpreter
     processes.  The interpreter specifications are read from the module
@@ -296,6 +299,7 @@ class ControllerLyxWithInterpreter(object):
     that module is assumed to contains all the specs."""
 
     def __init__(self, clientname):
+        """Start the controller for the client `clientname`."""
 
         self.no_echo = lyxNotebook_user_settings.no_echo
         self.buffer_replace_on_batch_eval = lyxNotebook_user_settings.buffer_replace_on_batch_eval
@@ -333,7 +337,7 @@ class ControllerLyxWithInterpreter(object):
         return
 
     def server_notify_loop(self):
-        """This is the main command loop, getting commands from Lyx and executing
+        """This is the main command/event loop, getting commands from Lyx and executing
         them."""
 
         self.keymap = dict(keymap.all_commands_and_keymap) # dict mapping keys to commands
@@ -576,10 +580,6 @@ class ControllerLyxWithInterpreter(object):
                 message = "toggled prompt echo to " + str(not self.no_echo)
                 self.lyx_process.show_message(message)
 
-            elif key_action == "evaluate newlines as current cell":
-                self.evaluate_lyx_cell(just_send_newlines=True)
-                self.lyx_process.show_message("evaluated newlines as current cell")
-
             #
             # Commands to open and close cells.
             #
@@ -602,24 +602,24 @@ class ControllerLyxWithInterpreter(object):
 
             else:
                 pass # ignore command from server-notify if it is not recognized
-        return # never executed; loop forever or sys.exit
+        return # Never executed; loop forever or sys.exit.
 
     def evaluate_all_code_cells(self, init=True, standard=True):
         """Evaluate all cells.  Quits evaluation between cells if any Lyx Notebook
         command key is pressed (any key bound to server-notify).  The flags can
         be used to only evaluate certain types of cells."""
 
-        # first set up code to check between cell evals whether user wants to halt
+        # First set up code to check between cell evals whether user wants to halt.
 
-        # initialize the relevant flag in the lyxProcess class
+        # Initialize the relevant flag in the lyxProcess class.
         self.lyx_process.ignored_server_notify_event = False
-        # eat any server events from Lyx (after the NOTIFY command to do the eval)
+        # Eat any server events from Lyx (after the NOTIFY command to do the eval).
         self.lyx_process.get_server_event(info=False, error=False, notify=False)
 
-        # define a local function to check and query the user if a NOTIFY was ignored
+        # Define a local function to check and query the user if a NOTIFY was ignored.
         def check_for_ignored_server_notify():
             """Return True if a server-notify was ignored and user wants to quit."""
-            # eat all events between cell evals, and check if NOTIFY was ignored
+            # Eat all events between cell evals, and check if NOTIFY was ignored.
             self.lyx_process.get_server_event(info=False, error=False, notify=False)
             if self.lyx_process.ignored_server_notify_event:
                 msg = "Halt multi-cell evaluation at the current point?"
@@ -629,7 +629,7 @@ class ControllerLyxWithInterpreter(object):
                 self.lyx_process.ignored_server_notify_event = False
             return False
 
-        # now get cell count data and print a nice message
+        # Now get cell count data and print a nice message.
         num_init_cells, num_standard_cells, num_output_cells = \
                                             self.lyx_process.get_global_cell_info()
         print("There are", num_init_cells+num_standard_cells, "code cells:",
@@ -638,7 +638,7 @@ class ControllerLyxWithInterpreter(object):
         elif init: print("Evaluating all the Init cells only.")
         elif standard: print("Evaluating all the Standard cells only.")
 
-        # cycle through the Init cells and then the Standard cells, evaluating
+        # Cycle through the Init cells and then the Standard cells, evaluating.
         if init:
             if num_init_cells > 0:
                 self.lyx_process.goto_buffer_begin()
@@ -664,7 +664,6 @@ class ControllerLyxWithInterpreter(object):
                 self.lyx_process.goto_next_cell(output=False, init=False)
                 self.evaluate_lyx_cell()
         print("Finished multi-cell evaluation.")
-        return
 
     def batch_evaluate_all_code_cells_to_lyx_file(self, init=True, standard=True,
                                            messages=False):
@@ -672,36 +671,40 @@ class ControllerLyxWithInterpreter(object):
         to an output .lyx file.  The filename of the new file is returned."""
         # TODO: also could print nice message to terminal like in regular routine
 
-        if not init and not standard: return None
-        if init and not standard: cell_types = "Init"
-        if not init and standard: cell_types = "Standard"
-        if init and standard: cell_types = "Init and Standard"
+        if not init and not standard:
+            return None
+        if init and not standard:
+            cell_types = "Init"
+        if not init and standard:
+            cell_types = "Standard"
+        if init and standard:
+            cell_types = "Init and Standard"
 
         if messages:
             self.lyx_process.show_message("Batch evaluating all %s cells." % (cell_types,))
-        # get all cell text from the Lyx auto-save file (saves it as a side effect)
+        # Get all cell text from the Lyx auto-save file (saves it as a side effect).
         all_cells = self.lyx_process.get_all_cell_text(use_latex_export=False)
 
         # evaluate all the cells in the list (results pasted onto the cells)
         self.evaluate_list_of_cell_classes(all_cells, init=init, standard=standard,
                                        messages=messages)
 
-        # get current directory data (also changes current directory to buffer's dir)
+        # Get current directory data (also changes current directory to buffer's dir).
         current_dir_data = self.lyx_process.get_updated_lyx_directory_data()
 
-        # calc the name of the auto-save file and the new .lyx file's name
+        # Calc the name of the auto-save file and the new .lyx file's name.
         from_file_name = current_dir_data[2] # prefer auto-save file
         if from_file_name == "": from_file_name = current_dir_data[1] # buffer's file
         to_file_name = current_dir_data[3][:-4] + ".newOutput.lyx"
 
-        # create the new .lyx file from the evaluated list of cells
+        # Create the new .lyx file from the evaluated list of cells.
         self.lyx_process.replace_all_cell_text_in_lyx_file(
             from_file_name, to_file_name, all_cells, init=init, standard=standard)
 
         if messages:
             self.lyx_process.show_message(
-                "Finished batch evaluation of all %s cells, wait for any buffer updates."
-                % (cell_types,))
+                "Finished batch evaluation of all {} cells, wait for any buffer updates."
+                .format(cell_types))
         return to_file_name
 
     def evaluate_list_of_cell_classes(self, cell_list, init=True, standard=True,
@@ -736,71 +739,70 @@ class ControllerLyxWithInterpreter(object):
                 self.lyx_process.show_message("Finished Standard cell evaluations.")
         return cell_list
 
-    def evaluate_lyx_cell(self, just_send_newlines=False):
+    def evaluate_lyx_cell(self, rewrite_code_cell=True):
         """Evaluate the code cell at the current cursor position in Lyx.  Ignore if
-        not inside a code cell or in an empty cell."""
+        not inside a code cell or in an empty cell.
 
-        # get the code text from the current cell
+        Setting `rewrite_code_cells` false can be a little more efficient, but in case
+        of bugs it gives better diagnostic information."""
+
+        # Get the code text from the current cell.
         code_cell_text = self.lyx_process.get_current_cell_text()
 
         if code_cell_text is None:
             return # Not in a cell in the first place.
 
-        # check that cell is code (could just check output=None later, but do here, too)
+        # Check that cell is code (could just check output=None later, but do here, too).
         basic_type, inset_specifier_language = code_cell_text.get_cell_type()
         if basic_type == "Output":
-            return # Not a code cell or an empty cell.
+            return # Not a code cell.
 
         # TODO: optional line wrapping at the Python level (but currently works OK
         # with listings).  Currently does nothing.  Can do the same with output
         # text below, but not currently done.  Could also highlight if that
         # would display in inset and be removable for later evals.
-        code_cell_text = self.wrap_long_lines(code_cell_text) # do any line-wrapping
+        code_cell_text = self.wrap_long_lines(code_cell_text)
 
-        # do the actual code evaluation and get the output
-        output = self.evaluate_code_in_cell_class(code_cell_text, just_send_newlines)
+        # Do the actual code evaluation and get the output.
+        output = self.evaluate_code_in_cell_class(code_cell_text)
 
         #
         # Replace the old output with the new output (and maybe replace input).
         #
-
-        """
-        print("debug code list being replaced with:\n", code_cell_text)
-        print("debug end of code list being replaced with")
-        print("debug code output being replaced with:\n", output)
-        print("debug end of code output being replaced with")
-        """
 
         # Rewrite input, might be useful for wrapping or formatting.
         # Bug on rewrite with empty last line!  Empty last lines are
         # ignored by listings when saving to Latex (and sometimes in the Lyx inset).
         # Thus they are not read in correctly after having been saved, and are not
         # printed.  So perhaps better not to display them in LyX: they won't print.
-        rewrite_code_cells = True
-        if rewrite_code_cells and not just_send_newlines:
+        cursor_after_code_inset = False
+        if rewrite_code_cell:
             self.lyx_process.replace_current_cell_text(code_cell_text, assert_inside_cell=True)
-        elif not just_send_newlines:
-            # some blue selection-highlighting feedback even when text not replaced...
+        else:
+            # Some blue selection-highlighting feedback even when text not replaced.
+            # (The highlight doesn't appear when both are in the same command-sequence.)
             self.lyx_process.process_lfun("inset-select-all")
-            self.lyx_process.process_lfun("escape")
+            self.lyx_process.process_lfun("escape") # Turn off selection.
+            #cursor_after_code_inset = True # Currently doesn't work...
 
         # Note there is a bug in listings 1.3 at least: showlines=true doesn't work
         # and will not show empty lines at the end of a listings box...  Adding spaces
         # or tabs on the line does not help, workaround of redefining formfeed in
         # listings is apparently blocked by passthru Flex option.  So warn users, minor
         # bug remains.
-        # if len(output) > 0 and output[-1] == "\n": output[-1] = "\f\n"
+        # if len(output) > 0 and output[-1] == "\n":
+        #     output[-1] = "\f\n"
 
         basic_type, inset_specifier = code_cell_text.get_cell_type()
         self.lyx_process.replace_current_output_cell_text(output,
-                      assert_inside_cell=True, inset_specifier=inset_specifier)
-        return
+                      assert_inside_cell=True, inset_specifier=inset_specifier,
+                      cursor_after_code_inset=cursor_after_code_inset)
 
-    def evaluate_code_in_cell_class(self, code_cell_text, just_send_newlines=False):
-        """Evaluate the lines of code in the Cell class instance code_cell_text.
+    def evaluate_code_in_cell_class(self, code_cell_text):
+        """Evaluate the lines of code in the `Cell` instance `code_cell_text`.
         The output is returned as a list of lines, and is also pasted onto the
         code_cell_text instance as the data field evaluation_output.  Returns
-        None for a non-code cell."""
+        `None` for a non-code cell."""
 
         basic_type, inset_specifier_lang = code_cell_text.get_cell_type()
         if basic_type == "Output": # if not a code cell
@@ -821,15 +823,11 @@ class ControllerLyxWithInterpreter(object):
         if noop_at_cell_end: # doesn't run for None or "", since they eval to False
             extra_code_lines = noop_at_cell_end.splitlines(True) # keepends=True
 
-        # use another variable, to evaluate with modifications without changing original
         modified_code_cell_text = code_cell_text + extra_code_lines
-        if just_send_newlines:
-            modified_code_cell_text = ["\n", "\n"] + extra_code_lines
 
-        # loop through each line of code, evaluating it and saving the results
+        # Loop through each line of code, evaluating it and saving the results.
         output = []
         ignore_empty_lines = interpreter_spec["ignore_empty_lines"]
-        if just_send_newlines: ignore_empty_lines = False
         for code_line in modified_code_cell_text:
             #print("debug processing line:", [code_line])
             interp_result = self.process_physical_code_line(
@@ -854,11 +852,12 @@ class ControllerLyxWithInterpreter(object):
         prompt to the first command on the list, and saves the last line of the
         list as the new most recently saved prompt (to prepend next time).  Any
         autoindenting after prompts is stripped off."""
-        if len(interp_result) == 0: return
+        if len(interp_result) == 0:
+            return
         interp_result[0] = interpreter_process.most_recent_prompt + interp_result[0]
         most_recent_prompt = interp_result[-1]
-        # remove any autoindent from most_recent_prompt; note main and continuation
-        # prompts might have different lengths (though they usually do not)
+        # Remove any autoindent from most_recent_prompt; note main and continuation
+        # prompts might have different lengths (though they usually do not).
         if most_recent_prompt.find(interpreter_process.spec["main_prompt"]) == 0:
             interpreter_process.most_recent_prompt = interpreter_process.spec["main_prompt"]
             #print("debug replaced a main prompt")
@@ -890,64 +889,64 @@ class ControllerLyxWithInterpreter(object):
             if not indent_calc.in_string_literal():
                 return []
 
-        # update the indentation calculations for current physical line
+        # Update the indentation calculations for current physical line.
         indent_calc.update_for_physical_line(code_line)
 
-        # send a completely empty line if the indentation level decreased to zero
-        # (uses a recursive function call which does not ignore_empty_lines)
+        # Send a completely empty line if the indentation level decreased to zero
+        # (uses a recursive function call which does not ignore_empty_lines).
         first_results = []
         if interp_spec["indent_down_to_zero_newline"] and indent_calc.indent_level_down_to_zero():
             first_results = self.process_physical_code_line(interpreter_process, "\n",
                                                         ignore_empty_lines=False)
 
-        # send the line of code to the interpreter
+        # Send the line of code to the interpreter.
         interpreter_process.external_interp.write(code_line)
 
-        # get the result of interpreting the line
+        # Get the result of interpreting the line.
         interp_result = interpreter_process.external_interp.read()
         interp_result = interp_result.splitlines(True) # keepends=True
 
-        # if the final prompt was a main prompt, not continuation, reset indent counts
+        # If the final prompt was a main prompt, not continuation, reset indent counts.
         if (len(interp_result) > 0
                 and interp_result[-1].rstrip() == interp_spec["main_prompt"].rstrip()
                 and interp_result[-1].find(interp_spec["main_prompt"]) == 0):
             indent_calc.reset()
 
-        # update the prompts (to remove final prompt and put prev prompt at beginning)
+        # Update the prompts (to remove final prompt and put prev prompt at beginning).
         interp_result = self.update_prompts(interp_result, interpreter_process)
 
-        # if spec removeNewlineBeforePrompt is True and last line is empty, remove it
+        # If spec removeNewlineBeforePrompt is True and last line is empty, remove it.
         if len(interp_result) > 0 and interp_spec["del_newline_pre_prompt"]:
             if interp_result[-1].strip() == "":
                 interp_result = interp_result[:-1]
 
-        # return the output, suppressing the first line if echo off
+        # Return the output, suppressing the first line if echo off
         # (note we're processing a physical line here, so the first line always
         # contains a prompt; even continued lines with no output have a prompt
-        # line at the beginning)
+        # line at the beginning).
         if self.no_echo and len(interp_result) > 0:
             return first_results + interp_result[1:]
         else:
             return first_results + interp_result
 
     def wrap_long_lines(self, line_list):
-        """A stub, which later can be used to do line-wrapping on long lines,
-        or modified and renamed to do any sort of processing or formatting."""
+        """A stub which later can be used to do line-wrapping on long lines,
+        or modified (and renamed) to do any sort of processing or formatting."""
         return line_list
 
     def replace_current_buffer_file(self, newfile, reload_buffer=True, messages=True):
         """Replace the current buffer file with the file newfile, saving
         a backup of the old file.  If reload_buffer=True then the Lyx buffer is
         reloaded."""
-        # write out buffer if it is unsaved, before copying to backup file
+        # Write out buffer if it is unsaved, before copying to backup file.
         self.lyx_process.process_lfun("buffer-write", warn_error=False)
 
-        # get the basic data
+        # Get the basic data.
         dir_data = self.lyx_process.get_updated_lyx_directory_data(
                                                               auto_save_update=False)
         num_backup_buffer_copies = lyxNotebook_user_settings.num_backup_buffer_copies
 
-        # move the older save files down the list to make room
+        # Move the older save files down the list to make room.
         for save_num in range(num_backup_buffer_copies-1, 0, -1):
             older = ".LyxNotebookSave" + str(save_num) + "_" + dir_data[1]
             newer = ".LyxNotebookSave" + str(save_num-1) + "_" + dir_data[1]
@@ -956,7 +955,7 @@ class ControllerLyxWithInterpreter(object):
                     os.remove(older)
                 os.rename(newer, older)
 
-        # wait for the buffer-write command started above to finish before final move
+        # Wait for the buffer-write command started above to finish before final move.
         prev_mtime = 0
         while True:
             mtime = os.stat(os.path.join(dir_data[0], dir_data[1])).st_mtime
@@ -970,7 +969,7 @@ class ControllerLyxWithInterpreter(object):
             else:
                 break
 
-        # variable newer should have ended up at save file 0, so move buffer to that
+        # Variable newer should have ended up at save file 0, so move buffer to that.
         if os.path.exists(newer):
             os.remove(newer)
         os.rename(dir_data[1], newer)
@@ -981,17 +980,17 @@ class ControllerLyxWithInterpreter(object):
         if messages:
             self.lyx_process.show_message(
             "Replaced current buffer with newly evaluated output cells.")
-        return
 
     def reload_buffer_file(self, dont_ask_first=True):
         """Reload the current buffer file.  If `dont_ask_first` is true a method is used
         which simply does the reload without asking the user."""
         if dont_ask_first:
+            # TODO: Try replacing this with `buffer-reload dump` which doesn't ask.
             # This command does not ask and always reloads:
             self.lyx_process.process_lfun("vc-command", 'R $$p "/bin/echo reloading..."')
             # TODO: Bug if we do not modify file and write it back out as below!  Why?
             # Cells are not read back in right, otherwise, until a save is done.
-            self.lyx_process.process_lfun("command-sequence",
+            self.lyx_process.process_lfun("command-sequence", argument=
                                           "self-insert x;char-delete-backward;buffer-write")
         else:
             # This LFUN will ask the user before reloading:
@@ -999,7 +998,7 @@ class ControllerLyxWithInterpreter(object):
 
     def revert_to_most_recent_batch_eval_backup(self, messages=False):
         """Revert the most recently saved batch backup file to be current buffer."""
-        # get basic data, autosaving as last resort in case this makes things worse
+        # Get basic data, autosaving as last resort in case this makes things worse.
         dir_data = self.lyx_process.get_updated_lyx_directory_data(auto_save_update=True)
         num_backup_buffer_copies = lyxNotebook_user_settings.num_backup_buffer_copies
 
@@ -1029,7 +1028,7 @@ class ControllerLyxWithInterpreter(object):
         os.remove(current_buffer_full)
         os.rename(most_recent_backup_full, current_buffer_full)
 
-        # shift down all the older backups
+        # Shift down all the older backups.
         for save_num in range(1, num_backup_buffer_copies):
             older = ".LyxNotebookSave" + str(save_num) + "_" + dir_data[1]
             newer = ".LyxNotebookSave" + str(save_num-1) + "_" + dir_data[1]
@@ -1043,6 +1042,4 @@ class ControllerLyxWithInterpreter(object):
             msg += " save file."
             self.lyx_process.show_message(msg)
             print(msg)
-        return
-
 

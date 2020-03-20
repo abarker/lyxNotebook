@@ -11,7 +11,7 @@ Copyright (c) 2012 Allen Barker
 
 This script runs the Lyx Notebook program.  It mainly checks to make sure
 that there is no other active Lyx Notebook process running, and if not then
-it launches an instance of the main `ControllerLyxWithInterpreter` class.
+it launches an instance of the main `ControllerOfLyxAndInterpreters` class.
 
 This program should always be run from the Lyx Notebook source directory, so it
 can find the path to that directory.  The variable
@@ -36,7 +36,7 @@ lyxNotebook_user_settings.lyx_notebook_source_dir = lyx_notebook_source_dir
 os.chdir(lyx_notebook_source_dir) # Makes relatives paths work in user_settings.
 
 # Do below import *after* the calculations above, since implicitly import process_interpreter_specs
-from .controller_of_lyx_and_interpreters import ControllerLyxWithInterpreter
+from .controller_of_lyx_and_interpreters import ControllerOfLyxAndInterpreters
 
 # Set the lockfile location to be in the user's local Lyx directory.
 user_home_lyx_directory = lyxNotebook_user_settings.user_home_lyx_directory
@@ -80,5 +80,5 @@ def main():
     print("Version from source directory:\n   ",
           lyxNotebook_user_settings.lyx_notebook_source_dir)
 
-    controller = ControllerLyxWithInterpreter("lyxNotebookClient")
+    controller = ControllerOfLyxAndInterpreters("lyxNotebookClient")
 
