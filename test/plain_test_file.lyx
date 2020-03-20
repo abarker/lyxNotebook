@@ -192,19 +192,23 @@ x
 status open
 
 \begin_layout Plain Layout
+
 " A string test È¢"
 \end_layout
 
 \begin_layout Plain Layout
+
 print("Standard cell")
 \end_layout
 
 \begin_layout Plain Layout
+
 print("Another line")
 \end_layout
 
 \begin_layout Plain Layout
 
+ 
 \end_layout
 
 \end_inset
