@@ -27,8 +27,6 @@ in the latter case we run the program in a new terminal window.
 
 """
 
-# TODO: Results are different under Python3 and Python2 for some reason...
-
 # TODO: Consider if using the sys.stdin.isatty() function would be helpful, and
 # similarly for sys.stdout.isatty().  sys.stdin and sys.stdout are file objects.
 # https://docs.python.org/2.4/lib/bltin-file-objects.html
@@ -41,7 +39,7 @@ import subprocess
 import os
 import sys
 import platform
-from . import lyxNotebook_user_settings
+from .config_file_processing import config_dict
 
 python_version = platform.python_version_tuple()
 
@@ -49,15 +47,11 @@ python_version = platform.python_version_tuple()
 # is run.  If this process is not found then an xterm will be opened (so setting
 # this to some "wrong" string will force an xterm to open rather than using the
 # Lyx process' tty for writing output).
-lyx_command_string = lyxNotebook_user_settings.lyx_command_string
-always_start_new_terminal = lyxNotebook_user_settings.always_start_new_terminal
-
-# Get path of the source dir from calling command for this script.
-lyx_notebook_source_dir = os.path.dirname(__file__)
-os.chdir(lyx_notebook_source_dir) # Make relative paths work in user_settings file.
+lyx_command_string = config_dict["lyx_command_string"]
+always_start_new_terminal = config_dict["always_start_new_terminal"]
 
 my_PID = os.getpid()
-my_CWD = os.getcwd()
+my_CWD = os.getcwd() # This can probably be eliminated... TODO.
 operating_system_platform = sys.platform
 
 # Utility function to get command output, for portability and future development.
@@ -189,7 +183,8 @@ def main(script_run_command):
                 ["xterm -e 'cd {} ; {}'".format(my_CWD, script_run_command)],
                 shell=True)
         else:
-            pass # later add terminal for other platforms
+            raise NotImplementedError("Only Linux is currently supported...")
     else: # got a unique terminal associated with current process or Lyx process
         proc = subprocess.Popen(["{} >{} 2>&1".format(script_run_command, terminal)], shell=True)
+
 

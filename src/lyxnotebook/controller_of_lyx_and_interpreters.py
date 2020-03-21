@@ -36,7 +36,7 @@ import os
 import time
 
 from . import gui_elements as gui
-from . import lyxNotebook_user_settings
+from .config_file_processing import config_dict
 from .lyx_server_API_wrapper import InteractWithLyxCells
 from .external_interpreter import ExternalInterpreter
 from . import process_interpreter_specs # Specs for all implemented interpreters.
@@ -221,7 +221,7 @@ class InterpreterProcessCollection:
     `InterpreterProcess` class instances.  Starts processes when necessary."""
 
     def __init__(self, current_buffer):
-        if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
+        if not config_dict["separate_interpreters_for_each_buffer"]:
             current_buffer = "___dummy___" # force all to use same buffer if not set
         self.interpreter_spec_list = [specName.params
                                     for specName in process_interpreter_specs.all_specs]
@@ -249,7 +249,7 @@ class InterpreterProcessCollection:
         """Reset the interpreter for inset_specifier cells for buffer buffer_name.
         Restarts the whole process.  If inset_specifier is the empty string then
         reset for all inset specifiers."""
-        if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
+        if not config_dict["separate_interpreters_for_each_buffer"]:
             buffer_name = "___dummy___" # Force all to use same buffer if not set.
         inset_specifier_list = [inset_specifier]
         if inset_specifier == "": # Do all if empty string.
@@ -263,12 +263,12 @@ class InterpreterProcessCollection:
 
     def get_interpreter_process(self, buffer_name, inset_specifier):
         """Get interpreter process, creating/starting one if one not there already."""
-        if not lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
+        if not config_dict["separate_interpreters_for_each_buffer"]:
             buffer_name = "___dummy___" # Force all to use same buffer if not set.
         key = (buffer_name, inset_specifier)
         if key not in self.main_dict:
             msg = "Starting interpreter for " + inset_specifier
-            if lyxNotebook_user_settings.separate_interpreters_for_each_buffer:
+            if config_dict["separate_interpreters_for_each_buffer"]:
                 msg += ", for buffer:\n   " + buffer_name
             print(msg)
             self.main_dict[key] = InterpreterProcess(
@@ -300,8 +300,8 @@ class ControllerOfLyxAndInterpreters:
     def __init__(self, clientname):
         """Start the controller for the client `clientname`."""
 
-        self.no_echo = lyxNotebook_user_settings.no_echo
-        self.buffer_replace_on_batch_eval = lyxNotebook_user_settings.buffer_replace_on_batch_eval
+        self.no_echo = config_dict["no_echo"]
+        self.buffer_replace_on_batch_eval = config_dict["buffer_replace_on_batch_eval"]
 
         # Set up interactions with Lyx.
         self.clientname = clientname
@@ -828,8 +828,8 @@ class ControllerOfLyxAndInterpreters:
             #print("debug result of line:", [interp_result])
             output = output + interp_result # get the result, per line
 
-        if len(output) > lyxNotebook_user_settings.max_lines_in_output_cell:
-            output = output[:lyxNotebook_user_settings.max_lines_in_output_cell]
+        if len(output) > config_dict["max_lines_in_output_cell"]:
+            output = output[:config_dict["max_lines_in_output_cell"]]
             output.append("<<< WARNING: Lines truncated by LyX Notebook. >>>""")
 
         if not self.no_echo and interpreter_spec["prompt_at_cell_end"]:
@@ -936,7 +936,7 @@ class ControllerOfLyxAndInterpreters:
         # Get the basic data.
         dir_data = self.lyx_process.get_updated_lyx_directory_data(
                                                               auto_save_update=False)
-        num_backup_buffer_copies = lyxNotebook_user_settings.num_backup_buffer_copies
+        num_backup_buffer_copies = config_dict["num_backup_buffer_copies"]
 
         # Move the older save files down the list to make room.
         for save_num in range(num_backup_buffer_copies-1, 0, -1):
@@ -993,7 +993,7 @@ class ControllerOfLyxAndInterpreters:
         """Revert the most recently saved batch backup file to be current buffer."""
         # Get basic data, autosaving as last resort in case this makes things worse.
         dir_data = self.lyx_process.get_updated_lyx_directory_data(auto_save_update=True)
-        num_backup_buffer_copies = lyxNotebook_user_settings.num_backup_buffer_copies
+        num_backup_buffer_copies = config_dict["num_backup_buffer_copies"]
 
         most_recent_backup = ".LyxNotebookSave0_" + dir_data[1]
         most_recent_backup_full = os.path.join(dir_data[0], most_recent_backup)

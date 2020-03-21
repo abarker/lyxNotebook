@@ -112,7 +112,7 @@ import datetime
 import getpass
 import random
 import string # just for generating random filenames
-from . import lyxNotebook_user_settings
+from .config_file_processing import config_dict
 from . import gui_elements as gui
 
 # This file is repeatedly written temporarily to current dir, then deleted.
@@ -273,9 +273,9 @@ class InteractWithLyxCells:
         user_name = getpass.getuser()
         self.local_latex_filename = "zzzTmpTmp_"+user_name+"_LyxNotebook_TmpTmp.tex"
 
-        lyx_server_pipe = lyxNotebook_user_settings.lyx_server_pipe
+        lyx_server_pipe = config_dict["lyx_server_pipe"]
         self.lyx_server_pipe = os.path.abspath(os.path.expanduser(lyx_server_pipe))
-        lyx_temporary_directory = lyxNotebook_user_settings.lyx_temporary_directory
+        lyx_temporary_directory = config_dict["lyx_temporary_directory"]
         self.lyx_temporary_directory = os.path.abspath(
             os.path.expanduser(lyx_temporary_directory))
 
@@ -298,7 +298,7 @@ class InteractWithLyxCells:
         if not self.lyx_named_pipes_exist():
             print("No LyX process running (nonexistent lyxpipe file).")
             print("Start up LyX and try again.  If LyX is running, check the")
-            print("lyxpipe settings in LyX and in lyxNotebook_user_settings.py.")
+            print("lyxpipe settings in LyX and in the lyxnotebook.cfg file.")
             print()
             time.sleep(4) # pause a few seconds so xterm window displays are readable
             sys.exit(1)
@@ -317,7 +317,7 @@ class InteractWithLyxCells:
         # Magic cookie initializations.
 
         # Magic cookies CANNOT contain ";" or the command-sequence LFUN will fail.
-        self.magic_cookie = lyxNotebook_user_settings.magic_cookie_string
+        self.magic_cookie = config_dict["magic_cookie_string"]
 
         # not all of these LFUN strings are currently used, but they may be at some time
         self.del_cookie_forward_command = "repeat {} char-delete-forward;"
@@ -964,7 +964,7 @@ class InteractWithLyxCells:
         if also_noncell:
             cell_list.append("".join(text_between_cells))
 
-        has_inset_edit = lyxNotebook_user_settings.has_inset_edit
+        has_inset_edit = config_dict["has_inset_edit"]
         if (has_inset_edit and cookie_lines_total > 0) or cookie_lines_total > 1:
             gui.text_info_popup("Warning: Multiple cookies were found in the file.\n\n"
                                 "This can cause problems with cell-goto operations.")
@@ -1133,8 +1133,8 @@ class InteractWithLyxCells:
         if not self.inside_cell() or self.inside_empty_cell(assert_inside_cell=True):
             return None # return None if not in a cell or empty cell
 
-        has_inset_edit_noeditor_mod = lyxNotebook_user_settings.has_inset_edit_noeditor_mod
-        has_inset_edit = lyxNotebook_user_settings.has_inset_edit
+        has_inset_edit_noeditor_mod = config_dict["has_inset_edit_noeditor_mod"]
+        has_inset_edit = config_dict["has_inset_edit"]
 
         if has_inset_edit and has_inset_edit_noeditor_mod:
             # TODO: Later maybe implement searching for the file from unmodified inset-edit.

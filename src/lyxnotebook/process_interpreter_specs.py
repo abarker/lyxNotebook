@@ -80,8 +80,7 @@ of different interpreters.
 
 import os
 import sys
-from . import lyxNotebook_user_settings # in case any of these settings are needed
-
+from .config_file_processing import config_dict
 from .interpreter_specs.spec_record import SpecRecord # TODO:  delete when all moved...
 
 all_specs = [] # the list of all defined specs; each section should append to it
@@ -119,7 +118,7 @@ all_specs.append(R)
 # auxiliaryFilesForInterpreters.  This bashrc file sources the usual ~/.bashrc
 # (if it exists and is readable) but then redefines the prompt strings to the
 # values which are set in the spec below.
-bashrc_file = os.path.join(lyxNotebook_user_settings.lyx_notebook_source_dir,
+bashrc_file = os.path.join(config_dict["lyx_notebook_source_dir"],
                           "auxiliaryFilesForInterpreters", "lyxNotebookBashrc")
 
 bash = SpecRecord()

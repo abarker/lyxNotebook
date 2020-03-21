@@ -11,7 +11,7 @@ Copyright (c) 2012 Allen Barker
 
 This program automates the install and setup process.
 
-The user's home Lyx directory is read from `lyxNotebook_user_settings.py` (the
+The user's home Lyx directory is read from `lyxnotebook.cfg` (the
 directory is assumed by default to be `~/.lyx`, but that file can be modified).
 
 The bind files `userCustomizableKeyBindings.bind` and `lyxNotebookKeyBindings.bind`
@@ -42,7 +42,7 @@ from os import path
 import platform
 import tempfile
 import PySimpleGUI as sg
-from . import lyxNotebook_user_settings
+from .config_file_processing import config_dict
 from .generate_module_files_from_template import generate_files_from_templates
 from .gui_elements import get_path_popup, yesno_popup, text_info_popup
 
@@ -178,7 +178,7 @@ def run_setup(lyxNotebook_run_script_path):
     source_dir = find_source_directory()
     os.chdir(source_dir) # So the relevant directories can be located.
 
-    user_home_lyx_directory_original = lyxNotebook_user_settings.user_home_lyx_directory
+    user_home_lyx_directory_original = config_dict["user_home_lyx_directory"]
     user_home_lyx_directory = path.abspath(path.expanduser(user_home_lyx_directory_original))
 
     setup_key_binding_files(user_home_lyx_directory, source_dir,
@@ -198,14 +198,14 @@ def run_setup(lyxNotebook_run_script_path):
                ~/.lyx/userCustomizableKeyBindings
           in the "Bind file" box on the top right; enter it WITHOUT any .bind suffix.
           (Modify the above in the obvious way if ~/.lyx is not your home Lyx directory;
-          in this case you'll also need to modify a line in lyxNotebook_user_settings.py.)
+          in this case you'll also need to modify a line in the lyxnotebook.cfg file.)
 
        3) While still in the preferences menu, check
                Tools > Preferences > Paths
           and make sure that the "LyXServer pipe" setting is ~/.lyx/lyxpipe (replacing
           ~/.lyx with your home Lyx directory if it is different).  You can use some
           other setting, but in that case you'll also need to modify a line in
-          lyxNotebook_user_settings.py.
+          the lyxnotebook.cfg file.
 
        3) Select the menu item
                Tools > Reconfigure
