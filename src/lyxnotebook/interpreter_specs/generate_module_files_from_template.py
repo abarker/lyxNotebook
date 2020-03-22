@@ -26,7 +26,7 @@ import os
 # The interpreterSpecs module is loaded because it contains the string defining
 # the Listings formatting language for each type of interpreter it defines.
 from .process_interpreter_specs import all_specs
-
+from ..config_file_processing import config_dict
 
 # =============================================================
 # Define the basic template for the header of the .module file.
@@ -46,7 +46,8 @@ module_header_template_common = \
 # Modifications can be made, but they will be overwritten if it is run again.
 
 #Format 21
-Format 80
+Format 66
+#Format 80
 
 Requires "listings,verbatim,ifthen,color,marginnote,needspace,graphicx,setspace,textcomp"
 
@@ -155,7 +156,7 @@ InsetLayout Flex:LyxNotebookCell:<<basic_cell_type>>:<<inset_specifier>>
    ForceLTR             true # not sure why, but similar modules set it
    MultiPar             true
    ForcePlain           true # force Plain Layout, so user cannot change
-   EditExternal         true # enable inset-edit to work
+   <<EditExternalTag>>
    # custompars false stops blue highlighting on update, inset-select-all still works
    # CustomPars           false # cannot use "paragraph settings" dialog inside inset
    #
@@ -275,6 +276,7 @@ InsetLayout Flex:LyxNotebookCell:<<basic_cell_type>>:<<inset_specifier>>
 End
 """
 
+
 # ===========================================
 # Define the basic template for Output cells.
 # ===========================================
@@ -302,7 +304,7 @@ InsetLayout Flex:LyxNotebookCell:Output:<<inset_specifier>>
    ForceLTR             true # not sure why, but similar modules set it
    MultiPar             true
    ForcePlain           true # force Plain Layout, so user cannot change
-   EditExternal         true # enable inset-edit to work
+   <<EditExternalTag>>
    # custompars false stops blue highlighting on update, inset-select-all still works
    # CustomPars           false # cannot use "paragraph settings" dialog inside inset
    #
@@ -414,7 +416,8 @@ listings_with_small_font = \
 # Modifications can be made, but they will be overwritten if it is run again.
 
 #Format 21
-Format 80
+Format 66
+#Format 80
 
 Requires "listings"
 
@@ -437,6 +440,11 @@ End
 # Generate the files from the templates
 # ==========================================================================
 #
+
+# This tag is new in 4.0.  Left out unless config file has_edit_external is true.
+edit_external_tag = "   EditExternal         true # enable inset-edit to work"
+has_inset_edit = config_dict["has_inset_edit"]
+edit_external_tag = edit_external_tag if has_inset_edit else ""
 
 def generate_module_files_from_templates(dirname):
     """Generate files, in the directory `dirname`."""
@@ -492,6 +500,8 @@ def generate_module_files_from_templates(dirname):
         head += preamble_latex_code + module_header_template_end
 
         # replace meta-vars in standard template
+        standard = standard.replace("<<EditExternalTag>>", edit_external_tag)
+        standard = standard.replace("<<triple_quote>>", "\"\"\"")
         standard = standard.replace("<<triple_quote>>", "\"\"\"")
         standard = standard.replace("<<inset_specifier>>", inset_specifier)
         standard = standard.replace("<<prog_name>>", prog_name)
@@ -501,6 +511,7 @@ def generate_module_files_from_templates(dirname):
 
         # Replace meta-vars in init template.
         # init cells are currently identical to standard cells except for the frame spec
+        init = init.replace("<<EditExternalTag>>", edit_external_tag)
         init = init.replace("<<triple_quote>>", "\"\"\"")
         init = init.replace("<<inset_specifier>>", inset_specifier)
         init = init.replace("<<prog_name>>", prog_name)
@@ -509,6 +520,7 @@ def generate_module_files_from_templates(dirname):
         init = init.replace("<<basic_cell_type>>", "Init")
 
         # Replace meta-vars in output template.
+        output = output.replace("<<EditExternalTag>>", edit_external_tag)
         output = output.replace("<<inset_specifier>>", inset_specifier)
         output = output.replace("<<prog_name>>", prog_name)
         output = output.replace("<<basic_cell_type>>", "Output")
