@@ -16,7 +16,9 @@ def run_lyxnotebook():
     """Run LyxNotebook in the ordinary way from a terminal."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--install", action="store_true", help=
-                        "Install files in the Lyx directory specified in user_settings file.")
+                  "Install files in the Lyx directory specified in user_settings file.")
+    #parser.add_argument("--cfg-path", num_args=1, help=
+    #                    "Pass in the path to the config file to use.")
     args = parser.parse_args()
 
     if args.install:
@@ -31,6 +33,11 @@ def run_lyxnotebook():
 def run_lyxnotebook_from_LFUN():
     """Run LyxNotebook from a Lyx LFUN.  This requires associating it with a terminal
     if it is not already associated with one."""
+    parser = argparse.ArgumentParser()
+    #parser.add_argument("--cfg-path", num_args=1, help=
+    #                    "Pass in the path to the config file to use.")
+    args = parser.parse_args()
+
     from . import run_lyxnotebook_from_LFUN
     run_lyxnotebook_from_LFUN.main("lyxnotebook") # Pass regular script name to call after setup.
 
