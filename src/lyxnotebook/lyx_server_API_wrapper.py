@@ -317,10 +317,17 @@ class InteractWithLyxCells:
 
         # Magic cookies CANNOT contain ";" or the command-sequence LFUN will fail.
         self.magic_cookie = config_dict["magic_cookie_string"]
+        cookie_len = len(self.magic_cookie)
 
-        # not all of these LFUN strings are currently used, but they may be at some time
-        self.del_cookie_forward_command = "repeat {} char-delete-forward;"
-        self.del_cookie_backward_command = "repeat {} char-delete-backward;"
+        #self.del_cookie_forward_string = ""
+        #self.del_cookie_backward_string = ""
+        #self.back_cookie_string = ""
+        #for i in range(0, len(self.magic_cookie)):
+        #    self.del_cookie_forward_string += "char-delete-forward;"
+        #    self.del_cookie_backward_string += "char-delete-backward;"
+        #    self.back_cookie_string += "char-left;"
+        self.del_cookie_forward_command = "repeat {} char-delete-forward;".format(cookie_len)
+        self.del_cookie_backward_command = "repeat {} char-delete-backward;".format(cookie_len)
 
     def set_magic_cookie(self, string):
         """Set the magic cookie value.  A convenience function, instead of just
@@ -690,20 +697,23 @@ class InteractWithLyxCells:
         are known to hold.  For undo to be sufficient, no intermediate actions can
         have been taken which count as changes to undo."""
         if assert_cursor_at_cookie_end:
-            return self.process_lfun("word-delete-backward")
+            # Safer to not assume what a "word" is with arbitrary cookie settings...
+            #return self.process_lfun("word-delete-backward")
+            return self.process_lfun("command-sequence", argument=self.del_cookie_backward_command)
         if not assert_inside_cell and not self.inside_cell():
             return None # We're not even in a cell.
         if on_current_line:
             self.process_lfun("line-begin")
         else:
             self.goto_cell_begin(assert_inside_cell=True)
-        self.process_lfun("command-sequence", self.del_cookie_forward_command)
+        self.process_lfun("command-sequence", argument=self.del_cookie_forward_command)
 
     def insert_magic_cookie_inside_forall(self, cell_type="Flex:LyxNotebookCell"):
         """Inserts the cookie inside all the selected insets, as beginning chars."""
-        # to insert cookies before cells, not inside, just remove the char-right
+        # Note that the "char-right" enters the inset.  The line-begin is important
+        # in some cases (a cell starting with 'import', for example), not sure why.
         return self.process_lfun("inset-forall",
-                 cell_type+" command-sequence char-right ; self-insert "+self.magic_cookie)
+                 cell_type+" command-sequence char-right;line-begin;self-insert "+self.magic_cookie)
 
     def delete_magic_cookie_inside_forall(self, cell_type="Flex:LyxNotebookCell"):
         """Deletes the magic cookie from all insets, assumed inside at beginning."""
@@ -713,8 +723,10 @@ class InteractWithLyxCells:
         # whole file?  Could do that before any operations and then afterwards to
         # avoid errors due to cookies left after errors.  LyX 2.0 now has
         # advanced search; look into that and any useful lfuns.
-        return self.process_lfun("inset-forall",
-                   cell_type+" command-sequence char-right;"+self.del_cookie_forward_command)
+        return self.process_lfun("inset-forall", argument=
+                # Safer to not assume what a "word" is with arbitrary cookie settings...
+                #cell_type+" command-sequence char-right;word-delete-forward")
+                cell_type+" command-sequence char-right;"+self.del_cookie_forward_command)
 
     def search_next_cookie(self):
         """Search for (goto) the next cookie in the buffer."""
