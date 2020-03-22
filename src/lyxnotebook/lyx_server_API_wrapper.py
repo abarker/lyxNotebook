@@ -1140,7 +1140,8 @@ class InteractWithLyxCells:
             # know the language associated with the current cell.  We will compare
             # text.
             all_cells = self.get_all_cell_text(use_latex_export=use_latex_export,
-                                               also_noncell=True) # DEBUG XXX
+                                               also_noncell=False) # DEBUG XXX
+            """
             with open("zzzzz_lyxnotebook_tmp_debug.lyxnotebook", "w") as f:
                 for i in all_cells: # DEBUG XXX
                     if isinstance(i, str):
@@ -1148,6 +1149,7 @@ class InteractWithLyxCells:
                     else:
                         print(i, "\n\n", end="", sep="", file=f) # DEBUG
             all_cells = [c for c in all_cells if not isinstance(c, str)] # DEBUG XXX
+            """
 
             # Get the text from the current cell.
             # Note below, we cannot enter cells with open edits, anyway...
