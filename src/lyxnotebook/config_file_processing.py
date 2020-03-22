@@ -41,7 +41,8 @@ def initialize_config_data():
     config_dict["lyx_notebook_source_dir"] = lyx_notebook_source_dir
 
     config_file_path = os.path.join(lyx_notebook_source_dir, # TODO: Search locations, see below.
-                                    "default_config_file.ini")
+                                    "default_config_file_and_data_files",
+                                    "default_config_file.cfg")
 
     if not os.path.isfile(config_file_path):
         raise IOError("Config file '{}' does not exist.".format(config_file_path))
@@ -103,7 +104,7 @@ def find_and_load_config_file():
         except IOError:
             pass
 
-#initialize_config_data("default_config_file.ini")
+#initialize_config_data("default_config_file.cfg")
 #print(config_dict)
 
 # General config parser reminder examples.

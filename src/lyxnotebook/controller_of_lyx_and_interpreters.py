@@ -38,7 +38,7 @@ from . import gui_elements as gui
 from .config_file_processing import config_dict
 from .lyx_server_API_wrapper import InteractWithLyxCells
 from .external_interpreter import ExternalInterpreter
-from . import process_interpreter_specs # Specs for all implemented interpreters.
+from .interpreter_specs import process_interpreter_specs # Specs for all implemented interpreters.
 from . import keymap # The current mapping of keys to Lyx Notebook functions.
 
 

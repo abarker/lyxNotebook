@@ -29,9 +29,13 @@ with open(os.path.join("src", "lyxnotebook", "__init__.py")) as f:
 
 # Paths to data files, relative to the main package directory.
 lyxnotebook_bindings = os.path.join(
-               "templates_for_dot_lyx_dir_bind_files", "lyxNotebookKeyBindings.template")
+               "templates_for_bind_files", "lyxNotebookKeyBindings.template")
 user_customizable_bindings = os.path.join(
-               "templates_for_dot_lyx_dir_bind_files", "userCustomizableKeyBindings.template")
+               "templates_for_bind_files", "userCustomizableKeyBindings.template")
+default_config_file = os.path.join(
+               "default_config_file_and_data_files", "default_config_file.cfg")
+bashrc_file = os.path.join(
+               "default_config_file_and_data_files", "lyxNotebookBashrc.bash")
 
 package_dir = {"": "src"} # Note src isn't used in later dotted package paths, set here!
 packages = find_packages("src") # Finds submodules (otherwise need explicit listing).
@@ -52,8 +56,8 @@ setup(
     install_requires=["wheel", "PySimpleGUI>=4.16.0"],
     url="https://github.com/abarker/lyxNotebook",
     entry_points = {
-         "console_scripts": ["lyxnotebook = lyxnotebook.entry_points:run_lyxNotebook",
-                             "lyxnotebook-from-lfun = lyxnotebook.entry_points:run_lyxNotebook_from_LFUN",]
+         "console_scripts": ["lyxnotebook = lyxnotebook.entry_points:run_lyxnotebook",
+                             "lyxnotebook-from-lfun = lyxnotebook.entry_points:run_lyxnotebook_from_LFUN",]
         },
     #scripts=['bin/funniest-joke'],
     license="GPL",
@@ -90,7 +94,8 @@ setup(
     author_email="Allen.L.Barker@gmail.com",
 
     #include_package_data=True, # Not set True when package_data is set.
-    package_data={"lyxnotebook":[lyxnotebook_bindings, user_customizable_bindings]},
+    package_data={"lyxnotebook":[lyxnotebook_bindings, user_customizable_bindings,
+                                 default_config_file, bashrc_file]},
     zip_safe=False,
 
     # Automated stuff below

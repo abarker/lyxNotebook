@@ -42,7 +42,7 @@ import platform
 import tempfile
 import PySimpleGUI as sg
 from .config_file_processing import config_dict
-from .generate_module_files_from_template import generate_files_from_templates
+from .interpreter_specs.generate_module_files_from_template import generate_module_files_from_templates
 from .gui_elements import get_path_popup, yesno_popup, text_info_popup
 
 python_version = platform.python_version_tuple()
@@ -73,7 +73,7 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
 
     # Process the user-modifiable bind file to load the path of the Lyx Notebook bindings.
     bind_template_pathname = path.join(
-        source_dir, "templates_for_dot_lyx_dir_bind_files", "userCustomizableKeyBindings.template")
+        source_dir, "templates_for_bind_files", "userCustomizableKeyBindings.template")
     with open(bind_template_pathname, "r") as bind_template:
         bind_contents_str = bind_template.read()
     bind_contents_str = bind_contents_str.replace("<<user_home_lyx_directory>>",
@@ -109,7 +109,7 @@ def setup_key_binding_files(user_home_lyx_directory, source_dir,
 
     # Process the Lyx Notebook bind file to contain the path of the user's source directory.
     bind_template_pathname = path.join(
-        source_dir, "templates_for_dot_lyx_dir_bind_files", "lyxNotebookKeyBindings.template")
+        source_dir, "templates_for_bind_files", "lyxNotebookKeyBindings.template")
     with open(bind_template_pathname, "r") as bind_template:
         bind_contents_str = bind_template.read()
     bind_contents_str = bind_contents_str.replace("<<lyxNotebook_run_script_path>>",
@@ -142,6 +142,7 @@ def setup_module_files(user_home_lyx_directory, source_dir):
     """Generate the .module files and copy to `user_home_lyx_directory`"""
     # Go to the directory for .module files.
     #tmp_modules_dir = path.join(source_dir, "files_for_dot_lyx_layouts_dir")
+    prev_dir = os.curdir
     with tempfile.TemporaryDirectory() as tmp_modules_dir:
         os.chdir(tmp_modules_dir)
 
@@ -155,7 +156,7 @@ def setup_module_files(user_home_lyx_directory, source_dir):
         #        os.remove(installed)
 
         # Regenerate all the .module files, in case the user changed interpreter specs.
-        generate_files_from_templates(tmp_modules_dir)
+        generate_module_files_from_templates(tmp_modules_dir)
 
         # Copy all the .module files to the layouts directory.
         print("\nCopying the regenerated .module files to the LyX layouts directory.")
@@ -164,6 +165,8 @@ def setup_module_files(user_home_lyx_directory, source_dir):
             path_in_layouts_dir = path.join(
                                     user_home_lyx_directory, "layouts", new_module_file)
             shutil.copyfile(new_module_file, path_in_layouts_dir)
+
+    os.chdir(prev_dir)
 
 def run_setup(lyxNotebook_run_script_path):
     """Main routine to run the setup.  Pass in the full path to the startup script

@@ -1084,16 +1084,15 @@ class InteractWithLyxCells:
            (<currentBufferFileDirectory>,<currentBufferFilename>,
            <auto-saveFilename>, <currentBufferFullPath>)
         It tries to save an auto-save file (unless auto_save_update is False), and
-        returns "" for the auto-save file if the file still does not exist.  The
-        current directory is always changed to <currentBufferFileDirectory>.
+        returns "" for the auto-save file if the file still does not exist.
         """
         # get the ordinary pathname and directory name of the buffer file
         fullpath = self.server_get_filename()
         dirname = os.path.dirname(fullpath)
         basename = os.path.basename(fullpath)
 
-        # change directory (the document in the current buffer may change, new dir)
-        os.chdir(dirname)
+        # Change directory (the document in the current buffer may change, new dir)
+        #os.chdir(dirname) # TODO: Avoid this if possible; delete if no problems.
 
         # try a save to auto-save file, then check if one exists newer than basename
         # (latter check needed for initial files which haven't been changed)
@@ -1155,8 +1154,17 @@ class InteractWithLyxCells:
             # Note below, we cannot enter cells with open edits, anyway...
             #self.process_lfun("inset-end-edit") # In case there was an open edit already.
             filename = self.process_lfun("inset-edit", argument="noeditor")
-            with open(filename, "r") as f:
-                cell_text = f.readlines()
+            if filename == "Command disabled":
+                print("Warning: Lyx Notebook attempted to run 'inset-edit' in a "
+                        "context where the command is disabled.")
+                return None
+            try:
+                with open(filename, "r") as f:
+                    cell_text = f.readlines()
+            except FileNotFoundError:
+                print("Warning: Lyx Notebook could not write out the .lyx file '{}'".
+                        format(filename))
+                return None
             if cell_text[-1][-1] != "\n":
                 cell_text[-1] += "\n" # Needed for cells with no blank lines at the end.
 

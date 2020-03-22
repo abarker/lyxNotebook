@@ -438,8 +438,9 @@ End
 # ==========================================================================
 #
 
-def generate_files_from_templates(dirname):
+def generate_module_files_from_templates(dirname):
     """Generate files, in the directory `dirname`."""
+    prev_dir = os.curdir
     os.chdir(dirname)
 
     # First do the Listings redefinition, since it just needs to be written out.
@@ -516,4 +517,5 @@ def generate_files_from_templates(dirname):
         with open("lyxNotebookCell"+inset_specifier+".module", "w") as f:
             f.write(head + init + standard + output)
 
+    os.chdir(prev_dir)
 

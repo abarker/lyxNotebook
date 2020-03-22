@@ -4,12 +4,15 @@
 # is to provide Lyx Notebook with consistent and predictable prompts which
 # do not depend on, say, the current directory.
 
-echo "loading lyxNotebookBashrc"
+echo "Loading lyxNotebookBashrc, with reliable prompt pattern..."
 
-if [ -r ~/.bashrc ]; then
-   . ~/.bashrc
+RCFILE="/etc/bash.bashrc"
+#RCFILE="~/.bashrc"
+
+if [ -r "$RCFILE" ]; then
+   source "$RCFILE"
 else
-   echo "local ~/.bashrc nonexistent or unreadable"
+   echo "Startup bashrc file nonexistent or unreadable..."
 fi
 
 export PS1='bash $ '
