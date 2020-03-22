@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 =========================================================================
 This file is part of LyX Notebook, which works with LyX but is an
