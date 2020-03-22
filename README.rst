@@ -6,6 +6,8 @@ notebook).
 UPDATE, Mar. 2020
 =================
 
+   Many improvements to the code have recently been made.
+
    Note that Lyx 2.4.0 may provide a mechanism to improve the program and
    eliminate the currently-necessary inserting of magic-cookie strings to get
    cell text.
@@ -32,10 +34,6 @@ UPDATE, Mar. 2020
    To uninstall the program, use ``pip uninstall lyxnotebook``.  Reset the bind
    file to its previous value.  Delete the Lyx Notebook ``.module`` files
    and ``.bind`` files in the ``.lyx`` directory.
-
-   The program has only recently been updated again.  Most features still work,
-   but some may no longer work due to changes in Lyx versions.  Bash cells
-   don't seem to be working.
 
 Earlier info
 ============

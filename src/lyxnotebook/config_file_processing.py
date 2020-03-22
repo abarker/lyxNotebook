@@ -14,12 +14,15 @@ Read and return values from the config file.
 
 import configparser
 import os
+from . import gui_elements
 
 # All config data is flattened into this single dict, ignoring sections.
 config_dict = {}
 
 config_parser = configparser.ConfigParser()
 
+lyx_notebook_source_dir = os.path.abspath(os.path.dirname(__file__))
+config_dict["lyx_notebook_source_dir"] = lyx_notebook_source_dir
 
 def to_bool(cfg_value):
     """Convert config file booleans to Python booleans."""
@@ -36,17 +39,7 @@ def initialize_config_data():
     the path `config_file_path`.  Flattened into a single dict with
     quotes stripped off of everything, booleans converted to bool, and
     ints converted to ints."""
-
-    lyx_notebook_source_dir = os.path.abspath(os.path.dirname(__file__))
-    config_dict["lyx_notebook_source_dir"] = lyx_notebook_source_dir
-
-    config_file_path = os.path.join(lyx_notebook_source_dir, # TODO: Search locations, see below.
-                                    "default_config_file_and_data_files",
-                                    "default_config_file.cfg")
-
-    if not os.path.isfile(config_file_path):
-        raise IOError("Config file '{}' does not exist.".format(config_file_path))
-    config_parser.read(config_file_path)
+    find_and_load_config_file(config_parser)
 
     for section in config_parser.sections():
         subdict = dict(config_parser[section])
@@ -76,36 +69,54 @@ def initialize_config_data():
     for setting in int_settings:
         config_dict[setting] = int(config_dict[setting])
 
-initialize_config_data()
 
-def find_and_load_config_file():
-    """Search for a relevant config file, and load it."""
-    # TODO
-
+def find_and_load_config_file(config_parser):
+    """Search for a relevant config file, and load it into `config_file`."""
     # Default on linux should be ~/.config/lyxnotebook dir,  the XDG
     # standard.   Maybe just make that dir and put it there...
     #
-    # For portability, consider this way to find:
+    # For portability, consider this way to find a dir:
     # https://github.com/ActiveState/appdirsa
     #
     # How jupyter does it: https://jupyter.readthedocs.io/en/latest/projects/jupyter-directories.html
+    #
+    # Currently just searches on a path...
+    homedir = os.path.expanduser("~")
 
-    home_dir = os.path.expanduser("~")
+    config_search_path = [
+                          os.path.join(homedir, ".config"),
+                          os.path.join(homedir, "lyxnotebook", ".config"),
+                          homedir,
+                          os.environ.get("LYXNOTEBOOK_CONF"),
+                          os.path.join(homedir, ".lyx")
+                          ]
 
-    config_search_path = [os.curdir,
-                          os.path.expanduser("~"),
-                          os.environ.get("LYXNOTEBOOK_CONF")]
-
+    found_config = False
     for dirname in config_search_path:
-        try:
-            with open(os.path.join(dirname, "lyxnotebook.cfg")) as cfgfile:
-                config_parser.read(cfgfile)
-            found_config = True
-        except IOError:
-            pass
+        if not dirname:
+            continue
+        pathname = os.path.join(dirname, "lyxnotebook.cfg")
+        for filename in ["lyxnotebook.cfg", ".lyxnotebook.cfg"]:
+            try:
+                with open(pathname) as cfgfile:
+                    config_parser.read(cfgfile)
+                found_config = True
+            except IOError:
+                pass
 
-#initialize_config_data("default_config_file.cfg")
-#print(config_dict)
+    if not found_config:
+        msg = "\nWarning: Could not find config file 'lyxnotebook.cfg', using default values."
+        print(msg)
+        pathname = os.path.join(lyx_notebook_source_dir,
+                                    "default_config_file_and_data_files",
+                                    "default_config_file.cfg")
+        config_parser.read(pathname)
+
+    print("\nFound and loaded config file at:\n   ", pathname)
+
+# Just loading this module initializes the config.  We need the config data
+# when running from command line or from lfun, i.e., from different modules.
+initialize_config_data()
 
 # General config parser reminder examples.
 #print(config_data.sections())

@@ -1107,8 +1107,7 @@ class InteractWithLyxCells:
             auto_save_filename = ""
 
         # return the tuple
-        ret_data = (dirname, basename, auto_save_filename, fullpath)
-        return ret_data
+        return dirname, basename, auto_save_filename, fullpath
 
     #
     # Get and modify text in the current cell.

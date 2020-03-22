@@ -2078,17 +2078,42 @@ status open
 
 \begin_layout Plain Layout
 
-testGraphicFile2.eps  testInteractWithLyxCells.lyx
+ copy.lyx	       '#testInteractWithLyxCells.lyx#'
 \end_layout
 
 \begin_layout Plain Layout
 
-testGraphicFile.eps   testInteractWithLyxCells.lyx~
+ copy.lyx~	        testInteractWithLyxCells.lyx
 \end_layout
 
 \begin_layout Plain Layout
 
-testGraphicFile.pdf
+ localLyx	        testInteractWithLyxCells.lyx~
+\end_layout
+
+\begin_layout Plain Layout
+
+ plain_test_file.lyx    testInteractWithLyxCells-lyx21.lyx~
+\end_layout
+
+\begin_layout Plain Layout
+
+ plain_test_file.lyx~   tttmp.lyx
+\end_layout
+
+\begin_layout Plain Layout
+
+ testGraphicFile2.eps   tttmp.lyx~
+\end_layout
+
+\begin_layout Plain Layout
+
+ testGraphicFile.eps    zzzzz_lyxnotebook_tmp_debug.lyxnotebook
+\end_layout
+
+\begin_layout Plain Layout
+
+ testGraphicFile.pdf
 \end_layout
 
 \end_inset
