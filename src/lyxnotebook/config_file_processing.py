@@ -26,9 +26,9 @@ config_dict["lyx_notebook_source_dir"] = lyx_notebook_source_dir
 
 def to_bool(cfg_value):
     """Convert config file booleans to Python booleans."""
-    if cfg_value in {"0", "false", "no"}:
+    if cfg_value in {"0", "false", "False", "no"}:
         return False
-    if cfg_value in {"1", "true", "yes"}:
+    if cfg_value in {"1", "true", "True", "yes"}:
         return True
     raise ValueError("Value {} in config file must be boolean in"
                      " a form such as 0/1, true/false, yes/no."""
