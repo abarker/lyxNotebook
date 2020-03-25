@@ -20,10 +20,11 @@ import sys
 import time
 from .config_file_processing import config_dict
 from .controller_of_lyx_and_interpreters import ControllerOfLyxAndInterpreters
+from . import gui_elements as gui
 
-user_home_lyx_directory = config_dict["user_home_lyx_directory"]
+lyx_user_directory = config_dict["lyx_user_directory"]
 lockfile_path = os.path.abspath(os.path.expanduser(
-                   os.path.join(user_home_lyx_directory, "lyxNotebook.lockfile")))
+                   os.path.join(lyx_user_directory, "lyxNotebook.lockfile")))
 
 def main():
     """
@@ -39,8 +40,10 @@ def main():
         old_PID = pidfile.readline()
         # Check if the PID from the lock file matches the current process PID.
         if os.path.exists(os.path.join("/proc", old_PID)):
-            print("You already have an instance of LyX Notebook running.")
-            print("It is running as process", old_PID + ".  Exiting.")
+            msg = ("You already have an instance of LyX Notebook running."
+                   "\nIt is running as process {}.  Exiting.".format(old_PID))
+            print(msg)
+            gui.text_info_popup(msg)
             time.sleep(4) # For when a new terminal opened, so message can be read.
             sys.exit(1)
         else:

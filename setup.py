@@ -56,8 +56,7 @@ setup(
     install_requires=["wheel", "PySimpleGUI>=4.16.0"],
     url="https://github.com/abarker/lyxNotebook",
     entry_points = {
-         "console_scripts": ["lyxnotebook = lyxnotebook.entry_points:run_lyxnotebook",
-                             "lyxnotebook-from-lfun = lyxnotebook.entry_points:run_lyxnotebook_from_LFUN",]
+         "console_scripts": ["lyxnotebook = lyxnotebook.entry_points:run_lyxnotebook",]
         },
     #scripts=['bin/funniest-joke'],
     license="GPL",

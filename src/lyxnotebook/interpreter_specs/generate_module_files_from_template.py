@@ -441,13 +441,12 @@ End
 # ==========================================================================
 #
 
-# This tag is new in 4.0.  Left out unless config file has_edit_external is true.
-edit_external_tag = "   EditExternal         true # enable inset-edit to work"
-has_inset_edit = config_dict["has_inset_edit"]
-edit_external_tag = edit_external_tag if has_inset_edit else ""
-
-def generate_module_files_from_templates(dirname):
+def generate_module_files_from_templates(dirname, has_editable_insets):
     """Generate files, in the directory `dirname`."""
+    # This tag is new in 4.0.  Left out unless has_editable_insets is true.
+    edit_external_tag = "   EditExternal         true # enable inset-edit to work"
+    edit_external_tag = edit_external_tag if has_editable_insets else ""
+
     prev_dir = os.curdir
     os.chdir(dirname)
 

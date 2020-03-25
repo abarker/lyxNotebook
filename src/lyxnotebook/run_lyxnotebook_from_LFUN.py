@@ -35,7 +35,6 @@ in the latter case we run the program in a new terminal window.
 # https://github.com/giampaolo/psutil
 
 import subprocess
-# import time
 import os
 import sys
 import platform

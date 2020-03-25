@@ -34,12 +34,24 @@ def to_bool(cfg_value):
                      " a form such as 0/1, true/false, yes/no."""
                      .format(cfg_value))
 
-def initialize_config_data():
+def initialize_config_data(lyx_user_dir):
     """Initialize the data dict `config_dict` from the config file at
     the path `config_file_path`.  Flattened into a single dict with
     quotes stripped off of everything, booleans converted to bool, and
     ints converted to ints."""
-    find_and_load_config_file(config_parser)
+    print("\nInitializing config data for LyX user dir:\n   {}"
+            .format(lyx_user_dir))
+    cfg_file_name = os.path.join(lyx_user_dir, "lyxnotebook.cfg")
+
+    try:
+        with open(cfg_file_name) as cfgfile:
+            pass # Configparser silently fails to load data with nonexistent file.
+    except IOError:
+        raise IOError("Cannot find file 'lyxnotebook.cfg' in the LyX user"
+                " at this path\n   {}.".format(cfg_file_name))
+    config_parser.read(cfg_file_name)
+
+    print("\nFound and read the config file:\n   {}".format(cfg_file_name))
 
     for section in config_parser.sections():
         subdict = dict(config_parser[section])
@@ -54,8 +66,8 @@ def initialize_config_data():
         "no_echo",
         "buffer_replace_on_batch_eval",
         "separate_interpreters_for_each_buffer",
-        "has_inset_edit_noeditor_mod",
-        "has_inset_edit",
+        "has_editable_insets_noeditor_mod",
+        "has_editable_insets",
         ]
 
     for setting in bool_settings:
@@ -69,9 +81,13 @@ def initialize_config_data():
     for setting in int_settings:
         config_dict[setting] = int(config_dict[setting])
 
+    config_dict["lyx_user_dir"] = lyx_user_dir
+
 
 def find_and_load_config_file(config_parser):
     """Search for a relevant config file, and load it into `config_file`."""
+    # TODO not used, delete
+
     # Default on linux should be ~/.config/lyxnotebook dir,  the XDG
     # standard.   Maybe just make that dir and put it there...
     #
@@ -116,7 +132,7 @@ def find_and_load_config_file(config_parser):
 
 # Just loading this module initializes the config.  We need the config data
 # when running from command line or from lfun, i.e., from different modules.
-initialize_config_data()
+#initialize_config_data()
 
 # General config parser reminder examples.
 #print(config_data.sections())

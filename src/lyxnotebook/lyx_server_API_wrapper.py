@@ -975,11 +975,11 @@ class InteractWithLyxCells:
         if also_noncell:
             cell_list.append("".join(text_between_cells))
 
-        has_inset_edit = config_dict["has_inset_edit"]
-        if (has_inset_edit and cookie_lines_total > 0) or cookie_lines_total > 1:
+        has_editable_insets_noeditor_mod = config_dict["has_editable_insets_noeditor_mod"]
+        if (has_editable_insets_noeditor_mod and cookie_lines_total > 0) or cookie_lines_total > 1:
             gui.text_info_popup("Warning: Multiple cookies were found in the file.\n\n"
                                 "This can cause problems with cell-goto operations.")
-        if not has_inset_edit and cookie_lines_in_cells > 1:
+        if not has_editable_insets_noeditor_mod and cookie_lines_in_cells > 1:
             gui.text_info_popup("Warning: Multiple cookies were found in Lyx Notebook\n"
                                 "cells in the file.\n\n"
                                 "This will cause problems with cell evaluations.")
@@ -1142,17 +1142,18 @@ class InteractWithLyxCells:
         if not self.inside_cell() or self.inside_empty_cell(assert_inside_cell=True):
             return None # return None if not in a cell or empty cell
 
-        has_inset_edit_noeditor_mod = config_dict["has_inset_edit_noeditor_mod"]
-        has_inset_edit = config_dict["has_inset_edit"]
+        has_editable_insets_noeditor_mod = config_dict["has_editable_insets_noeditor_mod"]
+        has_editable_insets = config_dict["has_editable_insets"]
 
-        if has_inset_edit and has_inset_edit_noeditor_mod:
+        if has_editable_insets and has_editable_insets_noeditor_mod:
             # TODO: Later maybe implement searching for the file from unmodified inset-edit.
 
             # Get all the cells from the Lyx or Latex output, because we need to
             # know the language associated with the current cell.  We will compare
             # text.
             all_cells = self.get_all_cell_text(use_latex_export=use_latex_export,
-                                               also_noncell=False) # DEBUG XXX
+                                               also_noncell=False)
+            # set above also_noncell to use below debug code; delete later.
             """
             with open("zzzzz_lyxnotebook_tmp_debug.lyxnotebook", "w") as f:
                 for i in all_cells: # DEBUG XXX
