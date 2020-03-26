@@ -1904,6 +1904,11 @@ println("Initializing Scala")
 :silent
 \end_layout
 
+\begin_layout Plain Layout
+
+println("After silent toggle.")
+\end_layout
+
 \end_inset
 
 
@@ -1912,12 +1917,6 @@ status open
 
 \begin_layout Plain Layout
 
-Initializing Scala
-\end_layout
-
-\begin_layout Plain Layout
-
-Switched off result printing.
 \end_layout
 
 \end_inset
@@ -1968,7 +1967,6 @@ status open
 
 \begin_layout Plain Layout
 
-0
 \end_layout
 
 \end_inset

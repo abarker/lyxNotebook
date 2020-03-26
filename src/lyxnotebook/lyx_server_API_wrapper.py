@@ -233,8 +233,8 @@ def convert_text_line_to_lyx_file_inset_format(text_line):
     # just try to make the diffs almost match and be a valid Lyx file.
     split_line_new = text_line_new.splitlines() # don't keep ends
     wrapped_line_new = []
+    break_len = 80
     for line in split_line_new:
-        break_len = 80
         while True:
             if len(line) <= break_len: # at most break_len chars in line
                 wrapped_line_new.append(line + "\n")
@@ -258,6 +258,20 @@ def convert_text_line_to_lyx_file_inset_format(text_line):
     result += "".join(wrapped_line_new)
     return result
 
+def convert_cell_lines_to_lyx_file_inset_format(cell, output_also=True):
+    """Convert all the lines in the cell text to have the Lyx file inset format, to be
+    written out as a .lyx file (usually after modifications to the code and/or output).
+    """
+    new_lines = []
+    for cell_line in cell:
+        new_lines.append(convert_text_line_to_lyx_file_inset_format(cell_line))
+    cell[:] = new_lines # Replace the text.
+
+    new_output_lines = []
+    if output_also:
+        for output_line in cell.evaluation_output:
+            new_output_lines.append(convert_text_line_to_lyx_file_inset_format(output_line))
+        cell.evaluation_output = new_output_lines
 
 class InteractWithLyxCells:
     """The main class for handling interactions with a running Lyx process
@@ -328,16 +342,6 @@ class InteractWithLyxCells:
         #    self.back_cookie_string += "char-left;"
         self.del_cookie_forward_command = "repeat {} char-delete-forward;".format(cookie_len)
         self.del_cookie_backward_command = "repeat {} char-delete-backward;".format(cookie_len)
-
-    def set_magic_cookie(self, string):
-        """Set the magic cookie value.  A convenience function, instead of just
-        using the magicCookie member variable.  Only alphanumeric cookies have
-        been tested."""
-        self.magic_cookie = string
-
-    def get_magic_cookie(self):
-        """Return the current value of the magic cookie."""
-        return self.magic_cookie
 
     #
     #
@@ -799,7 +803,7 @@ class InteractWithLyxCells:
         or listing, not a line within a cell or listing environment.  Not used
         except in experimental gotoNextCell2 routine."""
         return self.process_lfun("server-goto-file-row",
-                                filename + " " + str(linenum))
+                                 argument=filename + " " + str(linenum))
 
     def get_global_cell_info(self, use_latex_export=False):
         """This routine returns a tuple:
@@ -845,7 +849,7 @@ class InteractWithLyxCells:
          autoSaveFileName,
          full_path) = self.get_updated_lyx_directory_data()
 
-        if use_latex_export:
+        if use_latex_export: # May not work anymore...
             return self.get_all_cell_text_via_latex_file(bufferDirName)
         return self.get_all_cell_text_via_lyx_file(bufferDirName,
                                               nodelete_tmpfile=nodelete_tmpfile,
@@ -873,7 +877,7 @@ class InteractWithLyxCells:
 
     def get_all_cell_text_from_lyx_file(self, filename, also_noncell=False):
         """Read all the cell text from the Lyx file "filename."  Return a
-        list of Cell class instances, where each cell is a list of lines (and
+        list of `Cell` class instances, where each cell is a list of lines (and
         some additional data) corresponding to the lines of a code cell in the
         document (in the order that they appear in the document).  All cell types
         are included.
@@ -994,7 +998,12 @@ class InteractWithLyxCells:
         evaluation_output data fields.  The corresponding output cells are always
         replaced, and created if necessary, filled with the data in that field.
         """
-        # TODO: Rewrite this using the regular get cells but with also_noncell=True.
+        # TODO: Rewrite this big ugly thing using the regular get cells but with
+        # also_noncell=True.  Note, though, that this code is doing more.  It is
+        # handling creating output cells if necessary, and error checks, etc.
+        # Code was tested somewhat, and mostly worked, but on recent Lyx is
+        # broken again.
+
         original_saved_lyx_file = TerminatedFile(from_file_name, r"\end_document",
                                 err_msg_location="replace_all_cell_text_in_lyx_file")
         updated_saved_lyx_file = open(to_file_name, "w")
@@ -1003,9 +1012,17 @@ class InteractWithLyxCells:
             line = original_saved_lyx_file.readline()
             if line == "":
                 break
-            elif line.find(r"\begin_inset Flex LyxNotebookCell:") == 0:
+
+            elif line.find(r"\begin_inset Flex LyxNotebookCell:") != 0:
+                # Got an ordinary Lyx file line, so just echo it to output
+                if line.find(self.magic_cookie) != -1: # found cookie anywhere on line
+                    pass # later may want to do something if cookie was found
+                updated_saved_lyx_file.write(line)
+
+            else: # Got the beginning of a Flex LyxNotebookCell
                 updated_saved_lyx_file.write(line) # start the new cell
-                # find out what basic type of cell it is (Init, Standard, or Output)
+
+                # Find out what basic type of cell it is (Init, Standard, or Output).
                 if line.find(r"\begin_inset Flex LyxNotebookCell:Init") == 0:
                     basic_type = "Init"
                     if not init:
@@ -1013,51 +1030,54 @@ class InteractWithLyxCells:
                 elif line.find(r"\begin_inset Flex LyxNotebookCell:Standard") == 0:
                     basic_type = "Standard"
                     if not standard:
-                        continue # just echo it unless selected
-                else: # else must be an isolated output cell
-                    continue # output cells right after code cells are handed at same time
-                # find the corresponding Cell in all_cells
+                        continue # Just echo it unless selected.
+                else: # Else must be an isolated output cell.
+                    continue # Output cells right after code cells are handed at same time.
+
+                # Find the corresponding Cell instance in the all_cells list.
                 while True:
                     current_cell += 1
                     bType, inset_spec = all_cells[current_cell].get_cell_type()
                     if bType == basic_type:
                         break
-                # do an error check here, make sure inset_spec matches not just basic_type
+
+                # Do an error check here, make sure inset_spec matches not just basic_type.
                 if not (line.find(
                         r"\begin_inset Flex LyxNotebookCell:"+bType+":"+inset_spec) == 0):
                     print("Error in batch evaluation, cells do not match, exiting.")
                     time.sleep(4) # for xterm window displays
                     sys.exit(1)
-                # echo back all cell-header stuff to out_file until a plain layout starts
+
+                # Echo back all cell-header stuff to out_file until a plain layout starts
                 while True:
                     line = original_saved_lyx_file.readline()
                     if line.rstrip() == r"\begin_layout Plain Layout":
                         break
                     else:
                         updated_saved_lyx_file.write(line)
-                # now eat the old cell text up to the inset end, and ignore it
+
+                # Now eat the old cell text up to the inset end, and ignore it.
                 while line.rstrip() != r"\end_inset":
                     # later may want to check for cookie inside old cell
                     line = original_saved_lyx_file.readline()
-                #
+
                 # Write the new cell text (it may have been modified in processing).
-                #
                 for cell_line in all_cells[current_cell]:
                     updated_saved_lyx_file.write(convert_text_line_to_lyx_file_inset_format(cell_line))
-                # now end the cell in out_file
+
+                # Now end the cell in out_file.
                 updated_saved_lyx_file.write("\\end_inset\n")
-                #
+
                 # Now look ahead for an output cell; eat it all and ignore it if found.
-                #
                 saved_lines = []
                 while True:
                     saved_lines.insert(0, original_saved_lyx_file.readline())
-                    # save lines up to first non-empty, then break
+                    # Save lines up to first non-empty, then break.
                     if saved_lines[0].rstrip() != "":
                         break
                 if saved_lines[0].find(
                         r"\begin_inset Flex LyxNotebookCell:Output:"+inset_spec) == 0:
-                    # got an output cell, eat it
+                    # Got an output cell, eat it.  TODO: what about math output cells?
                     while True:
                         if original_saved_lyx_file.readline().rstrip() == r"\end_inset":
                             break
@@ -1066,27 +1086,22 @@ class InteractWithLyxCells:
                     for line in saved_lines:
                         original_saved_lyx_file.pushback(line)
                 updated_saved_lyx_file.write("\n\n") # two blank lines between insets
-                #
+
                 # Ready to write a new output cell, in both cases.
-                #
                 updated_saved_lyx_file.write(
                     r"\begin_inset Flex LyxNotebookCell:Output:"+inset_spec+"\n")
                 updated_saved_lyx_file.write("status open\n\n") # always create an open cell
                 eval_output = all_cells[current_cell].evaluation_output
-                # if cell wasn't evaluated the set output to be empty
+
+                # If cell wasn't evaluated then set output to be empty.
                 if eval_output is None:
                     eval_output = []
                 for cell_line in eval_output:
                     updated_saved_lyx_file.write(convert_text_line_to_lyx_file_inset_format(cell_line))
-                # finished, end the output cell inset
+
+                # Finished, end the output cell inset.
                 updated_saved_lyx_file.write("\\end_inset\n") # 2 blanks pushed back from code cell end
-            #
-            # Got an ordinary Lyx file line.
-            #
-            else: # got an ordinary Lyx file line, so just echo it to output
-                if line.find(self.magic_cookie) != -1: # found cookie anywhere on line
-                    pass # later may want to do something if cookie was found
-                updated_saved_lyx_file.write(line)
+
         original_saved_lyx_file.close()
         updated_saved_lyx_file.close()
 
