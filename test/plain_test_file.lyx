@@ -7,8 +7,9 @@
 \textclass article
 \use_default_options true
 \begin_modules
-lyxNotebookCellPython
 lyxNotebookCellPythonTwo
+lyxNotebookListingsWithSmallFont
+lyxNotebookCellPython
 \end_modules
 \maintain_unincluded_children false
 \language english
@@ -36,7 +37,7 @@ lyxNotebookCellPythonTwo
 \index_command default
 \float_placement class
 \float_alignment class
-\paperfontsize default
+\paperfontsize 11
 \spacing single
 \use_hyperref false
 \papersize default
@@ -155,6 +156,25 @@ Math is not editable in cells:
 
 \begin_layout Section
 Test some code cells
+\begin_inset Flex LyxNotebookCell:Init:Python
+status open
+
+\begin_layout Plain Layout
+
+print(
+\begin_inset Quotes eld
+\end_inset
+
+init cell
+\begin_inset Quotes erd
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

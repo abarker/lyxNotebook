@@ -17,8 +17,8 @@ R.params = {
     "file_suffix": ".R",
     "comment_line": "#",
     "line_continuation": None,
-    "inset_specifier": "R", # e.g., Flex:LyxNotebook:Standard:Scala
-    "listings_language": "R", # no Scala predefined yet in Listings
+    "inset_specifier": "R", # e.g., Flex:LyxNotebook:Standard:R
+    "listings_language": "R",
     "startup_sleep_secs": 1.0,
     "before_read_sleep_secs": 0.01,
     "noop_at_cell_end": None,

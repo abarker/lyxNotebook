@@ -8,7 +8,10 @@ Copyright (c) 2012 Allen Barker
 =========================================================================
 
 This file processes the specifications for all the interpreters which Lyx
-Notebook is able to use.
+Notebook is able to use.  This file goes through each spec file, processing it
+and then adding its `SpecRecord` instance to the list `all_specs`.  That list
+is then imported and used by the module `generate_module_files_from_template`
+to generate all the Lyx module files.
 
 To add a specification it is probably easiest to copy an existing one and then
 change the names and the values.  The name for the spec itself (i.e., the
@@ -16,7 +19,7 @@ variable it is assigned to in the first line) should then be added to the list
 `all_specs` at the end of this file.  All the fields must be present; there are
 no default values.
 
-We now briefly describe some of the fields.  See the python2 spec below for
+Some of the fields are briefly defined below.  See the python2 spec below for
 descriptions of the others.
 
 ----
@@ -120,14 +123,17 @@ all_specs.append(bash)
 
 
 def fix_comma(key_value_lines, end_in_comma=True):
-    """Returns the key=value list with a trailing comma either there or not."""
+    """Returns the key=value list (for Listings) with a trailing comma either
+    there or not."""
     lines = key_value_lines.strip("\n\t ").splitlines() # kill begin and end empty lines
-    if len(lines) == 0: return "% empty key-value list placeholder"
+    if len(lines) == 0:
+        return "% empty key-value list placeholder"
     # split off any comment at end of last line
     last_non_comment_line_index = -1
     for i in range(len(lines)-1, -1, -1):
         curr_line = lines[i].strip()
-        if len(curr_line) == 0: continue
+        if len(curr_line) == 0:
+            continue
         if curr_line[0] != "%":
             last_non_comment_line_index = i
             break
@@ -149,31 +155,36 @@ def fix_comma(key_value_lines, end_in_comma=True):
         print("Error: last line in interpreter spec key=value list cannot be comment.")
         sys.exit(-1)
     if main_last_line[-1] == ",":
-        if not end_in_comma: main_last_line = main_last_line[0:-1]
+        if not end_in_comma:
+            main_last_line = main_last_line[0:-1]
     else:
-        if end_in_comma: main_last_line = main_last_line + ","
+        if end_in_comma:
+            main_last_line = main_last_line + ","
     lines[last_non_comment_line_index] = main_last_line + " " + comment_last_line # rejoin
     return "\n".join(lines)
+
+def do_replacements(string, replacement_dict, fix_commas=True):
+    """Return the string `string` with all the keys/meta-vars in it replaced
+    by the corresponding values in `replacement_dict`.  The `fix_comma` function
+    is also applied to the replacement text."""
+    for key in replacement_dict:
+        replacement_text = replacement_dict[key]
+        if fix_commas:
+            replacement_text = fix_comma(replacement_text, True)
+        string = string.replace(key, replacement_text)
+    return string
 
 for spec in all_specs:
     preamble = spec.preamble_latex_code
     # make the metavar substitutions with replace
-    preamble = preamble.replace("<<general_listings_code_format>>",
-                                fix_comma(spec.general_listings_code_format, True))
-    preamble = preamble.replace("<<non_color_listings_code_format>>",
-                                fix_comma(spec.non_color_listings_code_format, True))
-    preamble = preamble.replace("<<color_listings_code_format>>",
-                                fix_comma(spec.color_listings_code_format, True))
-    preamble = preamble.replace("<<general_listings_output_format>>",
-                                fix_comma(spec.general_listings_output_format, True))
-    preamble = preamble.replace("<<non_color_listings_output_format>>",
-                                fix_comma(spec.non_color_listings_output_format, True))
-    preamble = preamble.replace("<<color_listings_output_format>>",
-                                fix_comma(spec.color_listings_output_format, True))
-    spec.preamble_latex_code = preamble
+    replacement_dict = {
+        "<<general_listings_code_format>>": spec.general_listings_code_format,
+        "<<non_color_listings_code_format>>": spec.non_color_listings_code_format,
+        "<<color_listings_code_format>>": spec.color_listings_code_format,
+        "<<general_listings_output_format>>": spec.general_listings_output_format,
+        "<<non_color_listings_output_format>>": spec.non_color_listings_output_format,
+        "<<color_listings_output_format>>": spec.color_listings_output_format,
+        }
 
+    spec.preamble_latex_code = do_replacements(spec.preamble_latex_code, replacement_dict)
 
-if __name__ == "__main__":
-
-    # look at the final, substituted version
-    print(python2.preamble_latex_code)

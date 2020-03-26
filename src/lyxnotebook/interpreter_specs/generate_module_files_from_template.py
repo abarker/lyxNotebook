@@ -34,6 +34,7 @@ from ..config_file_processing import config_dict
 # which is looped over <<basic_cell_type>>, 3) and a closing section.
 # =============================================================
 
+# All the Lyx modules for cells share this common header.
 module_header_template_common = \
     r"""#\DeclareLyXModule{Lyx Notebook <<inset_specifier>>}
 #DescriptionBegin
@@ -84,6 +85,8 @@ AddToPreamble
 
 """
 
+# This part of the header for modules is contains meta-vars which depend on the spec.
+# It is appended to the bottom of the part just above.
 module_header_template_basic_cell_type_dependent = \
     r"""
    %
@@ -123,6 +126,8 @@ module_header_template_basic_cell_type_dependent = \
    \expandafter\def\expandafter\lyxNotebookPrintOn\expandafter{\lyxNotebookPrintOn\lyxNotebookPrintOn<<basic_cell_type>><<inset_specifier>>}
 """
 
+# This ends the preamble section of the module, and is appended to the above after
+# the language-specific preamble from the language's spec file is appended.
 module_header_template_end = \
     r"""
 
@@ -399,6 +404,7 @@ End
 
 # ==================================================================================
 # Define the basic template for the module to redefine Listings to use a small font.
+# This module makes Listings display with the same size font as the Lyx Notebook insets.
 # ==================================================================================
 
 listings_with_small_font = \
@@ -441,10 +447,18 @@ End
 # ==========================================================================
 #
 
+def do_replacements(string, replacement_dict):
+    """Return the string `string` with all the keys/meta-vars in `replacement_dict`
+    replaced by their values."""
+    for key in replacement_dict:
+        string = string.replace(key, replacement_dict[key])
+    return string
+
+
 def generate_module_files_from_templates(dirname, has_editable_insets):
     """Generate files, in the directory `dirname`."""
     # This tag is new in 4.0.  Left out unless has_editable_insets is true.
-    edit_external_tag = "   EditExternal         true # enable inset-edit to work"
+    edit_external_tag = "EditExternal         true # enable inset-edit to work"
     edit_external_tag = edit_external_tag if has_editable_insets else ""
 
     prev_dir = os.curdir
@@ -456,77 +470,72 @@ def generate_module_files_from_templates(dirname, has_editable_insets):
 
     # Now do all the other modules, one for each interpreter specification.
     for spec in all_specs:
+        # Get some language-specific variable settings from the spec.
         preamble_latex_code = spec.preamble_latex_code
-        inset_specifier = spec.params["inset_specifier"]
-        prog_name = spec.params["prog_name"]
-        lst_language = spec.params["listings_language"]
+        inset_specifier = spec.params["inset_specifier"] # E.g., Python or Bash in LyX code.
+        prog_name = spec.params["prog_name"] # Like inset_specifier, but the displayed name.
+        lst_language = spec.params["listings_language"] # For listings style, e.g., python.
 
         print("running for inset_specifier=" + inset_specifier
               + ",  prog_name=" + prog_name + ",  listings_language=" + lst_language)
 
-        head_common = module_header_template_common
-        head_dependent = module_header_template_basic_cell_type_dependent
-        init = standard_template
-        standard = standard_template
-        output = output_template
+        replacement_dict = {
+            "<<EditExternalTag>>": edit_external_tag,
+            "<<triple_quote>>": "\"\"\"",
+            "<<triple_quote>>": "\"\"\"",
+            "<<inset_specifier>>": inset_specifier,
+            "<<prog_name>>": prog_name,
+            "<<label_modifier>>": "", # This adds a modifier to the cell label.
+            "<<lst_language>>": lst_language,
+            }
 
         # Replace meta-vars in the common header section.
-        head_common = head_common.replace("<<triple_quote>>", "\"\"\"")
-        head_common = head_common.replace("<<inset_specifier>>", inset_specifier)
-        head_common = head_common.replace("<<prog_name>>", prog_name)
-        head_common = head_common.replace("<<lst_language>>", lst_language)
-
-        head = head_common
+        header_common = do_replacements(module_header_template_common, replacement_dict)
 
         # Replace meta-vars in dependent header, one copy for each basic_cell_type.
-        # NOTE that we could have just treated the sections as <<...>> vars in head_common
-        for basic_cell_type in ["Init", "Standard", "Output"]:
-            head_tmp = head_dependent
-            head_tmp = head_tmp.replace("<<triple_quote>>", "\"\"\"")
-            head_tmp = head_tmp.replace("<<inset_specifier>>", inset_specifier)
-            head_tmp = head_tmp.replace("<<prog_name>>", prog_name)
-            head_tmp = head_tmp.replace("<<lst_language>>", lst_language)
-            head_tmp = head_tmp.replace("<<basic_cell_type>>", basic_cell_type)
-            head += head_tmp
+        header_dependent_concat = ""
+        for basic_cell_type in ["Init", "Standard", "Output",]: # "Noprint"]:
+            replacement_dict["<<basic_cell_type>>"] = basic_cell_type
+            header_dependent_concat += do_replacements(
+                    module_header_template_basic_cell_type_dependent, replacement_dict)
 
         # Replace certain meta-vars in preamble_latex_code.
-        preamble_latex_code = preamble_latex_code.replace("<<triple_quote>>", "\"\"\"")
-        preamble_latex_code = preamble_latex_code.replace("<<inset_specifier>>", inset_specifier)
-        preamble_latex_code = preamble_latex_code.replace("<<prog_name>>", prog_name)
-        preamble_latex_code = preamble_latex_code.replace("<<lst_language>>", lst_language)
-
-        # Now we have the full .module file header (stuff before any InsetLayout commands).
-        head += preamble_latex_code + module_header_template_end
-
-        # replace meta-vars in standard template
-        standard = standard.replace("<<EditExternalTag>>", edit_external_tag)
-        standard = standard.replace("<<triple_quote>>", "\"\"\"")
-        standard = standard.replace("<<triple_quote>>", "\"\"\"")
-        standard = standard.replace("<<inset_specifier>>", inset_specifier)
-        standard = standard.replace("<<prog_name>>", prog_name)
-        standard = standard.replace("<<label_modifier>>", "") # just Code, no special label
-        standard = standard.replace("<<lst_language>>", lst_language)
-        standard = standard.replace("<<basic_cell_type>>", "Standard")
+        preamble_latex_code = do_replacements(preamble_latex_code, replacement_dict)
 
         # Replace meta-vars in init template.
-        # init cells are currently identical to standard cells except for the frame spec
-        init = init.replace("<<EditExternalTag>>", edit_external_tag)
-        init = init.replace("<<triple_quote>>", "\"\"\"")
-        init = init.replace("<<inset_specifier>>", inset_specifier)
-        init = init.replace("<<prog_name>>", prog_name)
-        init = init.replace("<<label_modifier>>", "Init") # use "Init Code" on inset label
-        init = init.replace("<<lst_language>>", lst_language)
-        init = init.replace("<<basic_cell_type>>", "Init")
+        # Init cells are currently identical to standard cells except for the frame spec
+        replacement_dict["<<basic_cell_type>>"] = "Init"
+        replacement_dict["<<label_modifier>>"] = "Init"
+        init = do_replacements(standard_template, replacement_dict)
+
+        # Replace meta-vars in standard template.
+        replacement_dict["<<basic_cell_type>>"] = "Standard"
+        replacement_dict["<<label_modifier>>"] = "" # Standard is default.
+        standard = do_replacements(standard_template, replacement_dict)
 
         # Replace meta-vars in output template.
-        output = output.replace("<<EditExternalTag>>", edit_external_tag)
-        output = output.replace("<<inset_specifier>>", inset_specifier)
-        output = output.replace("<<prog_name>>", prog_name)
-        output = output.replace("<<basic_cell_type>>", "Output")
+        replacement_dict["<<basic_cell_type>>"] = "Output"
+        output = do_replacements(output_template, replacement_dict)
+
+        # Replace meta-vars in noprint template.
+        # TODO: Adding noprint messes up the Latex PDF generation...
+        #replacement_dict["<<basic_cell_type>>"] = "Noprint"
+        replacement_dict["<<label_modifier>>"] = "NP" #
+        #noprint = do_replacements(standard_template, replacement_dict)
+
 
         # Write concat of all templates to correct output file.
+        combined_string = (header_common
+                         + header_dependent_concat
+                         + preamble_latex_code
+                         + module_header_template_end
+                         + init
+                         + standard
+                         + output
+                         #+ noprint
+                         )
         with open("lyxNotebookCell"+inset_specifier+".module", "w") as f:
-            f.write(head + init + standard + output)
+            f.write(combined_string)
 
     os.chdir(prev_dir)
 
