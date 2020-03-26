@@ -41,59 +41,6 @@ Some earlier notes:
     wanted?  Note that Latex .sty style files are sometimes called layouts.  BUT,
     in Lyx .layout files are used: http://wiki.lyx.org/LyX/Concepts
 
-
-    Some LFUNs which would have been useful, but currently aren't implemented in Lyx
-    (rough descriptions of functionality).  These aren't meant as criticism, but just
-    as a wish-list and notes about what kinds of things would have been (and still
-    would be) useful.
-       get-char, get-word, get-line      -- return the actual character string
-       get-inset                         -- maybe get whole contents of inset as string
-       export-inset, export-paragraph    -- export less than the full file
-       get-position, set-position        -- cursor position in the file get or set, e.g.,
-                                               <line> <char>
-                                            server-get-xy does something different
-       get-current-inset-type            -- the name of the inset type, i.e. Listings,
-                                            or Math (like a general LFUN_IN_IPA).
-       goto-next-inset <type>            -- go to next inset of that type
-       inset-begin and inset-end mod     -- versions that are idempotent and stay inside
-       get-lyx-version                   -- the version of Lyx in case it matters
-                                              (like if new lfuns become available)
-       get-lyx-dir                       -- the particular Lyx home dir
-       inset-begin and inset-end         -- option to do absolute motions, regardless
-                                            of the current position in the inset.
-
-    -- Some way to dynamically set parameters on flex-insert items; maybe like the
-    listings environment with "Settings" menu, even if just like the extra items
-    box on the "Advanced" page with "More Parameters."  Some way to pass them as
-    arguments to the flex-insert command would also be good.  (Even just
-    dynamically-settable labels on Lyx Listings insets could be useful, but we
-    still wouldn't have a way to inset-forall to only certain subtypes.  That would
-    also need the colon-separated naming convention to be extended.  Pre- and post-
-    processing could, however, be done: by redefining the Listings inset and
-    changing the Latex environment name to a lstnewenvironment.)
-
-    -- Some way to temporarily turn off user interactions, such as mouse clicks
-    which can change the cursor point in the middle of other operations.  That is,
-    a way to make Lyx temporarily only listen to Lyx server commands and not to
-    user interactions.
-
-    -- Some kind of "escaped passthru" might be nice, especially if things like math
-    insets could be set to invoke them (and the escape char could be chosen).
-    For example, allow color and style commands only.
-
-    -- Some way to bind server-notify to menu items might be useful, so that not
-    as many keys would need to be bound (especially for lesser-used functions).
-    But now the gui menu does that.
-
-    -- Some way to detect which branch you are in, or to get current branch info
-    and specify branch-applicability in commands.  This might be useful, for
-    example, to have a branch for code where vpython was available, and a
-    branch where it wasn't.
-
-    -- Embedded Python would also be very nice, if that ever gets included (has been
-    discussed on the Lyx lists several times).  At least some kind of conditional
-    structure on LFUNs might be helpful in some instances.
-
 """
 
 # TODO it is probably doable to delete all magic cookies inside cells
@@ -865,6 +812,7 @@ class InteractWithLyxCells:
             try:
                 with open(filename, "r") as f:
                     cell_text = f.readlines()
+                    print("cell text:\n", cell_text, sep="") # DEBUG
             except FileNotFoundError:
                 print("Warning: Lyx Notebook could not write out the .lyx file '{}'".
                         format(filename))
@@ -880,6 +828,7 @@ class InteractWithLyxCells:
             # inset.
             self.process_lfun_seq("inset-end-edit", "char-right")
 
+            # Find the cell in all_cells that matches the text from inset-edit call.
             cell_match_indices = []
             for count, cell in enumerate(all_cells):
                 basic_type, language = cell.get_cell_type()
@@ -887,29 +836,32 @@ class InteractWithLyxCells:
                     continue
                 lines_match = True
                 for target_line, line in zip(cell_text, cell):
+                    print("target_line:", target_line) # DEBUG
+                    print("target_line:", line) # DEBUG
                     if target_line != line:
                         lines_match = False
                         break
                 if lines_match:
                     cell_match_indices.append(count)
+
+            # No matches found.
             if not cell_match_indices:
                 gui.text_info_popup(
                        "Warning: No cells in the .lyx file matched the text extracted\n"
                        "from the inset via the inset-edit LFUN.")
                 return None
+
+            # Multiple matches found.
             if len(cell_match_indices) > 1:
-                first_match = all_cells[cell_match_indices[0]]
-                # Empty cells don't reach here as of now, but line below checks anyway.
-                if len(first_match) != 1 or first_match[0] != "": # If cells not empty.
-                    languages = {all_cells[i].get_cell_type()[1]
-                                                       for i in cell_match_indices}
-                    msg = ("Warning: Cell numbered {} contain identical code for \n"
-                          "different languages.  Don't know which interpreter to run..."
-                          .format(cell_match_indices))
-                    if len(languages) != 1:
-                        print(msg)
-                        gui.text_info_popup(msg)
-                        return None
+                msg = ("Warning: Cells numbered {} contain identical code\n"
+                      "Don't know which interpreter to run or which cell\n"
+                      "to update the output of..."
+                      .format(cell_match_indices))
+                print(msg)
+                gui.text_info_popup(msg)
+                return None
+
+            # Single match.
             matched_index = cell_match_indices[0]
             return all_cells[matched_index]
 
