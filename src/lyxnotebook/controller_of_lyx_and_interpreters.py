@@ -40,6 +40,7 @@ from .lyx_server_API_wrapper import InteractWithLyxCells
 from .external_interpreter import ExternalInterpreter
 from .interpreter_specs import process_interpreter_specs # Specs for all implemented interpreters.
 from . import keymap # The current mapping of keys to Lyx Notebook functions.
+from .parse_and_write_lyx_files import replace_all_cell_text_in_lyx_file
 
 
 class IndentCalc:
@@ -690,7 +691,7 @@ class ControllerOfLyxAndInterpreters:
         to_file_name = current_dir_data[3][:-4] + ".newOutput.lyx"
 
         # Create the new .lyx file from the evaluated list of cells.
-        self.lyx_process.replace_all_cell_text_in_lyx_file(
+        replace_all_cell_text_in_lyx_file(
             from_file_name, to_file_name, all_cells, self.lyx_process.magic_cookie,
             init=init, standard=standard)
 
