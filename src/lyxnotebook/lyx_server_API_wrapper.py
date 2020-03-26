@@ -870,12 +870,15 @@ class InteractWithLyxCells:
                          "lyx mv $$FName " + full_tmp_name, warn_error=True)
         time.sleep(0.05) # let write get a slight head start before any reading
         all_cells = self.get_all_cell_text_from_lyx_file(full_tmp_name,
+                                                    self.magic_cookie,
                                                     also_noncell=also_noncell)
         if not nodelete_tmpfile and os.path.exists(tmp_saved_lyx_file_name):
             os.remove(tmp_saved_lyx_file_name)
         return all_cells
 
-    def get_all_cell_text_from_lyx_file(self, filename, also_noncell=False):
+    @staticmethod
+    def get_all_cell_text_from_lyx_file(filename, magic_cookie_string,
+                                        also_noncell=False):
         """Read all the cell text from the Lyx file "filename."  Return a
         list of `Cell` class instances, where each cell is a list of lines (and
         some additional data) corresponding to the lines of a code cell in the
@@ -961,18 +964,18 @@ class InteractWithLyxCells:
                         cell_line = saved_lyx_file.readline().rstrip("\n") # drop trailing \n
 
                     line = "".join(cell_line_substrings) + "\n"
-                    cookie_find_index = line.find(self.magic_cookie)
+                    cookie_find_index = line.find(magic_cookie_string)
                     if cookie_find_index == 0: # Cell cookies must begin lines.
                         new_cell.has_cookie_inside = True
                         cookie_lines_in_cells += 1
-                        line = line.replace(self.magic_cookie, "", 1) # replace one occurence
+                        line = line.replace(magic_cookie_string, "", 1) # Replace one occurence.
                     if cookie_find_index != -1:
                         cookie_lines_total += 1
 
-                    new_cell.append(line) # got a line from the cell, append it
+                    new_cell.append(line) # Got a line from the cell, append it.
 
-            else: # got an ordinary Lyx file line.
-                if line.find(self.magic_cookie) != -1: # found cookie anywhere on line
+            else: # Got an ordinary Lyx file line.
+                if line.find(magic_cookie_string) != -1: # found cookie anywhere on line
                     cookie_lines_total += 1
 
         # Add the final text piece if `also_noncell` is true.
@@ -989,8 +992,9 @@ class InteractWithLyxCells:
                                 "This will cause problems with cell evaluations.")
         return cell_list
 
-    def replace_all_cell_text_in_lyx_file(self, from_file_name, to_file_name, all_cells,
-                                    init=True, standard=True):
+    @staticmethod
+    def replace_all_cell_text_in_lyx_file(from_file_name, to_file_name, all_cells,
+                                    magig_cookie_string, init=True, standard=True):
         """Given a .lyx file `from_file`, write out another .lyx file which has the
         same text but in which all cells are replaced by the cells in `all_cells`.
         Currently only the selected code cells are replaced, and the code cells
@@ -1015,7 +1019,7 @@ class InteractWithLyxCells:
 
             elif line.find(r"\begin_inset Flex LyxNotebookCell:") != 0:
                 # Got an ordinary Lyx file line, so just echo it to output
-                if line.find(self.magic_cookie) != -1: # found cookie anywhere on line
+                if line.find(magic_cookie_string) != -1: # found cookie anywhere on line
                     pass # later may want to do something if cookie was found
                 updated_saved_lyx_file.write(line)
 
@@ -1441,7 +1445,7 @@ class InteractWithLyxCells:
         all_cells = self.get_all_cell_text()
         # some test lines for debugging below
         #all_cells = self.get_all_cell_text_from_latex(mostRecentLatexExport)
-        #all_cells = self.get_all_cell_text_from_lyx_file(currentBufferFilename)
+        #all_cells = self.get_all_cell_text_from_lyx_file(currentBufferFilename, self.magic_cookie)
 
         # Loop through all the inset types, writing the cells for that type.
         for filename, inset_specifier, commentLineBegin in data_tuple_list:

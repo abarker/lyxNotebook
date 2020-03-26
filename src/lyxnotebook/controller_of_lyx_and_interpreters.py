@@ -691,7 +691,8 @@ class ControllerOfLyxAndInterpreters:
 
         # Create the new .lyx file from the evaluated list of cells.
         self.lyx_process.replace_all_cell_text_in_lyx_file(
-            from_file_name, to_file_name, all_cells, init=init, standard=standard)
+            from_file_name, to_file_name, all_cells, self.lyx_process.magic_cookie,
+            init=init, standard=standard)
 
         if messages:
             self.lyx_process.show_message(
