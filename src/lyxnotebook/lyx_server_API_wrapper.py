@@ -246,7 +246,7 @@ class InteractWithLyxCells:
             break
         return parsed_list[3].rstrip("\n")
 
-    def get_server_event(self, info=True, error=True, notify=True, loop=False):
+    def get_server_event(self, info=True, error=True, notify=True):
         """Reads a single event from the Lyx Server.  If no event is there to
         be read it returns None.  If any flag is False then that type of event
         is completely ignored.  Returns a parsed list with the strings of the
@@ -317,11 +317,11 @@ class InteractWithLyxCells:
                 print("Warning: getServerEvent() read an unknown message type" +
                       " from LyX Server:", parsed_list)
 
-            if not loop:
-                break
         return parsed_list
 
-    def wait_for_server_event(self, info=True, error=True, notify=True):
+    # TODO: These loop options may or may not be work keeping, testing menu gui....
+    # Default is same as before...
+    def wait_for_server_event(self, info=True, error=True, notify=True, loop=True):
         """Go into a loop, waiting for an event from the Lyx process.  If the
         flag for any type of event is False then that type of event is ignored."""
         while True:
@@ -336,9 +336,13 @@ class InteractWithLyxCells:
                     sys.exit(0)
             else:
                 break
+            if not loop:
+                break
         return parsed_list
 
-    def wait_for_server_notify(self):
+    # TODO: These loop options may or may not be work keeping, testing menu gui....
+    # Default is same as before...
+    def wait_for_server_notify(self, loop=True):
         """This routine waits for a NOTIFY event, ignoring all others.  When it
         gets one, it returns only the actual keyboard key that was pressed, with
         the trailing newline stripped.  This is called from higher-level routines
@@ -346,7 +350,7 @@ class InteractWithLyxCells:
         and perform the action).  Thus all command-keys in Lyx for this application
         are bound to the LFUN "server-notify" (usually in a .bind file in the
         local .lyx directory)."""
-        parsed_list = self.wait_for_server_event(info=False, error=False)
+        parsed_list = self.wait_for_server_event(info=False, error=False, loop=True)
         # The second and last component of NOTIFY has the key:
         #   NOTIFY:<key_pressed>
         key_pressed = parsed_list[1].rstrip("\n")

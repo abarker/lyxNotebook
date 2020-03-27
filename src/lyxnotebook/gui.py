@@ -108,7 +108,7 @@ def menu_box_popup(menu_items_list, title=default_title):
                          default_values=None,
                          select_mode=None,
                          change_submits=False,
-                         enable_events=True, # Return the user's click immediately.
+                         enable_events=True, # Do/Don't return the user's click immediately.
                          bind_return_key=False,
                          size=(width, height),
                          disabled=False,
@@ -124,8 +124,10 @@ def menu_box_popup(menu_items_list, title=default_title):
                          visible=True,
                          metadata=None)
 
+    layout = [ [listbox], [sg.Cancel()] ]
+
     window = sg.Window(title=title,
-                       layout=[ [listbox], [sg.Cancel()] ],
+                       layout=layout,
                        default_element_size=(45, 1),
                        default_button_element_size=(None, None),
                        auto_size_text=None,
@@ -160,10 +162,20 @@ def menu_box_popup(menu_items_list, title=default_title):
                        use_ttk_buttons=None,
                        metadata=None)
 
-    event, values = window.Read()
-    window.close()
+    btn, values_dict = window.Read(timeout=0) # TODO, may or may not be needed...
+    return window
 
-    if event == "Cancel":
+def read_menu_event(window, timeout=None):
+    event, values = window.Read(timeout=timeout)
+    print("------------------------> event and values are:", event, values)
+
+    if event == "Cancel" or event == "pop up submenu":
+        print("-------------------------> got turn off signal")
         return None
+
+    print("-----------> action being returned is", values[0][0])
     return values[0][0]
+
+def close_menu(window):
+    window.close()
 
