@@ -29,7 +29,7 @@ import sys
 import os
 import time
 
-from . import gui_elements as gui
+from . import gui
 from .config_file_processing import config_dict
 from .lyx_server_API_wrapper import InteractWithLyxCells
 from . import keymap # The current mapping of keys to Lyx Notebook functions.

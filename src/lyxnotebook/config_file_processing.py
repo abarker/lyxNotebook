@@ -10,11 +10,21 @@ Copyright (c) 2012 Allen Barker
 
 Read and return values from the config file.
 
+
+General config parser reminder examples:
+
+    print(config_data.sections())
+    config_data.options('magic cookie')
+    config_data.get('magic cookie', 'magic_cookie_string')
+    config_data.get('magic cookie', 'magic_cookie_string')
+    config_data['magic cookie'].getboolean('magic_cookie_string')
+    config_data['magic cookie']['magic_cookie_string']
+
 """
 
 import configparser
 import os
-from . import gui_elements
+#from . import gui
 
 # All config data is flattened into this single dict, ignoring sections.
 config_dict = {}
@@ -84,61 +94,4 @@ def initialize_config_data(lyx_user_dir):
     config_dict["lyx_user_dir"] = lyx_user_dir
 
 
-def find_and_load_config_file(config_parser):
-    """Search for a relevant config file, and load it into `config_file`."""
-    # TODO not used, delete
-
-    # Default on linux should be ~/.config/lyxnotebook dir,  the XDG
-    # standard.   Maybe just make that dir and put it there...
-    #
-    # For portability, consider this way to find a dir:
-    # https://github.com/ActiveState/appdirsa
-    #
-    # How jupyter does it: https://jupyter.readthedocs.io/en/latest/projects/jupyter-directories.html
-    #
-    # Currently just searches on a path...
-    homedir = os.path.expanduser("~")
-
-    config_search_path = [
-                          os.path.join(homedir, ".config"),
-                          os.path.join(homedir, "lyxnotebook", ".config"),
-                          homedir,
-                          os.environ.get("LYXNOTEBOOK_CONF"),
-                          os.path.join(homedir, ".lyx")
-                          ]
-
-    found_config = False
-    for dirname in config_search_path:
-        if not dirname:
-            continue
-        pathname = os.path.join(dirname, "lyxnotebook.cfg")
-        for filename in ["lyxnotebook.cfg", ".lyxnotebook.cfg"]:
-            try:
-                with open(pathname) as cfgfile:
-                    config_parser.read(cfgfile)
-                found_config = True
-            except IOError:
-                pass
-
-    if not found_config:
-        msg = "\nWarning: Could not find config file 'lyxnotebook.cfg', using default values."
-        print(msg)
-        pathname = os.path.join(lyx_notebook_source_dir,
-                                    "default_config_file_and_data_files",
-                                    "default_config_file.cfg")
-        config_parser.read(pathname)
-
-    print("\nFound and loaded config file at:\n   ", pathname)
-
-# Just loading this module initializes the config.  We need the config data
-# when running from command line or from lfun, i.e., from different modules.
-#initialize_config_data()
-
-# General config parser reminder examples.
-#print(config_data.sections())
-#config_data.options('magic cookie')
-#config_data.get('magic cookie', 'magic_cookie_string')
-#config_data.get('magic cookie', 'magic_cookie_string')
-#config_data['magic cookie'].getboolean('magic_cookie_string')
-#config_data['magic cookie']['magic_cookie_string']
 

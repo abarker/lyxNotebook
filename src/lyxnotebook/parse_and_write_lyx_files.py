@@ -12,7 +12,7 @@ This module contains functions which parse and rewrite Lyx .lyx files.
 """
 
 from .config_file_processing import config_dict
-from . import gui_elements as gui
+from . import gui
 
 class TerminatedFile:
     """A class to read lines from a file with a known termination line, which may

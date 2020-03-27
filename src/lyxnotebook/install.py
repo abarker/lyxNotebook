@@ -43,7 +43,7 @@ import tempfile
 import PySimpleGUI as sg
 from .config_file_processing import config_dict
 from .interpreter_specs.generate_module_files_from_template import generate_module_files_from_templates
-from .gui_elements import get_path_popup, yesno_popup, text_info_popup
+from .gui import get_path_popup, yesno_popup, text_info_popup
 
 python_version = platform.python_version_tuple()
 

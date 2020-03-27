@@ -59,7 +59,7 @@ import getpass
 import random
 import string # just for generating random filenames
 from .config_file_processing import config_dict
-from . import gui_elements as gui
+from . import gui
 from .parse_and_write_lyx_files import (TerminatedFile, get_all_cell_text_from_lyx_file,
                                         replace_all_cell_text_in_lyx_file)
 

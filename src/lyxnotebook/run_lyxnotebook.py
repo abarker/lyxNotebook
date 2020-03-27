@@ -20,7 +20,7 @@ import sys
 import time
 from .config_file_processing import config_dict
 from .controller_of_lyx_and_interpreters import ControllerOfLyxAndInterpreters
-from . import gui_elements as gui
+from . import gui
 
 lyx_user_directory = config_dict["lyx_user_directory"]
 lockfile_path = os.path.abspath(os.path.expanduser(
