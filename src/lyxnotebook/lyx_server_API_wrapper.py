@@ -246,7 +246,7 @@ class InteractWithLyxCells:
             break
         return parsed_list[3].rstrip("\n")
 
-    def get_server_event(self, info=True, error=True, notify=True):
+    def get_server_event(self, info=True, error=True, notify=True, loop=False):
         """Reads a single event from the Lyx Server.  If no event is there to
         be read it returns None.  If any flag is False then that type of event
         is completely ignored.  Returns a parsed list with the strings of the
@@ -268,7 +268,11 @@ class InteractWithLyxCells:
 
         If multiple events are read at once (assumed to be delimited by newlines)
         then they are buffered and returned one at a time.
-        """
+
+        If `loop` is set to true then this method will loop until it reads a valid
+        event.  Otherwise, it will just perform one iteration, for example for when
+        this is just one step of a larger event loop including the GUI events
+        (the `server_notify_loop` method of `ControllerOfLyxAndInterpreters`)."""
         while True:
             # if no events in buffer, do a read (returning None if nothing to read)
             if len(self.lyx_server_read_event_buffer) == 0: # could be if
@@ -312,6 +316,9 @@ class InteractWithLyxCells:
             else: # ignore unknown, but print warning
                 print("Warning: getServerEvent() read an unknown message type" +
                       " from LyX Server:", parsed_list)
+
+            if not loop:
+                break
         return parsed_list
 
     def wait_for_server_event(self, info=True, error=True, notify=True):
@@ -836,8 +843,6 @@ class InteractWithLyxCells:
                     continue
                 lines_match = True
                 for target_line, line in zip(cell_text, cell):
-                    print("target_line:", target_line) # DEBUG
-                    print("target_line:", line) # DEBUG
                     if target_line != line:
                         lines_match = False
                         break
