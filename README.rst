@@ -3,37 +3,46 @@ Lyx Notebook is a program which allows the word processor Lyx to be used as a
 code-evaluating notebook (similar to Mathematica notebooks or the Sage
 notebook).  
 
+Only Linux is currently supported.
+
 UPDATE, Mar. 2020
 =================
 
-   Many improvements to the code have recently been made.
+Many improvements to the code have recently been made.  The GUI looks nicer
+now, and a config file ``lyxnotebook.cfg`` with user-modifiable settings is now
+written to the Lyx user dir.
 
-   Note that Lyx 2.4.0 may provide a mechanism to improve the program and
-   eliminate the currently-necessary inserting of magic-cookie strings to get
-   cell text.
+Lyx Notebook has recently been updated to install with ``setup.py`` and
+``pip``.  This creates the entry point script ``lyxnotebook`` (and another
+one which works when called from a Lyx lfun bound to F12 by default).  The
+older installation methods no longer work.  To install for development,
+goto the root directory of the project and run::
 
-   Lyx Notebook has recently been updated to install with ``setup.py`` and
-   ``pip``.  This creates the entry point script ``lyxnotebook`` (and another
-   one which works when called from a Lyx lfun bound to F12 by default).  The
-   older installation methods no longer work.  To install for development,
-   goto the root directory of the project and run::
+   pip3 install -e . --user
 
-      pip3 install -e . --user
+For non-development use the ``-e`` option is not needed.  Inside a
+virtualenv the ``--user`` option is not needed.  The ``tkinter`` module is
+also required.  If it is not already installed, you can install it
+on Ubuntu with::
 
-   For non-development use the ``-e`` option is not needed.  Inside a
-   virtualenv the ``--user`` option is not needed.  The ``tkinter`` module is
-   also required.  If it is not already installed, you can install it
-   on Ubuntu with::
+   sudo apt install python3-tk
+
+Now for Lyx 2.3 run this command and follow the instructions it gives::
    
-      sudo apt install python3-tk
+   lyxnotebook --install --no-editable-insets
 
-   Now run this command and follow the instructions it gives::
-      
-      lyxnotebook --install
+For Lyx 2.4 you can leave out the ``--no-editable-insets`` part.  To use
+a Lyx user directory other than the default, use the ``--user-dir`` option
+to set the path.
 
-   To uninstall the program, use ``pip uninstall lyxnotebook``.  Reset the bind
-   file to its previous value.  Delete the Lyx Notebook ``.module`` files
-   and ``.bind`` files in the ``.lyx`` directory.
+To uninstall the program, use ``pip uninstall lyxnotebook``.  Reset the bind
+file to its previous value.  Delete the Lyx Notebook ``.module`` files
+and ``.bind`` files in the ``.lyx`` directory.
+
+Note that Lyx 2.4.0 may provide a mechanism to improve the program and
+eliminate the currently-necessary inserting of magic-cookie strings to get
+cell text.  The current development is targeted at that, but Lyx 2.0.3
+also still works.
 
 Earlier info
 ============
