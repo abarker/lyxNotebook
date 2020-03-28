@@ -108,7 +108,7 @@ def menu_box_popup(menu_items_list, title=default_title):
                          default_values=None,
                          select_mode=None,
                          change_submits=False,
-                         enable_events=True, # Do/Don't return the user's click immediately.
+                         enable_events=False, # Don't return user's click immediately.
                          bind_return_key=False,
                          size=(width, height),
                          disabled=False,
@@ -117,7 +117,7 @@ def menu_box_popup(menu_items_list, title=default_title):
                          no_scrollbar=False,
                          background_color=None,
                          text_color=None,
-                         key=None,
+                         key="cmd list",
                          pad=None,
                          tooltip=None,
                          right_click_menu=None,
@@ -149,7 +149,7 @@ def menu_box_popup(menu_items_list, title=default_title):
                        text_justification=None,
                        no_titlebar=False,
                        grab_anywhere=False,
-                       keep_on_top=True,
+                       keep_on_top=False, # This could be an option in cfg file.
                        resizable=False,
                        disable_close=False,
                        disable_minimize=False,
@@ -162,20 +162,30 @@ def menu_box_popup(menu_items_list, title=default_title):
                        use_ttk_buttons=None,
                        metadata=None)
 
-    btn, values_dict = window.Read(timeout=0) # TODO, may or may not be needed...
+    # A read is needed before an update, according to manual.
+    btn, values_dict = window.Read(timeout=0)
     return window
 
-def read_menu_event(window, timeout=None):
-    event, values = window.Read(timeout=timeout)
-    print("------------------------> event and values are:", event, values)
+def read_menu_event(window, choices, timeout=None):
+    """Reads the window event.  Return `None` if no event to respond to, otherwise
+    return the selected menu item's text."""
+    event, values = window.read(timeout=timeout)
 
-    if event == "Cancel" or event == "pop up submenu":
-        print("-------------------------> got turn off signal")
-        return None
+    if not event:
+        return "pop up submenu"
 
-    print("-----------> action being returned is", values[0][0])
-    return values[0][0]
+    # Update the values to clear the current selection, since we've read it.
+    window["cmd list"].update(values=choices)
+
+    if event == "Cancel":
+        return "pop up submenu"
+
+    if not values or not values["cmd list"]:
+        return None # Got no command, do nothing.
+
+    return values["cmd list"][0]
 
 def close_menu(window):
+    """Close the window `window`."""
     window.close()
 

@@ -248,31 +248,26 @@ class InteractWithLyxCells:
 
     def get_server_event(self, info=True, error=True, notify=True):
         """Reads a single event from the Lyx Server.  If no event is there to
-        be read it returns None.  If any flag is False then that type of event
+        be read it returns `None`.  If any flag is `False` then that type of event
         is completely ignored.  Returns a parsed list with the strings of the
         Lyx server events (but not the colon separator, and keeping the final
         newline on the last element in the list).
 
         This routine is repeated in a polling loop to wait for an event in the
-        routine self.wait_for_server_event().  It can also be used outside a wait
-        loop, for example, calling it with all cell types False will empty
-        out all events, buffered and pending, and return None.
+        routine `self.wait_for_server_event()`.  It can also be used outside a
+        wait loop, for example, calling it with all cell types `False` will empty
+        out all events, buffered and pending, and return `None`.
 
         If a NOTIFY event from the server is ignored it nonetheless sets the
-        flag self.ignored_server_notify_event to True.  This flag can be initialized
-        and accessed by a higher-level routine, if desired.  It is used to
-        determine if the user hit a key bound to server-notify while some
-        other actions were taking place, like a multi-cell evaluation.  The
-        higher-level routine can then stop the evaluations by checking between
-        cell evaluations.
+        flag `self.ignored_server_notify_event` to `True`.  This flag can be
+        initialized and accessed by a higher-level routine, if desired.  It is
+        used to determine if the user hit a key bound to server-notify while
+        some other actions were taking place, like a multi-cell evaluation.
+        The higher-level routine can then stop the evaluations by checking
+        between cell evaluations.
 
-        If multiple events are read at once (assumed to be delimited by newlines)
-        then they are buffered and returned one at a time.
-
-        If `loop` is set to true then this method will loop until it reads a valid
-        event.  Otherwise, it will just perform one iteration, for example for when
-        this is just one step of a larger event loop including the GUI events
-        (the `server_notify_loop` method of `ControllerOfLyxAndInterpreters`)."""
+        If multiple events are read at once (assumed to be delimited by
+        newlines) then they are buffered and returned one at a time."""
         while True:
             # if no events in buffer, do a read (returning None if nothing to read)
             if len(self.lyx_server_read_event_buffer) == 0: # could be if
@@ -319,11 +314,9 @@ class InteractWithLyxCells:
 
         return parsed_list
 
-    # TODO: These loop options may or may not be work keeping, testing menu gui....
-    # Default is same as before...
-    def wait_for_server_event(self, info=True, error=True, notify=True, loop=True):
+    def wait_for_server_event(self, info=True, error=True, notify=True):
         """Go into a loop, waiting for an event from the Lyx process.  If the
-        flag for any type of event is False then that type of event is ignored."""
+        flag for any type of event is `False` then that type of event is ignored."""
         while True:
             parsed_list = self.get_server_event(info=info, error=error, notify=notify)
             if parsed_list is None:
@@ -336,21 +329,17 @@ class InteractWithLyxCells:
                     sys.exit(0)
             else:
                 break
-            if not loop:
-                break
         return parsed_list
 
-    # TODO: These loop options may or may not be work keeping, testing menu gui....
-    # Default is same as before...
-    def wait_for_server_notify(self, loop=True):
-        """This routine waits for a NOTIFY event, ignoring all others.  When it
+    def wait_for_server_notify(self):
+        """This routine waits for a `NOTIFY` event, ignoring all others.  When it
         gets one, it returns only the actual keyboard key that was pressed, with
         the trailing newline stripped.  This is called from higher-level routines
         to wait for a Lyx command-key sent by server-notify (they then to "wake up"
         and perform the action).  Thus all command-keys in Lyx for this application
         are bound to the LFUN "server-notify" (usually in a .bind file in the
         local .lyx directory)."""
-        parsed_list = self.wait_for_server_event(info=False, error=False, loop=True)
+        parsed_list = self.wait_for_server_event(info=False, error=False)
         # The second and last component of NOTIFY has the key:
         #   NOTIFY:<key_pressed>
         key_pressed = parsed_list[1].rstrip("\n")
@@ -856,8 +845,8 @@ class InteractWithLyxCells:
             # No matches found.
             if not cell_match_indices:
                 gui.text_info_popup(
-                       "Warning: No cells in the .lyx file matched the text extracted\n"
-                       "from the inset via the inset-edit LFUN.")
+                       "Warning: No code cells in the .lyx file matched the text\n"
+                       "extracted from the inset via the inset-edit LFUN.")
                 return None
 
             # Multiple matches found.

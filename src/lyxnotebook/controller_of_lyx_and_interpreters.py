@@ -68,17 +68,26 @@ class ControllerOfLyxAndInterpreters:
         """This is the main command/event loop, getting commands from Lyx and executing
         them."""
         # Get a dict mapping keys to commands/actions.
+        sleep_time = 0.25 # Time to sleep between polling, in seconds.
         self.keymap = dict(keymap.all_commands_and_keymap)
         window = None
 
+        # Create the menu list of choices.
+        menu_choices = []
+        for key, command in keymap.all_commands_and_keymap:
+            if key is not None:
+                key = key.replace("Shift+", "S-") # this is to align columns
+                key += " "*(5-len(key))
+            else:
+                key = " "*5
+            menu_choices.append(key + " " + command)
+
         while True:
             # Wait for a bound key in Lyx to be pressed, and get it when it is.
-            print("testing key press")
-            key_pressed = self.lyx_process.wait_for_server_notify(loop=False)
-            print("after testing key press")
+            parsed_list = self.lyx_process.get_server_event(info=False, error=False)
+            key_pressed = parsed_list[1].rstrip("\n") if parsed_list else None
 
-            if key_pressed and key_pressed in self.keymap: # TODO later above call can return None
-                print("got a key press")
+            if key_pressed and key_pressed in self.keymap:
 
                 # Eat any buffered events (notify or otherwise): avoid annoying user.
                 self.lyx_process.get_server_event(info=False, error=False, notify=False)
@@ -87,52 +96,32 @@ class ControllerOfLyxAndInterpreters:
                 key_action = self.keymap[key_pressed]
 
                 # Look for menu toggle; open menu if found and not already open.
-
                 if key_action == "pop up submenu": # handle the pop-up menu option first
                     if not window:
-                        choices = []
-                        for key, command in keymap.all_commands_and_keymap:
-                            if key is not None:
-                                key = key.replace("Shift+", "S-") # this is to align columns
-                                key += " "*(5-len(key))
-                            else:
-                                key = " "*5
-                            choices.append(key + " " + command)
-                        window = gui.menu_box_popup(menu_items_list=choices)
+                        window = gui.menu_box_popup(menu_items_list=menu_choices)
                     else:
                         gui.close_menu(window)
                         window = None
                         continue
 
-                print("LyxNotebook processing user command:", key_action)
                 self.lyx_process.show_message("Processing user command: " + key_action)
-
                 self.respond_to_key_action(key_action)
 
             if window:
-                print("============> getting window event")
-                #choice_str = gui.read_menu_event(window, timeout=0)
-                choice_str = gui.read_menu_event(window, timeout=None)
-                if choice_str is None:
-                    gui.close_menu(window)
-                    window = None
-                    continue
+                choice_str = gui.read_menu_event(window, menu_choices,
+                                                 timeout=0) # Time in ms.
+                if choice_str:
+                    if choice_str.rstrip().endswith("pop up submenu"):
+                        gui.close_menu(window)
+                        window = None
+                        continue
 
-                # Strip off the beginning part which shows the shortcut.
-                key_action = choice_str[5:].strip()
-                print("----------------> key action is", key_action)
+                    # Strip off the beginning part which shows the shortcut.
+                    key_action = choice_str[5:].strip()
 
-                self.respond_to_key_action(key_action)
-                # TODO: Below returns to old way; loop hangs at window AND key press
-                # still for some reason...
-                gui.close_menu(window)
-                window = None
+                    self.respond_to_key_action(key_action)
 
-            #gui_event = gui.get_menu_event()
-            # if gui_event:
-            #     Etc., intercept key for gui toggle, and keep track of its state.
-            #     If it is displayed then query it for its event and process it...
-            #     Something like that.
+            time.sleep(sleep_time)
 
     def respond_to_key_action(self, key_action):
         """Perform the appropriate action for a key bound to Lyx Notebook pressed in
