@@ -10,6 +10,7 @@
 lyxNotebookCellPythonTwo
 lyxNotebookCellPython
 lyxNotebookListingsWithSmallFont
+lyxNotebookCellBash
 \end_modules
 \maintain_unincluded_children false
 \language english
@@ -317,6 +318,71 @@ status open
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex LyxNotebookCell:Standard:Bash
+status open
+
+\begin_layout Plain Layout
+
+ls
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex LyxNotebookCell:Output:Bash
+status open
+
+\begin_layout Plain Layout
+
+ copy.lyx		   testGraphicFile.pdf
+\end_layout
+
+\begin_layout Plain Layout
+
+ copy.lyx~		   testInteractWithLyxCells.lyx
+\end_layout
+
+\begin_layout Plain Layout
+
+ default_config_file.cfg   testInteractWithLyxCells.lyx~
+\end_layout
+
+\begin_layout Plain Layout
+
+ localLyx		   testInteractWithLyxCells-lyx21.lyx~
+\end_layout
+
+\begin_layout Plain Layout
+
+'#plain_test_file.lyx#'    test_lyx_file_parsing.py
+\end_layout
+
+\begin_layout Plain Layout
+
+ plain_test_file.lyx	   tttmp.lyx
+\end_layout
+
+\begin_layout Plain Layout
+
+ plain_test_file.lyx~	   tttmp.lyx~
+\end_layout
+
+\begin_layout Plain Layout
+
+ testGraphicFile2.eps	   zzzzz_lyxnotebook_tmp_debug.lyxnotebook
+\end_layout
+
+\begin_layout Plain Layout
+
+ testGraphicFile.eps
 \end_layout
 
 \end_inset

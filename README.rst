@@ -1,7 +1,7 @@
 
 LyX Notebook is a program which allows the word processor LyX to be used as a
-code-evaluating notebook (similar to Mathematica notebooks or the Sage
-notebook).  
+code-evaluating notebook (similar to Mathematica notebooks, the Sage
+notebook, or Jupyter notebooks).  
 
 Only Linux is currently supported.
 
