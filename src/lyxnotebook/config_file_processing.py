@@ -78,6 +78,7 @@ def initialize_config_data(lyx_user_dir):
         "separate_interpreters_for_each_buffer",
         "has_editable_insets_noeditor_mod",
         "has_editable_insets",
+        "gui_window_always_on_top",
         ]
 
     for setting in bool_settings:

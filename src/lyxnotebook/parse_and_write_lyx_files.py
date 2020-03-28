@@ -268,10 +268,10 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
     using_inset_edit_method = (config_dict["has_editable_insets_noeditor_mod"]
                                and config_dict["has_editable_insets"])
     if (using_inset_edit_method and cookie_lines_total > 0) or cookie_lines_total > 1:
-        gui.text_info_popup("Warning: Multiple cookies were found in the file.\n\n"
+        gui.text_warning_popup("Warning: Multiple cookies were found in the file.\n\n"
                             "This can cause problems with cell-goto operations.")
     if not using_inset_edit_method and cookie_lines_in_cells > 1:
-        gui.text_info_popup("Warning: Multiple cookies were found in Lyx Notebook\n"
+        gui.text_warning_popup("Warning: Multiple cookies were found in Lyx Notebook\n"
                             "cells in the file.\n\n"
                             "This will cause problems with cell evaluations.")
     return cell_list
@@ -315,7 +315,7 @@ def replace_all_cell_text_in_lyx_string(lyx_string, replacement_cells, magic_coo
                 if not replacement_cells:
                     msg = "Warning: Cells number and type do not match replacement cells."
                     print(msg)
-                    gui.text_info_popup(msg)
+                    gui.text_warning_popup(msg)
                 replacement_cell = replacement_cells.pop()
                 if isinstance(replacement_cell, str):
                     continue

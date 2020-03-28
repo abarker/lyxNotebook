@@ -844,7 +844,7 @@ class InteractWithLyxCells:
 
             # No matches found.
             if not cell_match_indices:
-                gui.text_info_popup(
+                gui.text_warning_popup(
                        "Warning: No code cells in the .lyx file matched the text\n"
                        "extracted from the inset via the inset-edit LFUN.")
                 return None
@@ -856,7 +856,7 @@ class InteractWithLyxCells:
                       "to update the output of..."
                       .format(cell_match_indices))
                 print(msg)
-                gui.text_info_popup(msg)
+                gui.text_warning_popup(msg)
                 return None
 
             # Single match.
@@ -880,7 +880,7 @@ class InteractWithLyxCells:
                               "\ncookie string " + self.magic_cookie + " from the"
                               " document and try again.\n")
                         print(err_msg, file=sys.stderr)
-                        gui.text_info_popup(err_msg)
+                        gui.text_warning_popup(err_msg)
                         return None
                     found_cookie = True
                     return_cell = cell

@@ -98,7 +98,8 @@ class ControllerOfLyxAndInterpreters:
                 # Look for menu toggle; open menu if found and not already open.
                 if key_action == "toggle gui": # handle the pop-up menu option first
                     if not window:
-                        window = gui.menu_box_popup(menu_items_list=menu_choices)
+                        window = gui.main_lyxnotebook_gui_window(
+                                                      menu_items_list=menu_choices)
                     else:
                         gui.close_menu(window)
                         window = None
@@ -772,7 +773,7 @@ class ControllerOfLyxAndInterpreters:
         if not os.path.exists(most_recent_backup_full):
             if messages:
                 msg = "Error: No backup file to recover."
-                gui.text_info_popup(msg)
+                gui.text_warning_popup(msg)
                 self.lyx_process.show_message(msg)
                 print(msg)
             return

@@ -14,6 +14,7 @@ Simple GUI elements used by the program.
 
 import pathlib
 import PySimpleGUI as sg
+from .config_file_processing import config_dict
 
 # For persistent GUI inside an event loop, note that the current main event loop
 # for getting and executing commands is in the method `server_notify_loop` of
@@ -58,6 +59,25 @@ def text_info_popup(text, title=default_title):
         keep_on_top=False,
         location=popup_location)
 
+def text_warning_popup(text, title=default_title):
+    """A simple blocking popup displaying warning text for the user to read and confirm.
+    As of not it is the same as `text_info_popup` except it is always on top."""
+    sg.popup(text,
+        title=title,
+        button_color=None,
+        background_color=None,
+        text_color=None,
+        button_type=0,
+        custom_text=(None, None),
+        non_blocking=False,
+        icon=None,
+        line_width=None,
+        font=None,
+        no_titlebar=False,
+        grab_anywhere=False,
+        keep_on_top=True,
+        location=popup_location)
+
 def get_path_popup(message, default_path, *, title=default_title, directory=False):
     """Query to get a pathname.  If `directory` is true then it browses for directories
     instead of files."""
@@ -99,7 +119,7 @@ def get_path_popup(message, default_path, *, title=default_title, directory=Fals
                                  initial_folder=pathlib.Path.home())
     return path
 
-def menu_box_popup(menu_items_list, title=default_title):
+def main_lyxnotebook_gui_window(menu_items_list, title=default_title):
     """Pop up a menu with a list of choices."""
     height = len(menu_items_list)
     width = max(len(line) for line in menu_items_list)
@@ -149,7 +169,7 @@ def menu_box_popup(menu_items_list, title=default_title):
                        text_justification=None,
                        no_titlebar=False,
                        grab_anywhere=False,
-                       keep_on_top=False, # This could be an option in cfg file.
+                       keep_on_top=config_dict["gui_window_always_on_top"],
                        resizable=False,
                        disable_close=False,
                        disable_minimize=False,

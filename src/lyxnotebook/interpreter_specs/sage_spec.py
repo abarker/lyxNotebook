@@ -41,14 +41,5 @@ sage.params = {
     "run_only_on_demand": True
 }
 
-# all formatting is identical to Python2
-sage.preamble_latex_code = python2.preamble_latex_code
-
 sage.general_listings_code_format = python2.general_listings_code_format
-sage.non_color_listings_code_format = python2.non_color_listings_code_format
-sage.color_listings_code_format = python2.color_listings_code_format
-
-sage.general_listings_output_format = python2.general_listings_output_format
-sage.non_color_listings_output_format = python2.non_color_listings_output_format
-sage.color_listings_output_format = python2.color_listings_output_format
 

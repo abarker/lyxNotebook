@@ -63,15 +63,4 @@ scala.general_listings_code_format = r"""
       upquote=true,
 """
 
-# use same code in the preamble
-scala.preamble_latex_code = python2.preamble_latex_code
-
-# re-use the color settings from Python2
-scala.non_color_listings_code_format = python2.non_color_listings_code_format
-scala.color_listings_code_format = python2.color_listings_code_format
-
-# use the same output cells as Python2
-scala.general_listings_output_format = python2.general_listings_output_format
-scala.non_color_listings_output_format = python2.non_color_listings_output_format
-scala.color_listings_output_format = python2.color_listings_output_format
 

@@ -50,15 +50,3 @@ R.general_listings_code_format = r"""
       breakautoindent=true,
 """
 
-# use same code in the preamble
-R.preamble_latex_code = python2.preamble_latex_code
-
-# re-use the color settings from Python2
-R.non_color_listings_code_format = python2.non_color_listings_code_format
-R.color_listings_code_format = python2.color_listings_code_format
-
-# use the same output cells as Python2
-R.general_listings_output_format = python2.general_listings_output_format
-R.non_color_listings_output_format = python2.non_color_listings_output_format
-R.color_listings_output_format = python2.color_listings_output_format
-

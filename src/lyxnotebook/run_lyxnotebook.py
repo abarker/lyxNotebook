@@ -43,7 +43,7 @@ def main():
             msg = ("You already have an instance of LyX Notebook running."
                    "\nIt is running as process {}.  Exiting.".format(old_PID))
             print(msg)
-            gui.text_info_popup(msg)
+            gui.text_warning_popup(msg)
             time.sleep(4) # For when a new terminal opened, so message can be read.
             sys.exit(1)
         else:

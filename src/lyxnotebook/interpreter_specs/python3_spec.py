@@ -11,6 +11,7 @@ from .spec_record import SpecRecord
 from .python2_spec import *
 
 python3 = SpecRecord()
+
 python3.params = {
     "prog_name": "Python", # name of the prog, used in formatted label
     "main_prompt": ">>> ",   # the main prompt
@@ -33,14 +34,5 @@ python3.params = {
     "run_only_on_demand": True     # don't start unless required to eval a cell
 }
 
-# all formatting is identical to Python2
-python3.preamble_latex_code = python2.preamble_latex_code
-
 python3.general_listings_code_format = python2.general_listings_code_format
-python3.non_color_listings_code_format = python2.non_color_listings_code_format
-python3.color_listings_code_format = python2.color_listings_code_format
-
-python3.general_listings_output_format = python2.general_listings_output_format
-python3.non_color_listings_output_format = python2.non_color_listings_output_format
-python3.color_listings_output_format = python2.color_listings_output_format
 
