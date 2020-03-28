@@ -172,13 +172,13 @@ def read_menu_event(window, choices, timeout=None):
     event, values = window.read(timeout=timeout)
 
     if not event:
-        return "pop up submenu"
+        return "toggle gui"
 
     # Update the values to clear the current selection, since we've read it.
     window["cmd list"].update(values=choices)
 
     if event == "Cancel":
-        return "pop up submenu"
+        return "toggle gui"
 
     if not values or not values["cmd list"]:
         return None # Got no command, do nothing.

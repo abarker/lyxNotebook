@@ -96,7 +96,7 @@ class ControllerOfLyxAndInterpreters:
                 key_action = self.keymap[key_pressed]
 
                 # Look for menu toggle; open menu if found and not already open.
-                if key_action == "pop up submenu": # handle the pop-up menu option first
+                if key_action == "toggle gui": # handle the pop-up menu option first
                     if not window:
                         window = gui.menu_box_popup(menu_items_list=menu_choices)
                     else:
@@ -111,7 +111,7 @@ class ControllerOfLyxAndInterpreters:
                 choice_str = gui.read_menu_event(window, menu_choices,
                                                  timeout=0) # Time in ms.
                 if choice_str:
-                    if choice_str.rstrip().endswith("pop up submenu"):
+                    if choice_str.rstrip().endswith("toggle gui"):
                         gui.close_menu(window)
                         window = None
                         continue

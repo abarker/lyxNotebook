@@ -33,7 +33,7 @@ forward/backward keys.
 """
 
 all_commands_and_keymap = [
-    ("F1", "pop up submenu"),
+    ("F1", "toggle gui"),
     # Goto cell commands.
     (None, "goto next any cell"),
     (None, "goto prev any cell"),

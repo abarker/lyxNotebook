@@ -161,15 +161,17 @@ status open
 
 \begin_layout Plain Layout
 
-print(
-\begin_inset Quotes eld
+print("init cell")
+\end_layout
+
 \end_inset
 
+
+\begin_inset Flex LyxNotebookCell:Output:Python
+status open
+
+\begin_layout Plain Layout
 init cell
-\begin_inset Quotes erd
-\end_inset
-
-)
 \end_layout
 
 \end_inset
