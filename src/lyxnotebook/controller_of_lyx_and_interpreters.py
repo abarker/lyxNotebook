@@ -446,7 +446,7 @@ class ControllerOfLyxAndInterpreters:
         if messages:
             self.lyx_process.show_message("Batch evaluating all %s cells." % (cell_types,))
         # Get all cell text from the Lyx auto-save file (saves it as a side effect).
-        all_cells = self.lyx_process.get_all_cell_text(use_latex_export=False)
+        all_cells = self.lyx_process.get_all_cell_text()
 
         # evaluate all the cells in the list (results pasted onto the cells)
         self.evaluate_list_of_cell_classes(all_cells, init=init, standard=standard,
@@ -564,9 +564,9 @@ class ControllerOfLyxAndInterpreters:
 
     def evaluate_code_in_cell_class(self, code_cell_text):
         """Evaluate the lines of code in the `Cell` instance `code_cell_text`.
-        The output is returned as a list of lines, and is also pasted onto the
-        code_cell_text instance as the data field evaluation_output.  Returns
-        `None` for a non-code cell."""
+        The output is returned as a list of lines, and is also set as an
+        attribute of the `code_cell_text` instance as the data field
+        evaluation_output.  Returns `None` for a non-code cell."""
 
         basic_type, inset_specifier_lang = code_cell_text.get_cell_type()
         if basic_type == "Output": # if not a code cell
@@ -587,7 +587,7 @@ class ControllerOfLyxAndInterpreters:
         if noop_at_cell_end: # doesn't run for None or "", since they eval to False
             extra_code_lines = noop_at_cell_end.splitlines(True) # keepends=True
 
-        modified_code_cell_text = code_cell_text + extra_code_lines
+        modified_code_cell_text = code_cell_text.lines + extra_code_lines
 
         # Loop through each line of code, evaluating it and saving the results.
         output = []

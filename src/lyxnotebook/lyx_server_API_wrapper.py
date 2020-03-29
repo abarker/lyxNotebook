@@ -60,69 +60,12 @@ import random
 import string # just for generating random filenames
 from .config_file_processing import config_dict
 from . import gui
-from .parse_and_write_lyx_files import (TerminatedFile, get_all_cell_text_from_lyx_file,
+from .parse_and_write_lyx_files import (Cell, TerminatedFile, get_all_cell_text_from_lyx_file,
                                         replace_all_cell_text_in_lyx_file)
 
 # This file is repeatedly written temporarily to current dir, then deleted.
 # TODO: Do in temp dir.
 tmp_saved_lyx_file_name = "tmp_save_file_lyx_notebook_xxxxx.lyxnotebook"
-
-class Cell(list):
-    """Simple container class derived from a list.  It is meant to hold lines
-    of text corresponding to the contents of a cell.  The line numbers are
-    relative to Lyx/Latex files (when the cell text is extracted from such files)."""
-    # TODO: maybe go back to list as internal, using composition.  Inheriting
-    # from list isn't a great idea.  General list-returning operations like
-    # slices return lists, not Cell subclasses.
-
-    def __init__(self):
-        """Initialize the data stored for the cell.  As a subclass of a list, the
-        list elements are the lines of text."""
-        # NOTE: Remember this is a list subclass with lines as elements.
-        super().__init__()
-
-        self.has_cookie_inside = False  # is there a cookie inside this cell?
-        # self.lines = []  # now the base list class contains the lines
-        self.begin_line_number = -1 # the line number where the cell begins
-        self.begin_line = ""       # the text of the begin line (i.e., the Latex \begin)
-        self.end_line_number = -1   # the line number where the cell ends
-        self.end_line = ""         # the text of the end line (i.e., the Latex \end)
-        self.evaluation_output = None # list of lines resulting from code evaluation
-
-    def get_cell_type(self):
-        """Note this depends on the naming convention in the .module files.
-        Returns a tuple (<basictype>,<language>).  For example,
-        ("Standard", "Python")."""
-        if self.begin_line == -1:
-            return None, None
-        if self.begin_line.find(r"\begin_inset Flex LyxNotebookCell") == 0: # from Lyx
-            split_line = self.begin_line.split(":")
-            language = split_line[-1].strip()
-            basic_type = split_line[-2].strip()
-        else: # from a Latex file, \begin{...
-            begin_pos = self.begin_line.find("{")+1
-            end_pos = self.begin_line.find("}")
-            type_string = self.begin_line[begin_pos:end_pos]
-            if type_string.find("lyxNotebookCellStandard") == 0:
-                language = type_string[len("lyxNotebookCellStandard"):]
-                basic_type = "Standard"
-            elif type_string.find("lyxNotebookCellInit") == 0:
-                language = type_string[len("lyxNotebookCellInit"):]
-                basic_type = "Init"
-            elif type_string.find("lyxNotebookCellOutput") == 0:
-                language = type_string[len("lyxNotebookCellOutput"):]
-                basic_type = "Output"
-            else:
-                language = None
-                basic_type = None
-        return basic_type, language
-
-    def __repr__(self):
-        all_text = "".join(self)
-        all_text = all_text.replace("\n", "\\n")
-        basic_type, language = self.get_cell_type()
-        return "Cell[{},{}]('{}')".format(basic_type, language, all_text)
-
 
 class InteractWithLyxCells:
     """The main class for handling interactions with a running Lyx process
@@ -656,7 +599,7 @@ class InteractWithLyxCells:
         return self.process_lfun("server-goto-file-row",
                                  argument=filename + " " + str(linenum))
 
-    def get_global_cell_info(self, use_latex_export=False):
+    def get_global_cell_info(self):
         """This routine returns a tuple:
 
             num_init_cells, num_standard_cells, num_output_cells
@@ -664,7 +607,7 @@ class InteractWithLyxCells:
         which is used in multiple-cell evaluations from inside Lyx.  Basically we
         need to know how many cells of each type to loop over using the cell-goto
         commands, and this function gets the data."""
-        cell_list = self.get_all_cell_text(use_latex_export=use_latex_export)
+        cell_list = self.get_all_cell_text()
         num_init_cells = 0
         num_standard_cells = 0
         num_output_cells = 0
@@ -684,9 +627,7 @@ class InteractWithLyxCells:
     #
     #
 
-    def get_all_cell_text(self, use_latex_export=False,
-                          nodelete_tmpfile=False,
-                          also_noncell=False):
+    def get_all_cell_text(self, nodelete_tmpfile=False, also_noncell=False):
         """Returns a list of `Cell` data structures containing the text for each
         cell in the current buffer.  Always updates the file before reading it.
         It can read either from a locally exported .tex Latex file (with
@@ -700,8 +641,6 @@ class InteractWithLyxCells:
          autoSaveFileName,
          full_path) = self.get_updated_lyx_directory_data()
 
-        if use_latex_export: # May not work anymore...
-            return self.get_all_cell_text_via_latex_file(bufferDirName)
         return self.get_all_cell_text_via_lyx_file(bufferDirName,
                                               nodelete_tmpfile=nodelete_tmpfile,
                                               also_noncell=also_noncell)
@@ -762,17 +701,17 @@ class InteractWithLyxCells:
     # Get and modify text in the current cell.
     #
 
-    def get_current_cell_text(self, use_latex_export=False):
+    def get_current_cell_text(self):
         r"""Returns a `Cell` data structure containing the current text of the cell,
         as lines.  Returns `None` if the cursor is not currently inside a cell
         or if the cell is empty.
 
-        The \begin and \end Latex markers (or Lyx markers) for the cell type are not
-        included as lines of a Cell, but they are saved as additional fields.
-        This currently works by putting a cookie in the current cell, updating the
-        save/export, removing the cookie, and then reading all the cells in from
-        that file and looking for which one has the cookie.  (This routine is
-        nontrivial due to a lack of LFUNs to do it more directly.)"""
+        The begin and end markers for the cell type are not included as lines
+        of a `Cell`, but they are saved as additional fields.  This currently
+        works by putting a cookie in the current cell, updating the
+        save/export, removing the cookie, and then reading all the cells in
+        from that file and looking for which one has the cookie.  (This routine
+        is nontrivial due to a lack of LFUNs to do it more directly.)"""
         # This routine is similar to `get_all_cell_text()` except the current cell has
         # to be singled out (identified with a cookie).  It calls that routine
         # after setting the cookie, searches for it, then deletes the cookie.
@@ -785,11 +724,10 @@ class InteractWithLyxCells:
         if has_editable_insets and has_editable_insets_noeditor_mod:
             # TODO: Later maybe implement searching for the file from unmodified inset-edit.
 
-            # Get all the cells from the Lyx or Latex output, because we need to
+            # Get all the cells from the Lyx output, because we need to
             # know the language associated with the current cell.  We will compare
             # text.
-            all_cells = self.get_all_cell_text(use_latex_export=use_latex_export,
-                                               also_noncell=False)
+            all_cells = self.get_all_cell_text(also_noncell=False)
             # set above also_noncell to use below debug code; delete later.
             """
             with open("zzzzz_lyxnotebook_tmp_debug.lyxnotebook", "w") as f:
@@ -867,7 +805,7 @@ class InteractWithLyxCells:
             self.insert_magic_cookie_inside_current(assert_inside_cell=True,
                                                     on_current_line=False)
 
-            all_cells = self.get_all_cell_text(use_latex_export=use_latex_export)
+            all_cells = self.get_all_cell_text()
 
             self.delete_magic_cookie_inside_current(assert_cursor_at_cookie_end=True)
 
@@ -1064,9 +1002,6 @@ class InteractWithLyxCells:
 
         # Get all the cells and open the file with name filename.
         all_cells = self.get_all_cell_text()
-        # some test lines for debugging below
-        #all_cells = self.get_all_cell_text_from_latex(mostRecentLatexExport)
-        #all_cells = get_all_cell_text_from_lyx_file(currentBufferFilename, self.magic_cookie)
 
         # Loop through all the inset types, writing the cells for that type.
         for filename, inset_specifier, commentLineBegin in data_tuple_list:
@@ -1151,115 +1086,4 @@ class InteractWithLyxCells:
         graph_str = r"graphics lyxscale 100 width 5in keepAspectRatio filename " \
             + most_recent
         self.process_lfun("inset-insert", graph_str)
-
-    #
-    # Get cell info by writing and analyzing the Latex source file.
-    # TODO: This method may or may not still work...
-    #
-
-    def get_all_cell_text_via_latex_file(self, bufferDirName):
-        """Get all Lyx cell text using the method of parsing the `.lyx` file."""
-        # Export to local Latex file, and wait only briefly
-        # TODO can use full_path now instead of re-join
-        abs_local_file_path = os.path.join(bufferDirName, self.local_latex_filename)
-        if os.path.exists(abs_local_file_path):
-            os.remove(abs_local_file_path)
-        self.export_latex_to_file(abs_local_file_path)
-        while not os.path.exists(abs_local_file_path):
-            # print("waiting for file creation.................")
-            time.sleep(0.05) # wait until file is at least created
-        time.sleep(0.05) # let the write get a slight head start before any reading
-
-        all_cells = self.get_all_cell_text_from_latex_file(abs_local_file_path)
-
-        # clean up self.local_latex_filename after writing and reading it
-        if os.path.exists(self.local_latex_filename):
-            os.remove(self.local_latex_filename)
-        return all_cells
-
-    def get_all_cell_text_from_latex_file(self, filename):
-        """Read all the special cell text from the Latex file "filename."
-        Return a list of Cell class instances, where each instance for a cell
-        is a list of lines (and some additional data) corresponding to the
-        lines of a cell in the document (in the order that they appear in the
-        document).
-
-        To update the data and then call this function, use getAllCellText() with
-        flag useLatexExport=True.
-        """
-        latex_file = TerminatedFile(filename, r"\end{document}",
-                                    err_msg_location="get_all_cell_text_from_latex_file")
-        cell_list = []
-        inside_cell = False
-        while True:
-            line = latex_file.readline()
-            if line == "":
-                break
-            # search lines starting with \begin{lyxNotebookCell, \end{lyxNotebookCell,
-            # or a cookie at the start of a cell line or anywhere in an ordinary line
-            if line.find(r"\begin{lyxNotebookCell") == 0 and line.strip()[-1] == "}":
-                inside_cell = True
-                cell_list.append(Cell()) # create a new cell
-                cell_list[-1].begin_line = line # begin{} may have meaningful args later
-                cell_list[-1].begin_line_number = latex_file.number
-                # did we find a cookie earlier that needs to be recorded with new cell?
-            elif line.find(r"\end{lyxNotebookCell") == 0 and line.strip()[-1] == "}":
-                cell_list[-1].end_line = line # include the end{} markup, too
-                cell_list[-1].end_line_number = latex_file.number
-                inside_cell = False
-            elif inside_cell:
-                # TODO: detect multiple cookies inside a cell (here and below routine)
-                # Can delete any multiples with or without raising error message.
-                # See the TODO in below routine (which is now used instead of this one
-                # by default).
-                if line.find(self.magic_cookie) == 0: # cell cookies must begin lines, too
-                    cell_list[-1].has_cookie_inside = True
-                    line = line.replace(self.magic_cookie, "", 1) # replace one occurence
-                cell_list[-1].append(line) # got a line in the cell, append it
-            else: # got an ordinary text line
-                if line.find(self.magic_cookie) != -1: # found cookie anywhere on line
-                    cookie_not_in_cell_line_num = latex_file.number
-        return cell_list
-
-    def export_latex_to_lyx_temp_dir(self):
-        """Update the Lyx temporary directory's version of exported Latex (for
-        the current buffer).  Note that this is different from just exporting to
-        Latex.  This is just a wrapper for an LFUN, and should not usually be
-        called by higher-level routines.  Higher-level routines should use
-        getAllCellText(), which updates the save file and gets the cell data from
-        it."""
-        # return self.process_lfun("buffer-update-dvi") # dvi version doesn't work
-        # doing below twice gives "command disabled" on second try, first returns
-        # empty data string in INFO message
-        self.process_lfun("buffer-update", "ps")
-
-    def export_latex_to_file(self, filename):
-        """Exports plain Latex to filename.  Note that the LFUN command seems to
-        prefer absolute pathnames, especially when Lyx notebook is running
-        without a terminal (for some reason)."""
-        self.process_lfun("buffer-export-custom", "latex cat $$FName >" + filename)
-
-    #
-    # Dead code below, but parts might still be usable.
-    #
-
-    def get_most_recent_temp_dir_latex_filename(self):
-        """Returns the filename of the most recently updated "export to latex" in
-        the Lyx temp directory.  The ls command used assumes the file is the most
-        recent one in the Lyx temp dir which matches: lyx*/*/*.tex"""
-        # This function is now UNUSED; it was mainly for server-goto-file-row
-        # experiments which didn't turn out well.  If needed it could be made more
-        # portable in a way similar to the insertMostRecentGraphicsFile code.
-
-        # BROKEN, for example, retData is undefined.
-
-        # (Note that the last ls option is the number 1, not the letter l.)
-        ls_cmd = "ls -ct1 "+self.lyx_temporary_directory+"/lyx*/*/"+retData[1][:-4]+".tex"
-        if os.system(ls_cmd+" >/dev/null"):
-            print("Failed to find exported Latex file.")
-            return []
-        f = os.popen(ls_cmd)
-        most_recent = f.readline().strip() # get first listed, strip off whitespace (\n)
-        return most_recent
-
 

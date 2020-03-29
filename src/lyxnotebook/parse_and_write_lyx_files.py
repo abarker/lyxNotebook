@@ -14,6 +14,67 @@ This module contains functions which parse and rewrite Lyx .lyx files.
 from .config_file_processing import config_dict
 from . import gui
 
+
+class Cell:
+    """Simple container class.  It holds lines of text corresponding to the
+    contents of a cell as well as other data about the cell.  The line numbers
+    are relative to Lyx files where the cell text is extracted."""
+
+    def __init__(self):
+        """Initialize the data stored for the cell.  As a subclass of a list, the
+        list elements are the lines of text."""
+        super().__init__()
+
+        self.has_cookie_inside = False  # Is there a cookie inside this cell?
+        self.lines = []             # The lines of code in the cell.
+        self.begin_line_number = -1 # The line number where the cell begins.
+        self.begin_line = None      # The text of the begin line, start of inset.
+        self.end_line_number = -1   # The line number where the cell ends
+        self.end_line = None        # The text of the end line, the \end_inset.
+        self.evaluation_output = None # List of lines resulting from code evaluation.
+
+    def get_cell_type(self):
+        """Note this depends on the naming convention in the .module files.
+        Returns a tuple (<basictype>,<language>).  For example,
+        ("Standard", "Python")."""
+        if not self.begin_line:
+            return None, None
+        split_line = self.begin_line.split(":")
+        language = split_line[-1].strip()
+        basic_type = split_line[-2].strip()
+        return basic_type, language
+
+    def append(self, line):
+        """Append an item to the list."""
+        self.lines.append(line)
+
+    def __getitem__(self, index):
+        """Index a line in the `Cell` instance."""
+        if isinstance(index, slice):
+            return self.lines[index.start:index.stop:index.step]
+        if index < 0: # Handle negative indices.
+            index += len(self)
+        return self.lines[index]
+
+    def __setitem__(self, index, value):
+        """Set a line in the `Cell` instance."""
+        if isinstance(index, slice):
+            self.lines[index.start:index.stop:index.step] = value
+            return
+        if index < 0: # Handle negative indices.
+            index += len(self)
+        self.lines[index] = Item(value)
+
+    def __len__(self):
+        return len(self.lines)
+
+    def __repr__(self):
+        all_text = "".join(self)
+        all_text = all_text.replace("\n", "\\n")
+        basic_type, language = self.get_cell_type()
+        return "Cell[{},{}]('{}')".format(basic_type, language, all_text)
+
+
 class TerminatedFile:
     """A class to read lines from a file with a known termination line, which may
     not be finished writing by a writer process.  This is to deal with possible
@@ -143,6 +204,7 @@ def get_all_lines_from_lyx_file(filename):
 
 
 def get_all_cell_text_from_lyx_file(filename, magic_cookie_string,
+                                    code_language=None,
                                     also_noncell=False, join_char="\n"):
     """Read all the cell text from the Lyx-format string `string`."  Return a
     list of `Cell` class instances, where each cell is a list of lines (and
@@ -161,6 +223,7 @@ def get_all_cell_text_from_lyx_file(filename, magic_cookie_string,
 
 
 def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
+                                      code_language=None,
                                       also_noncell=False):
     """Read all the cell text from the Lyx file format string `string`.  Return
     a list of `Cell` class instances, where each cell is a list of lines (and
@@ -168,11 +231,14 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
     document (in the order that they appear in the document).  All cell types
     are included.
 
+    The `code_language` option, if set, will extract only cells of the given
+    language.  The string passed should be the capitalized name that appears
+    at the end of the inset's name in the Lyx file, e.g., "Python".
+
     If `also_noncell` is true then the list returned is the list of cells
     alternating with strings holding the text in the .lyx file that is
     between the cells.
     """
-    from .lyx_server_API_wrapper import Cell # Circular import if not in fun.
     lyx_format_lines = list(reversed(lyx_string.splitlines())) # Reversed, pop off end.
 
     cell_list = [] # A list of lines in the cell.
@@ -198,6 +264,12 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
         # spread across several lines as substrings, between a
         # `\begin_layout Plain Layout` line and an `\end_layout` line.
         if rstripped_line.startswith(r"\begin_inset Flex LyxNotebookCell:"):
+            begin_line_parts = rstripped_line.split(":")
+            cell_type = begin_line_parts[1]
+            lang = begin_line_parts[2]
+            if code_language:
+                if lang != code_language:
+                    continue
             inside_cell = True
             inside_cell_text_part = False
             inside_cell_plain_layout = False
