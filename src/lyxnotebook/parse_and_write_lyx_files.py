@@ -143,7 +143,7 @@ def get_all_lines_from_lyx_file(filename):
 
 
 def get_all_cell_text_from_lyx_file(filename, magic_cookie_string,
-                                      also_noncell=False, join_char="\n"):
+                                    also_noncell=False, join_char="\n"):
     """Read all the cell text from the Lyx-format string `string`."  Return a
     list of `Cell` class instances, where each cell is a list of lines (and
     some additional data) corresponding to the lines of a code cell in the
@@ -168,7 +168,7 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
     document (in the order that they appear in the document).  All cell types
     are included.
 
-    if `also_noncell` is true then the list returned is the list of cells
+    If `also_noncell` is true then the list returned is the list of cells
     alternating with strings holding the text in the .lyx file that is
     between the cells.
     """

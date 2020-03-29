@@ -11,12 +11,7 @@ Copyright (c) 2012 Allen Barker
 Generate all the `.module` files from templates.  The function
 `generate_files_from_templates` performs the operations.
 
-This module is only used by `install.py` to generate `.module` files.  It only
-imports from `process_interpreter_specs`.
-
-All file reads and writes are from the Python current working directory.  This
-module expects that the CWD when it is run will be the
-`files_for_dot_lyx_layouts_dir` directory!
+This module is only used by `install.py` to generate `.module` files.
 
 """
 
@@ -85,8 +80,9 @@ AddToPreamble
 
 """
 
-# This part of the header for modules is contains meta-vars which depend on the spec.
-# It is appended to the bottom of the part just above.
+# This part of the header for modules contains meta-vars which depend on the spec.
+# It is looped over all basic cell types (Init, Standard, Output) replacing the
+# meta-vars and appending to the bottom of the part just above.
 module_header_template_basic_cell_type_dependent = \
     r"""
    %
@@ -485,7 +481,7 @@ def generate_module_files_from_templates(dirname, has_editable_insets):
             "<<triple_quote>>": "\"\"\"",
             "<<inset_specifier>>": inset_specifier,
             "<<prog_name>>": prog_name,
-            "<<label_modifier>>": "", # This adds a modifier to the cell label.
+            "<<label_modifier>>": "", # This adds a modifier to the Lyx cell label.
             "<<lst_language>>": lst_language,
             }
 
