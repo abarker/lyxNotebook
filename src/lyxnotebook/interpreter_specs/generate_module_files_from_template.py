@@ -400,10 +400,11 @@ End
 
 # ==================================================================================
 # Define the basic template for the module to redefine Listings to use a small font.
-# This module makes Listings display with the same size font as the Lyx Notebook insets.
+# This module makes Listings display with the same size font as the Lyx Notebook insets
+# and makes them editable externally if that option is available.
 # ==================================================================================
 
-listings_with_small_font = \
+listings_with_small_font_template = \
     r"""#\DeclareLyXModule{Listings with Small Font}
 #DescriptionBegin
 #Changes the built-in LyX listings insets to use a small font in the LyX display.
@@ -426,6 +427,7 @@ Requires "listings"
 InsetLayout Listings
    CopyStyle           Listings
    BgColor             white
+   <<EditExternalTag>>
    Font # the font of the text in Lyx, not the Latex font
       Color               foreground
       Size                Small
@@ -460,7 +462,10 @@ def generate_module_files_from_templates(dirname, has_editable_insets):
     prev_dir = os.curdir
     os.chdir(dirname)
 
-    # First do the Listings redefinition, since it just needs to be written out.
+    # First do the Listings redefinition, since it is simple.
+    replacement_dict = {"<<EditExternalTag>>": edit_external_tag,}
+    listings_with_small_font = do_replacements(listings_with_small_font_template,
+                                               replacement_dict)
     with open("lyxNotebookListingsWithSmallFont.module", "w") as f:
         f.write(listings_with_small_font)
 
