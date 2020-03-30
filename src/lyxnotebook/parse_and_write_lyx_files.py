@@ -11,68 +11,124 @@ This module contains functions which parse and rewrite Lyx .lyx files.
 
 """
 
+import copy
 from .config_file_processing import config_dict
 from . import gui
+
+
+def get_cell_type_from_inset_begin_line(begin_line):
+    """Note this depends on the naming convention in the .module files.
+    Returns a tuple (<basictype>,<language>).  For example,
+    ("Standard", "Python")."""
+    split_line = begin_line.split(":")
+    language = split_line[-1].strip()
+    basic_type = split_line[-2].strip()
+    return basic_type, language
 
 
 class Cell:
     """Simple container class.  It holds lines of text corresponding to the
     contents of a cell as well as other data about the cell.  The line numbers
-    are relative to Lyx files where the cell text is extracted."""
+    are relative to Lyx files where the cell text is extracted.
 
-    def __init__(self):
-        """Initialize the data stored for the cell.  As a subclass of a list, the
-        list elements are the lines of text."""
+    Cells are currently only created when parsing a Lyx string or file to
+    extract the cell contents.
+
+    The lines of Lyx-format text still have newlines on them."""
+
+    def __init__(self, basic_type, language):
+        """Initialize the data stored for the cell."""
         super().__init__()
+        self.basic_type = basic_type
+        self.language = language
 
-        self.has_cookie_inside = False  # Is there a cookie inside this cell?
-        self.lines = []             # The lines of code in the cell.
-        self.begin_line_number = -1 # The line number where the cell begins.
-        self.begin_line = None      # The text of the begin line, start of inset.
-        self.end_line_number = -1   # The line number where the cell ends
-        self.end_line = None        # The text of the end line, the \end_inset.
+        self.text_code_lines = [] # The lines of code in the cell, as ordinary text.
+        self.has_cookie_inside = False # Is there a cookie inside this cell?
         self.evaluation_output = None # List of lines resulting from code evaluation.
+
+        self.lyx_starting_lines = [] # The Lyx-format starting lines.
+        self.starting_line_number = -1 # The line number where the cell begins.
+
+        self.lyx_code_lines = []     # The Lyx-format code lines.
+
+        self.lyx_ending_lines = []   # The Lyx-format ending lines.
+        self.ending_line_number = -1   # The line number where the cell ends
 
     def get_cell_type(self):
         """Note this depends on the naming convention in the .module files.
         Returns a tuple (<basictype>,<language>).  For example,
         ("Standard", "Python")."""
-        if not self.begin_line:
-            return None, None
-        split_line = self.begin_line.split(":")
-        language = split_line[-1].strip()
-        basic_type = split_line[-2].strip()
-        return basic_type, language
+        return self.basic_type, self.language
+
+    def lyx_string_format(self, beginning=True, code=True, ending=True):
+        """Return the Lyx string format of the cell, like in a .lyx file."""
+        combined_list = []
+        if beginning:
+            combined_list += self.lyx_starting_lines
+        if code:
+            combined_list += self.lyx_code_lines
+        if ending:
+            combined_list += self.lyx_ending_lines
+        return "\n".join(combined_list)
+
+    def create_empty_cell(self):
+        """Convert the cell into an empty cell of the same `basic_type` and
+        `language`."""
+        self.text_code_lines = []
+        self.has_cookie_inside = False
+        self.evaluation_output = None
+        self.lyx_code_lines = []
+
+        self.lyx_starting_lines = [
+                  r"\begin_inset Flex LyxNotebookCell:{}:{}".format(
+                                              self.basic_type, self.language),
+                  r"status open",
+                  r"",]
+        self.starting_line_number = -1
+
+        self.lyx_code_lines = []
+
+        self.lyx_ending_lines = [r"\end_inset", r""]
+        self.ending_line_number = -1
 
     def append(self, line):
-        """Append an item to the list."""
-        self.lines.append(line)
+        """Append a code line to the list."""
+        self.text_code_lines.append(line)
+
+    def copy(self):
+        """Return a deep shallow copy."""
+        return copy.copy(self)
+
+    def deepcopy(self):
+        """Return a deep shallow copy."""
+        return copy.deepcopy(self)
 
     def __getitem__(self, index):
         """Index a line in the `Cell` instance."""
-        if isinstance(index, slice):
-            return self.lines[index.start:index.stop:index.step]
-        if index < 0: # Handle negative indices.
-            index += len(self)
-        return self.lines[index]
+        # NOTE: Slices return a list, not another Cell.
+        #if isinstance(index, slice):
+        #    return self.lines[index.start:index.stop:index.step]
+        #if index < 0: # Handle negative indices.
+        #    index += len(self)
+        return self.text_code_lines[index]
 
     def __setitem__(self, index, value):
         """Set a line in the `Cell` instance."""
-        if isinstance(index, slice):
-            self.lines[index.start:index.stop:index.step] = value
-            return
-        if index < 0: # Handle negative indices.
-            index += len(self)
-        self.lines[index] = Item(value)
+        #if isinstance(index, slice):
+        #    self.lines[index.start:index.stop:index.step] = value
+        #    return
+        #if index < 0: # Handle negative indices.
+        #    index += len(self)
+        self.text_code_lines[index] = value
 
     def __len__(self):
-        return len(self.lines)
+        return len(self.text_code_lines)
 
     def __repr__(self):
-        all_text = "".join(self)
+        all_text = "".join(self.text_code_lines)
         all_text = all_text.replace("\n", "\\n")
         basic_type, language = self.get_cell_type()
-        return "Cell[{},{}]('{}')".format(basic_type, language, all_text)
+        return "Cell('{}','{}')['{}']".format(basic_type, language, all_text)
 
 
 class TerminatedFile:
@@ -119,6 +175,25 @@ class TerminatedFile:
 
     def close(self):
         self.file_in.close()
+
+
+def lyx_format_code_line_to_text(cell_line_list):
+    """Convert the Lyx format lines in `cell_line_list` to a line in text format."""
+    cell_line_substrings = []
+    for line in cell_line_list:
+        if line.startswith(r"\begin_inset Quotes"):
+            # Lyx 2.3 introduced quote insets even inside listings; convert to '"' char.
+            # The corresponding \end_inset will be ignored in condition below.
+            cell_line_substrings.append('"')
+        elif line.rstrip() == r"\backslash":
+            cell_line_substrings.append("\\")
+        elif line.startswith("\\"):
+            # Skip all other markup starting with \, including `\end_inset` markers.
+            # This includes anything like `\lang english` which Unicode can cause.
+            pass
+        else: # Got a line of actual text.
+            cell_line_substrings.append(line)
+    return "".join(cell_line_substrings) + "\n"
 
 
 def convert_text_line_to_lyx_file_inset_format(text_line):
@@ -241,7 +316,7 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
     """
     lyx_format_lines = list(reversed(lyx_string.splitlines())) # Reversed, pop off end.
 
-    cell_list = [] # A list of lines in the cell.
+    cell_list = []                   # A list of the extracted cells as `Cell` instances.
     inside_cell = False              # Inside a lyxnotebook cell of any type.
     inside_cell_plain_layout = False # Inside a Plain Layout inside a cell.
     inside_cell_text_part = False    # After the first Plain Layout inside a cell.
@@ -252,91 +327,105 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
     while True:
         if not lyx_format_lines:
             break
-        line = lyx_format_lines.pop()
+        lyx_line = lyx_format_lines.pop()
         line_num += 1
-        rstripped_line = line.rstrip()
-        if not inside_cell_text_part:
-            text_between_cells.append(line)
+        rstripped_line = lyx_line.rstrip()
 
         # To get code cells search for lines starting with something like
         #    \begin_inset Flex LyxNotebookCell:Standard:PythonTwo
         # Those begin the inset, but individual lines of the inset are each
         # spread across several lines as substrings, between a
         # `\begin_layout Plain Layout` line and an `\end_layout` line.
+
         if rstripped_line.startswith(r"\begin_inset Flex LyxNotebookCell:"):
-            begin_line_parts = rstripped_line.split(":")
-            cell_type = begin_line_parts[1]
-            lang = begin_line_parts[2]
+            basic_type, lang = get_cell_type_from_inset_begin_line(rstripped_line)
+
+            # Treat cells as normal text if the language doesn't match.
             if code_language:
                 if lang != code_language:
+                    text_between_cells.append(lyx_line)
                     continue
+
+            # Create a new cell.
+            new_cell = Cell(basic_type, lang) # create a new cell
+            new_cell.starting_line_number = line_num
+            new_cell.lyx_starting_lines.append(lyx_line)
+
+            # Save previous text between cells and reset list to empty.
+            if also_noncell:
+                cell_list.append("".join(text_between_cells))
+            text_between_cells = []
+
+            # Update states.
             inside_cell = True
             inside_cell_text_part = False
             inside_cell_plain_layout = False
-            new_cell = Cell() # create a new cell
-            new_cell.begin_line = line # begin{} may have meaningful args later
-            new_cell.begin_line_number = line_num
 
         elif inside_cell:
             if rstripped_line == r"\end_inset":
-                new_cell.end_line = line
-                new_cell.end_line_number = line_num
-                cell_list.append(new_cell)
-                text_between_cells.append(line)
+                new_cell.lyx_ending_lines.append(lyx_line)
+                new_cell.ending_line_number = line_num + 1 # Count the blank line after.
+
+                # Read the empty line that follows an end_inset.
+                next_line = lyx_format_lines.pop()
+                assert next_line.rstrip() == ""
+                new_cell.lyx_ending_lines.append(next_line)
+
+                cell_list.append(new_cell) # Finished creating the cell.
+                print("\noriginal text was:\n", new_cell.lyx_string_format(), sep="")
+
                 inside_cell = False
                 inside_cell_text_part = False
 
             elif rstripped_line == r"\begin_layout Plain Layout":
-                if not inside_cell_text_part:
-                    del text_between_cells[-1] # Leave out this starting \begin_layout.
-                if also_noncell:
-                    cell_list.append("".join(text_between_cells))
-                text_between_cells = []
+                new_cell.lyx_code_lines.append(lyx_line)
                 inside_cell_plain_layout = True
                 inside_cell_text_part = True
 
             elif inside_cell_plain_layout: # An actual line of cell text, on several lines.
-                cell_line = line.rstrip("\n") # Could rstrip all whitespace.
-                cell_line_substrings = []
+                new_cell.lyx_code_lines.append(lyx_line)
+                cell_line = lyx_line.rstrip("\n") # Could rstrip all whitespace.
+                cell_line_list = []
                 while True:
                     if cell_line.rstrip() == r"\end_layout":
                         inside_cell_plain_layout = False
-                        break
-                    elif cell_line.startswith(r"\begin_inset Quotes"):
-                        # Lyx 2.3 introduced quote insets even inside listings; convert to '"' char.
-                        # The corresponding \end_inset will be ignored in condition below.
-                        cell_line_substrings.append('"')
-                    elif cell_line.rstrip() == r"\backslash":
-                        cell_line_substrings.append("\\")
-                    elif cell_line.startswith("\\"):
-                        # Skip all other markup starting with \, including `\end_inset` markers.
-                        # This includes anything like `\lang english` which Unicode can cause.
-                        pass
-                    else: # Got a line of actual text.
-                        cell_line_substrings.append(cell_line)
 
-                    cell_line = lyx_format_lines.pop().rstrip("\n") # drop trailing \n
+                        # Read the empty line that follows an end_inset.
+                        next_line = lyx_format_lines.pop()
+                        assert next_line.rstrip() == ""
+                        new_cell.lyx_code_lines.append(next_line)
+                        break
+
+                    next_line = lyx_format_lines.pop()
+                    new_cell.lyx_code_lines.append(next_line)
+                    cell_line = next_line.rstrip("\n") # drop trailing \n
+                    cell_line_list.append(cell_line) # drop trailing \n
                     line_num += 1
 
-                line = "".join(cell_line_substrings) + "\n"
-                cookie_find_index = line.find(magic_cookie_string)
+                lyx_line = lyx_format_code_line_to_text(cell_line_list)
+                cookie_find_index = lyx_line.find(magic_cookie_string)
                 if cookie_find_index == 0: # Cell cookies must begin lines.
                     new_cell.has_cookie_inside = True
                     cookie_lines_in_cells += 1
-                    line = line.replace(magic_cookie_string, "", 1) # Replace one occurence.
+                    lyx_line = lyx_line.replace(magic_cookie_string, "", 1) # Replace one occurence.
                 if cookie_find_index != -1:
                     cookie_lines_total += 1
 
-                new_cell.append(line) # Got a line from the cell, append it.
+                new_cell.text_code_lines.append(lyx_line) # Got a text line, append it.
+
+            else:
+                new_cell.lyx_starting_lines.append(lyx_line)
 
         else: # Got an ordinary Lyx file line.
-            if line.find(magic_cookie_string) != -1: # found cookie anywhere on line
+            text_between_cells.append(lyx_line)
+            if lyx_line.find(magic_cookie_string) != -1: # found cookie anywhere on line
                 cookie_lines_total += 1
 
     # Add the final text piece if `also_noncell` is true.
     if also_noncell:
         cell_list.append("".join(text_between_cells))
 
+    # Do an error-check on the number of cookies found in the files.
     using_inset_edit_method = (config_dict["has_editable_insets_noeditor_mod"]
                                and config_dict["has_editable_insets"])
     if (using_inset_edit_method and cookie_lines_total > 0) or cookie_lines_total > 1:

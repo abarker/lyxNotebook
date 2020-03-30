@@ -587,7 +587,7 @@ class ControllerOfLyxAndInterpreters:
         if noop_at_cell_end: # doesn't run for None or "", since they eval to False
             extra_code_lines = noop_at_cell_end.splitlines(True) # keepends=True
 
-        modified_code_cell_text = code_cell_text.lines + extra_code_lines
+        modified_code_cell_text = code_cell_text.text_code_lines + extra_code_lines
 
         # Loop through each line of code, evaluating it and saving the results.
         output = []
