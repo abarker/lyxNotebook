@@ -198,25 +198,9 @@ class ExternalInterpreter:
             try:
                 read_string_bytes += os.read(self.fd, max_bytes)
                 read_string = read_string_bytes.decode("utf-8")
-                #print("DEBUG: read this string: |", read_string, "|", sep="")
-
-                # Test stripping ANSI color codes. But sage is adding some extra ipython stuff
-                # that defies the usual stripping rules.  Consider running making sage switch
-                # ipython: sage -ipython --colors=NoColor --simple-prompt
-                # BUT then the prompt is 'in[1]: ' and so forth.  Also using unknown init for ipython.
-                # TRY: --TerminalInteractiveShell.prompts_class=<Type>
-                #     above has Default: 'IPython.terminal.prompts.Prompts' so look up better one
-                #     see the --help-all option.
-
-                # https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
-                #import re
-                #self.debug = True # DEBUG !!!!!!!!!!!!!!!!!!!!!
-                #ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
-                #ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-                #read_string = ansi_escape.sub("", read_string)
-                #print("DEBUG: stripped string piece is |", read_string, "|", sep="")
             except OSError:
                 self.report_read_error()
+
             if self.read_error_found:
                 # return nothing for now, user must see message on screen
                 self.report_read_error() # print message again
@@ -243,10 +227,8 @@ class ExternalInterpreter:
             # hang()
 
             lines = read_string.splitlines()  # keepends = False
-            #print("DEBUG: string lines are", lines)
             possible_main_prompt = lines[-1]
             possible_cont_prompt = lines[-1]
-            #print("DEBUG: possible_main_prompt:", possible_main_prompt, "self.main_prompt:", self.main_prompt)
 
             # see if we really got a prompt...
             # note that some interpreters will add autoindent spaces, so look for prefix

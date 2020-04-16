@@ -372,7 +372,7 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
                 new_cell.lyx_ending_lines.append(next_line)
 
                 cell_list.append(new_cell) # Finished creating the cell.
-                print("\noriginal text was:\n", new_cell.lyx_string_format(), sep="")
+                #print("\nDEBUG original text was:\n", new_cell.lyx_string_format(), sep="")
 
                 inside_cell = False
                 inside_cell_text_part = False

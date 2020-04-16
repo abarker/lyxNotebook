@@ -1046,7 +1046,31 @@ Here is a line of text.
 
 \begin_layout Standard
 Here is a test of multiple indentation.
- 
+ # comment
+\end_layout
+
+\begin_layout Standard
+print "sage cell"
+\end_layout
+
+\begin_layout Standard
+x= 5
+\end_layout
+
+\begin_layout Standard
+print x
+\end_layout
+
+\begin_layout Standard
+if 4==4:
+\end_layout
+
+\begin_layout Standard
+   for i in [1,2]:
+\end_layout
+
+\begin_layout Standard
+      print "true"
 \begin_inset Flex LyxNotebookCell:Standard:PythonTwo
 status open
 
@@ -1521,7 +1545,7 @@ status open
 
 \begin_layout Plain Layout
 
-print "sage cell"
+print("sage cell")
 \end_layout
 
 \begin_layout Plain Layout
@@ -1531,7 +1555,7 @@ x= 5
 
 \begin_layout Plain Layout
 
-print x
+print(x)
 \end_layout
 
 \begin_layout Plain Layout
@@ -1546,7 +1570,7 @@ if 4==4:
 
 \begin_layout Plain Layout
 
-      print "true"
+      print("true")
 \end_layout
 
 \end_inset
@@ -1556,22 +1580,18 @@ if 4==4:
 status open
 
 \begin_layout Plain Layout
-
 sage cell
 \end_layout
 
 \begin_layout Plain Layout
-
 5
 \end_layout
 
 \begin_layout Plain Layout
-
 true
 \end_layout
 
 \begin_layout Plain Layout
-
 true
 \end_layout
 
