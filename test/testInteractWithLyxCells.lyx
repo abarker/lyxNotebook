@@ -1580,18 +1580,22 @@ if 4==4:
 status open
 
 \begin_layout Plain Layout
+
 sage cell
 \end_layout
 
 \begin_layout Plain Layout
+
 5
 \end_layout
 
 \begin_layout Plain Layout
+
 true
 \end_layout
 
 \begin_layout Plain Layout
+
 true
 \end_layout
 
