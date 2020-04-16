@@ -57,9 +57,9 @@ operating_system_platform = sys.platform
 
 def get_command_output(command_and_arg_list):
     """Return the output of the passed-in command."""
-    print("\nPROCESS CALL:", " ".join(command_and_arg_list))
+    #print("\nPROCESS CALL:", " ".join(command_and_arg_list))
     output = subprocess.check_output(command_and_arg_list).decode("utf-8")
-    print("OUTPUT:\n", output)
+    #print("OUTPUT:\n", output)
     return output
 
 def main(script_run_command):

@@ -93,7 +93,8 @@ class ExternalInterpreter:
             # All print statements to stdout in child go to the pseudo-tty fd.
 
             # Note that child's fd is invalid (equal to -1); cannot write to it.
-            if self.debug: print("   Child after pty.fork, fd is", self.fd,
+            if self.debug:
+                print("   Child after pty.fork, fd is", self.fd,
                                  "and child_pid is", self.child_pid)
 
             # Note that child's print to stdout goes to the self.fd pseudo-tty file.
@@ -123,10 +124,12 @@ class ExternalInterpreter:
         # Parent process handling code.
         #
         else: # in parent process
-            if self.debug: print("Parent after pty.fork, fd is", self.fd,
+            if self.debug:
+                print("Parent after pty.fork, fd is", self.fd,
                                  "and child_pid is", self.child_pid)
             # This print below is not strictly necessary, but matches the one in child.
-            if self.debug: print("In Parent Process: PID=" + str(os.getpid()))
+            if self.debug:
+                print("In Parent Process: PID=" + str(os.getpid()))
             # We MUST read from fd in order for the child to be spawned.
             try:
                 first_read_from_fd = os.read(self.fd, 10000)
@@ -185,6 +188,7 @@ class ExternalInterpreter:
             self.before_first_read_or_write = False
             self.read_interpreter_init_message()
         read_string = ""
+        read_string_bytes = b""
         while True:
             # brief sleep to make sure child has time to read any writes into its stdin
             time.sleep(self.before_read_sleep_secs)
@@ -192,8 +196,25 @@ class ExternalInterpreter:
             sys.stdin.flush() # probably not be needed
             # read at most max_bytes bytes from fd, return "" at EOF
             try:
-                read_string += os.read(self.fd, max_bytes).decode(
-                    "utf-8") # decode for Python3
+                read_string_bytes += os.read(self.fd, max_bytes)
+                read_string = read_string_bytes.decode("utf-8")
+                #print("DEBUG: read this string: |", read_string, "|", sep="")
+
+                # Test stripping ANSI color codes. But sage is adding some extra ipython stuff
+                # that defies the usual stripping rules.  Consider running making sage switch
+                # ipython: sage -ipython --colors=NoColor --simple-prompt
+                # BUT then the prompt is 'in[1]: ' and so forth.  Also using unknown init for ipython.
+                # TRY: --TerminalInteractiveShell.prompts_class=<Type>
+                #     above has Default: 'IPython.terminal.prompts.Prompts' so look up better one
+                #     see the --help-all option.
+
+                # https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
+                #import re
+                #self.debug = True # DEBUG !!!!!!!!!!!!!!!!!!!!!
+                #ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+                #ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+                #read_string = ansi_escape.sub("", read_string)
+                #print("DEBUG: stripped string piece is |", read_string, "|", sep="")
             except OSError:
                 self.report_read_error()
             if self.read_error_found:
@@ -207,11 +228,11 @@ class ExternalInterpreter:
             # We read until the interpreter returns a prompt, so we know that it is
             # finished with its evaluation.
 
-            # TODO: This can cause an error if
-            # the code prints a newline followed by a prompt and then goes into
-            # a calculation causing it to hang for a while.  Not likely, but worth
-            # noting and considering.  If so, could reset prompt to an even less
-            # likely string, or for some interpreters could redirect the prompt
+            # TODO: This can cause an error if the code prints a newline
+            # followed by a prompt and then goes into a calculation causing it
+            # to hang for a while.  Not likely, but worth noting and
+            # considering.  If so, could reset prompt to an even less likely
+            # string, or for some interpreters could redirect the prompt
             # strings to a named pipe to read from.  Or just "don't do that."
             #
             # Note this Python test case fails as expected.
@@ -222,22 +243,27 @@ class ExternalInterpreter:
             # hang()
 
             lines = read_string.splitlines()  # keepends = False
+            #print("DEBUG: string lines are", lines)
             possible_main_prompt = lines[-1]
             possible_cont_prompt = lines[-1]
+            #print("DEBUG: possible_main_prompt:", possible_main_prompt, "self.main_prompt:", self.main_prompt)
 
             # see if we really got a prompt...
             # note that some interpreters will add autoindent spaces, so look for prefix
             if (possible_main_prompt.find(self.main_prompt) == 0
                              and possible_main_prompt.rstrip() == self.main_prompt.rstrip()):
-                if self.debug: print("got a main prompt, breaking")
+                if self.debug:
+                    print("got a main prompt, breaking")
                 break
             if (possible_cont_prompt.find(self.cont_prompt) == 0
                              and possible_cont_prompt.rstrip() == self.cont_prompt.rstrip()):
-                if self.debug: print("got a continuation prompt, breaking")
+                if self.debug:
+                    print("got a continuation prompt, breaking")
                 break
             # This sleep only executes waiting for slow operations on the child to
             # return a prompt, or when there is some problem causing a hang
             time.sleep(0.5) # could sum up to get a maxTime for possible hangs, throw err
+
         if remove_backslash_r:
             # assume no naturally occurring \r characters and only " \r" or "\r\n"
             read_string = read_string.replace("\r\n", "\n")

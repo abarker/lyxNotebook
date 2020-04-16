@@ -23,14 +23,14 @@ sage.params = {
     "prog_name": "Sage",
     "main_prompt": "sage: ",
     "cont_prompt": "....: ",
-    "run_command": "/usr/bin/sage", # try local, too
+    "run_command": "sage",
     "run_arguments": [],
     "file_suffix": ".sage",
     "comment_line": "#",
     "line_continuation": "\\",
     "inset_specifier": "Sage", # e.g., Flex:LyxNotebook:Standard:Sage
     "listings_language": "python", # same as Python
-    "startup_sleep_secs": 3.0,  # sage startup is slow
+    "startup_sleep_secs": 4.0,  # sage startup is slow
     "before_read_sleep_secs": 0.02,  # sage slower than raw Python
     "noop_at_cell_end": "pass\npass\n", # two to catch some extra indent cases
     "exit_command": "exit()\n",

@@ -750,7 +750,7 @@ class InteractWithLyxCells:
             try:
                 with open(filename, "r") as f:
                     cell_text = f.readlines()
-                    print("cell text:\n", cell_text, sep="") # DEBUG
+                    #print("cell text:\n", cell_text, sep="") # DEBUG
             except FileNotFoundError:
                 print("Warning: Lyx Notebook could not write out the .lyx file '{}'".
                         format(filename))

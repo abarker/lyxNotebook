@@ -92,7 +92,7 @@ def initialize_config_data(lyx_user_dir):
     for setting in int_settings:
         config_dict[setting] = int(config_dict[setting])
 
-    config_dict["lyx_user_dir"] = lyx_user_dir
+    config_dict["lyx_user_directory"] = lyx_user_dir
 
 
 

@@ -201,7 +201,7 @@ def run_setup(lyx_user_dir, lyxNotebook_run_script_path, has_editable_insets):
 
     # Find the Lyx Notebook source directory from the invoking pathname and cwd.
     source_dir = find_source_directory()
-    os.chdir(source_dir) # So the relevant directories can be located.
+    os.chdir(source_dir) # So the relevant data directories can be located.
 
     setup_config_file(lyx_user_dir, source_dir, has_editable_insets)
 
