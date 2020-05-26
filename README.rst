@@ -75,9 +75,15 @@ https://github.com/abarker/lyxNotebook/blob/master/doc/lyxNotebookDocs.pdf
 
 After installing, and for each document, insert the modules for the kinds
 of cells that you want to use (e.g., Python or Python2).  Insert the
-a code cell into the document and write some code into it.  You can then
-hit F-12 to start up Lyx Notebook, and hit F-1 to see a menu of options.
-The menu shows the available key bindings, also.
+a code cell into the document and write some code into it.
+
+You can then hit F-12 to start up Lyx Notebook, and hit F-1 to see a menu of
+options.  The menu shows the available key bindings, also.
+
+If something gets messed up, use undo to revert it.  Use caution with batch
+cell update commands since ordinary undo cannot undo those operations and they
+might no longer be working correctly (there is a save file and an option to
+revert, though).
 
 Earlier info
 ============
