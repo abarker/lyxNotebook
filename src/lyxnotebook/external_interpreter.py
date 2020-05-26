@@ -39,6 +39,144 @@ import pty
 import signal
 # import subprocess # for alternative where subprocess.call is used
 #from . import process_interpreter_specs # only needed for testing code at end
+import pexpect
+
+class ExternalInterpreterExpect:
+    """This class runs a single external interpreter.  There can be multiple
+    instances, each running a possibly different interpreter application.  The
+    interpreter is forked as a process connected to a pseudo-tty, so
+    applications which expect terminal input can be run.  The only
+    initialization argument is an interpreterSpec dict object which has the
+    predefined collection of keys all defined."""
+
+    def __init__(self, interpreter_spec):
+        self.debug = False # debug flag, for verbose output
+        # copy some of interpreter_spec data which is used in this
+        # module to class member variables
+        self.prog_name = interpreter_spec["prog_name"]
+        self.inset_specifier = interpreter_spec["inset_specifier"]
+        self.main_prompt = interpreter_spec["main_prompt"]
+        self.cont_prompt = interpreter_spec["cont_prompt"]
+        self.run_command = interpreter_spec["run_command"]
+        self.run_arguments = interpreter_spec["run_arguments"]
+        self.exit_command = interpreter_spec["exit_command"]
+
+        # Todo: These two can be renamed if this class is default; no longer "sleep".
+        # TODO: default timeout values fail, set too small... redefine spec?
+        self.startup_sleep_secs = interpreter_spec["startup_sleep_secs"]
+        self.before_read_sleep_secs = interpreter_spec["before_read_sleep_secs"]
+
+        self.before_first_read = True
+        self.before_first_read_or_write = True
+        self.read_error_found = False
+        self.child = None
+
+
+    def read_interpreter_init_message(self):
+        """Read the initialization message from the interpreter, and the first
+        prompt.  This is an internal initialization routine, called on first write."""
+        try:
+            child = pexpect.spawn(self.run_command, self.run_arguments,
+                                  timeout=30,#self.startup_sleep_secs,
+                                  cwd=None, env=None,
+                                  encoding="utf-8", echo=True)
+            child.expect_exact(self.main_prompt, timeout=30)#self.startup_sleep_secs)
+        except pexpect.TIMEOUT as e:
+            print("\nLyxNotebook error: Timeout on initializing the interpreter started"
+                  "\nwith the command '{}'.".format(self.run_command), file=sys.stderr)
+            return
+        except pexpect.ExceptionPexpect as e:
+            print("\nLyxNotebook error: Unspecified error initializing the interpreter"
+                  "\nstarted with the command '{}'.  The exception text is:\n\n{}"
+                  .format(self.run_command, str(e)), file=sys.stderr)
+            return
+
+        init_msg = child.before
+        print("----- initialization message of interpreter", self.prog_name)
+        print("\nDEBUG: init and read timeouts are", self.startup_sleep_secs, self.before_read_sleep_secs)
+        print(init_msg)
+        print("----- end initialization of interpreter", self.prog_name)
+
+        self.child = child
+        self.before_first_read_or_write = False
+
+
+    def write(self, string):
+        """Writes to the stdin of the child's process.  The input string should be
+        code that is executable in the interpreter, and should be newline terminated."""
+        if not isinstance(string, str): # DEBUG, should not occur.
+            raise Exception("Got a non-string to write, type is {}".format(type(string)))
+
+        if self.before_first_read_or_write:
+            self.read_interpreter_init_message()
+        if self.child:
+            self.child.send(string)
+
+
+    def read(self):
+        """Reads from the stdout of the child process, up until a new prompt appears.
+        If no child process exists it returns an empty string."""
+        child = self.child
+        if self.before_first_read_or_write or not child or not child.isalive():
+            print("\nLyxNotebook error: Attempted read from a child interpreter process"
+                  "\nthat is uninitialized or not running.  Started with command '{}'."
+                  .format(self.run_command), file=sys.stderr)
+            return "\n"
+
+        try:
+            # Note that `index` below gives the index of the matched prompt.  Not used yet.
+            index = child.expect_exact([self.main_prompt, self.cont_prompt],
+                                       timeout=30)#self.before_read_sleep_secs)
+        except pexpect.TIMEOUT as e:
+            print("\nLyxNotebook error: Timeout on reading from the interpreter started"
+                  "\nwith the command '{}'.".format(self.run_command), file=sys.stderr)
+            return
+        except pexpect.ExceptionPexpect as e:
+            print("\nLyxNotebook error: Unspecified error reading from the interpreter"
+                  "\nstarted with the command '{}'.  The exception text is:\n\n{}"
+                  .format(self.run_command, str(e)), file=sys.stderr)
+            return
+
+        read_string = child.before
+        # Below, the process_physical_code_line routine in controller_of_lyx_and_interpreters
+        # module needs to look for the prompt to determine if it is a continuation
+        # prompt (from older way).  Maybe change that at some point; also return the
+        # type of prompt that pexpect recognized.
+        read_string += child.after
+        return read_string
+
+
+    def kill(self, soft=True, hard=False):
+        """Do a soft or a hard kill, or both to try soft before hard."""
+        child = self.child
+        if not child:
+            return
+        if soft:
+            exit_sequence = self.exit_command.splitlines(True) # keepends=True
+            for cmd in exit_sequence:
+                child.sendline(cmd)
+                time.sleep(0.2)
+        if hard and child.isalive():
+            print("\nLyxNotebook message: Doing a hard kill on process started with"
+                  " command '{}'.".format(self.run_command))
+            if child.isalive():
+                child.terminate()
+            time.sleep(0.2)
+            if child.isalive():
+                child.terminate(force=True)
+        self.child = None
+
+    def __del__(self):
+        if self.child:
+            self.kill(True, True)
+
+def print_before_after(msg, child):
+    """A debugging function for a Pexpect child process."""
+    print()
+    print(msg)
+    print("   Before is |", child.before, "|", sep="")
+    print("   After is |", child.after, "|", sep="")
+    print()
 
 
 class ExternalInterpreter:
@@ -254,6 +392,7 @@ class ExternalInterpreter:
             # now delete any remaining \r characters
             read_string = read_string.replace("\r", "")
         self.before_first_read = False
+        print("DEBUG returning read string: |", read_string, "|", sep="")
         return read_string
 
     def kill(self, soft=True, hard=False):
@@ -322,13 +461,13 @@ if __name__ == "__main__":
     interp.write("for i in range(0,10000): w=i+1\n\n") # note extra \n required!
     in_chars += interp.read() # if we read right after, avoid the piling-up double echo
     """
-   If our controller process goes on and writes later lines while python churns
-   on loop we can get the "piling up" effect, where stdin doesn't get read soon
-   enough by the child process and so the parent reads it back, causing double echo
-   (caused by child sharing stdin and stdout on a single file descriptor fd).
-   This suggests that we should do a read after *each* line, really line by line
-   We don't want the writer to get ahead of the child's stdin reader.
-   """
+    If our controller process goes on and writes later lines while python churns
+    on loop we can get the "piling up" effect, where stdin doesn't get read soon
+    enough by the child process and so the parent reads it back, causing double echo
+    (caused by child sharing stdin and stdout on a single file descriptor fd).
+    This suggests that we should do a read after *each* line, really line by line
+    We don't want the writer to get ahead of the child's stdin reader.
+    """
     interp.write("print 'extra bonus 4'\n")
     interp.write("x=5\n")
     interp.write("x\n")
@@ -342,3 +481,4 @@ if __name__ == "__main__":
     print("after soft kill")
     interp.write("print 'this will be an error if kill above is uncommented'\n")
     print(interp.read())
+

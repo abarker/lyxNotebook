@@ -17,8 +17,10 @@ which is a collection of interpreters.
 import re
 
 from .config_file_processing import config_dict
-from .external_interpreter import ExternalInterpreter
+from .external_interpreter import ExternalInterpreter, ExternalInterpreterExpect
 from .interpreter_specs import process_interpreter_specs # Specs for all implemented interpreters.
+
+USE_PEXPECT = True # Set to False to use the older approach to I/O (raw pty).
 
 # TODO: Look into this Python library and consider if its functionality could
 # replace some of this code (such as IndentCalc and the whole interpreter
@@ -192,7 +194,10 @@ class InterpreterProcess:
         self.spec = spec
         self.most_recent_prompt = self.spec["main_prompt"]
         self.indent_calc = IndentCalc()
-        self.external_interp = ExternalInterpreter(self.spec)
+        if USE_PEXPECT:
+            self.external_interp = ExternalInterpreterExpect(self.spec)
+        else:
+            self.external_interp = ExternalInterpreter(self.spec)
 
 
 class InterpreterProcessCollection:

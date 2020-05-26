@@ -342,47 +342,42 @@ status open
 
 \begin_layout Plain Layout
 
- copy.lyx		   testGraphicFile.pdf
+ localLyx		  testGraphicFile.eps
 \end_layout
 
 \begin_layout Plain Layout
 
- copy.lyx~		   testInteractWithLyxCells.lyx
+ lyx_nested_comment.lyx   testGraphicFile.pdf
 \end_layout
 
 \begin_layout Plain Layout
 
- default_config_file.cfg   testInteractWithLyxCells.lyx~
+ lyxnotebook.cfg	  testInteractWithLyxCells.lyx
 \end_layout
 
 \begin_layout Plain Layout
 
- localLyx		   testInteractWithLyxCells-lyx21.lyx~
+'#plain_test_file.lyx#'   testInteractWithLyxCells.lyx~
 \end_layout
 
 \begin_layout Plain Layout
 
-'#plain_test_file.lyx#'    test_lyx_file_parsing.py
+ plain_test_file.lyx	  test_lyx_file_parsing.py
 \end_layout
 
 \begin_layout Plain Layout
 
- plain_test_file.lyx	   tttmp.lyx
+ plain_test_file.lyx~	  tttmp.lyx
 \end_layout
 
 \begin_layout Plain Layout
 
- plain_test_file.lyx~	   tttmp.lyx~
+ plain_test_file.lyx~~	  zzzzz_lyxnotebook_tmp_debug.lyxnotebook
 \end_layout
 
 \begin_layout Plain Layout
 
- testGraphicFile2.eps	   zzzzz_lyxnotebook_tmp_debug.lyxnotebook
-\end_layout
-
-\begin_layout Plain Layout
-
- testGraphicFile.eps
+ testGraphicFile2.eps
 \end_layout
 
 \end_inset

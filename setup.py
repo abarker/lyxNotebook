@@ -53,7 +53,7 @@ setup(
     version=__version__, # <majorVersion>.<minorVersion>.<patch> format, (see PEP440)
     description="Use LyX like a code-executing notebook.",
     keywords=["LyX", "LaTeX", "TeX", "notebook"],
-    install_requires=["wheel", "PySimpleGUI>=4.16.0"],
+    install_requires=["wheel", "PySimpleGUI>=4.16.0", "pexpect"],
     url="https://github.com/abarker/lyxNotebook",
     entry_points = {
          "console_scripts": ["lyxnotebook = lyxnotebook.entry_points:run_lyxnotebook",]
