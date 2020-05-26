@@ -75,7 +75,8 @@ https://github.com/abarker/lyxNotebook/blob/master/doc/lyxNotebookDocs.pdf
 
 After installing, and for each document, insert the modules for the kinds of
 cells that you want to use (e.g., Python or Python2).  Insert a code cell of
-that type into the document and write some code into it.
+that type into the document (via ``Insert -> Custom Inset``) and write some
+code into it.
 
 Pressing F12 should start up Lyx Notebook, and F1 will show a menu of
 options.  The menu also shows the available key bindings.
