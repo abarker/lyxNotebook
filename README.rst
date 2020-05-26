@@ -5,12 +5,40 @@ notebook, or Jupyter notebooks).
 
 Only Linux is currently supported.
 
+UPDATE, May 26, 2020
+====================
+
+The code has been under further development.  Some changes other than general
+code cleanup and are listed below.  The install method is still the same as in
+the March update.
+
+* A code cell will automatically write into a math inset if that inset
+  immediately follows the code inset.  It will not create such an inset,
+  though, the user needs to do that.  This allows, for example, having
+  SymPy code print out Latex math equations which will then be rendered
+  as a Lyx preview and will appear in the final document.
+
+* The module running external interpreters now uses the Pexpect package by
+  default, replacing the earlier hand-rolled version.  (This might make
+  a Windows port possible, if wexpect works and process control issues
+  are dealt with.)
+
 UPDATE, Mar. 2020
 =================
 
-Many improvements to the code have recently been made.  The GUI looks nicer
-now, and a config file ``lyxnotebook.cfg`` with user-modifiable settings is now
-written to the LyX user dir.
+Many improvements to the code have recently been made.
+
+* The GUI looks nicer now, using PySimpleGUI.
+  
+* A config file ``lyxnotebook.cfg`` with user-modifiable settings is now
+  written to the LyX user dir.
+
+* LyX 2.4.0 may provide a mechanism to improve the program and eliminate the
+  currently-necessary inserting of magic-cookie strings to get cell text.  The
+  current development is targeted at that, but LyX 2.0.3 also still works.
+
+New install procedure
+---------------------
 
 LyX Notebook has recently been updated to install with ``setup.py`` and
 ``pip``.  This creates the entry point script ``lyxnotebook`` (and another
@@ -39,10 +67,17 @@ To uninstall the program, use ``pip uninstall lyxnotebook``.  Reset the bind
 file to its previous value.  Delete the LyX Notebook ``.module`` files
 and ``.bind`` files in the ``.lyx`` directory.
 
-Note that LyX 2.4.0 may provide a mechanism to improve the program and
-eliminate the currently-necessary inserting of magic-cookie strings to get
-cell text.  The current development is targeted at that, but LyX 2.0.3
-also still works.
+Running and using
+-----------------
+
+Many of the details are still only documented in the older PDF manual at
+https://github.com/abarker/lyxNotebook/blob/master/doc/lyxNotebookDocs.pdf
+
+After installing, and for each document, insert the modules for the kinds
+of cells that you want to use (e.g., Python or Python2).  Insert the
+a code cell into the document and write some code into it.  You can then
+hit F-12 to start up Lyx Notebook, and hit F-1 to see a menu of options.
+The menu shows the available key bindings, also.
 
 Earlier info
 ============
