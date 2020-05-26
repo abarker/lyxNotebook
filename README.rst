@@ -5,8 +5,8 @@ notebook, or Jupyter notebooks).
 
 Only Linux is currently supported.
 
-UPDATE, May 26, 2020
-====================
+UPDATE, May 2020
+================
 
 The code has been under further development.  Some changes other than general
 code cleanup and are listed below.  The install method is still the same as in
