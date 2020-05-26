@@ -16,7 +16,7 @@ the March update.
   immediately follows the code inset.  It will not create such an inset,
   though; the user needs to do that.  This allows, for example, having
   SymPy code print out Latex math equations which will then be rendered
-  as a Lyx preview and will appear in the final document.
+  as a LyX preview and will appear in the final document.
 
 * The module running external interpreters now uses the Pexpect package by
   default, replacing the earlier hand-rolled version.  (This might make
@@ -63,6 +63,8 @@ For LyX 2.4 you can leave out the ``--no-editable-insets`` part.  To use
 a LyX user directory other than the default, use the ``--user-dir`` option
 to set the path.
 
+Follow the LyX setup instructions that appear in the popup and in the terminal.
+
 To uninstall the program, use ``pip uninstall lyxnotebook``.  Reset the bind
 file to its previous value.  Delete the LyX Notebook ``.module`` files
 and ``.bind`` files in the ``.lyx`` directory.
@@ -73,18 +75,18 @@ Running and using
 Many of the details are still only documented in the older PDF manual at
 https://github.com/abarker/lyxNotebook/blob/master/doc/lyxNotebookDocs.pdf
 
-After installing, and for each document, insert the modules for the kinds of
-cells that you want to use (e.g., Python or Python2).  Insert a code cell of
-that type into the document (via ``Insert -> Custom Inset``) and write some
-code into it.
+After installing, open a document and insert the modules for the kinds of cells
+that you want to use (e.g., Python or Python2) via ``Document -> Settings ->
+Modules -> Miscellaneous``.  Insert a code cell of that type into the document
+(via ``Insert -> Custom Inset``) and write some code into it.
 
-Pressing F12 should start up Lyx Notebook, and F1 will show a menu of
+Pressing F12 should start up LyX Notebook, and F1 will show a menu of
 options.  The menu also shows the available key bindings.
 
 If something gets messed up, use undo to revert it.  Use caution with batch
 cell update commands since ordinary undo cannot undo those operations and they
-might no longer be working correctly (there is a save file and an option to
-revert to it, though).
+are no longer be working correctly for now (there is a save file and an option
+to revert to it, though).
 
 Earlier info
 ============
