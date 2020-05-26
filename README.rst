@@ -14,7 +14,7 @@ the March update.
 
 * A code cell will automatically write into a math inset if that inset
   immediately follows the code inset.  It will not create such an inset,
-  though, the user needs to do that.  This allows, for example, having
+  though; the user needs to do that.  This allows, for example, having
   SymPy code print out Latex math equations which will then be rendered
   as a Lyx preview and will appear in the final document.
 
@@ -73,17 +73,17 @@ Running and using
 Many of the details are still only documented in the older PDF manual at
 https://github.com/abarker/lyxNotebook/blob/master/doc/lyxNotebookDocs.pdf
 
-After installing, and for each document, insert the modules for the kinds
-of cells that you want to use (e.g., Python or Python2).  Insert the
-a code cell into the document and write some code into it.
+After installing, and for each document, insert the modules for the kinds of
+cells that you want to use (e.g., Python or Python2).  Insert a code cell of
+that type into the document and write some code into it.
 
-You can then hit F-12 to start up Lyx Notebook, and hit F-1 to see a menu of
-options.  The menu shows the available key bindings, also.
+Pressing F12 should start up Lyx Notebook, and F1 will show a menu of
+options.  The menu also shows the available key bindings.
 
 If something gets messed up, use undo to revert it.  Use caution with batch
 cell update commands since ordinary undo cannot undo those operations and they
 might no longer be working correctly (there is a save file and an option to
-revert, though).
+revert to it, though).
 
 Earlier info
 ============
