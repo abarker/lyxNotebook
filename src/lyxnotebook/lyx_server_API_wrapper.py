@@ -81,10 +81,10 @@ class InteractWithLyxCells:
         self.local_latex_filename = "zzzTmpTmp_"+user_name+"_LyxNotebook_TmpTmp.tex"
 
         self.lyx_server_pipe = config_dict["lyx_server_pipe"]
-        self.lyx_server_pipe = os.path.abspath(os.path.expanduser(lyx_server_pipe))
+        self.lyx_server_pipe = os.path.abspath(os.path.expanduser(self.lyx_server_pipe))
         self.lyx_temporary_directory = config_dict["lyx_temporary_directory"]
         self.lyx_temporary_directory = os.path.abspath(
-                                          os.path.expanduser(lyx_temporary_directory))
+                                       os.path.expanduser(self.lyx_temporary_directory))
 
         self.lyx_server_read_event_buffer = []  # buffer for the events read from the pipe
 
