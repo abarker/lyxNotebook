@@ -23,8 +23,8 @@ python3.params = {
     "line_continuation": "\\",     # char which denotes line continuation
     "inset_specifier": "Python", # e.g., Flex:LyxNotebook:Standard:Python
     "listings_language": "python", # the language=???? value for formatting
-    "startup_sleep_secs": 0.01,     # initialization time for interpreter startup
-    "before_read_sleep_secs": 0.01,     # delay between writing to interp and reading
+    "startup_timeout_secs": 30,     # initialization time for interpreter startup
+    "read_output_timeout_secs": 30,     # delay between writing to interp and reading
     "noop_at_cell_end": "pass\n", # a command to always evaluate at cell ends
     "exit_command": "exit()\n", # the command to exit the interpreter
     "del_newline_pre_prompt": False,      # whether to remove a newline before prompt

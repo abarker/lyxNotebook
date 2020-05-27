@@ -57,7 +57,7 @@ def run_lyxnotebook():
     if args.ensure_tty:
         cmd_string = "lyxnotebook " + " ".join(sys.argv[1:])
         cmd_string = cmd_string.replace(" --ensure-tty", "") # Avoid recursive call.
-        print("\nCommand to associate with a terminal: ", cmd_string)
+        print("\nCommand to start lyxnotebook, with terminal output:\n   ", cmd_string)
 
         from . import run_lyxnotebook_from_LFUN
         run_lyxnotebook_from_LFUN.main(cmd_string) # Pass regular script name to call after setup.

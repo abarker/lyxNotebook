@@ -19,8 +19,8 @@ scala.params = {
     "line_continuation": None,
     "inset_specifier": "Scala", # e.g., Flex:LyxNotebook:Standard:Scala
     "listings_language": "", # no Scala predefined yet in Listings
-    "startup_sleep_secs": 1.0, # startup can be slow...
-    "before_read_sleep_secs": 0.01,
+    "startup_timeout_secs": 30, # startup can be slow...
+    "read_output_timeout_secs": 30,
     "noop_at_cell_end": None,
     "exit_command": "exit()\n",
     "del_newline_pre_prompt": True, # Scala interp. adds a blank line before prompt

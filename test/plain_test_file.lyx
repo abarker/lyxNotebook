@@ -11,6 +11,7 @@ lyxNotebookCellPythonTwo
 lyxNotebookCellPython
 lyxNotebookListingsWithSmallFont
 lyxNotebookCellBash
+lyxNotebookCellR
 \end_modules
 \maintain_unincluded_children false
 \language english

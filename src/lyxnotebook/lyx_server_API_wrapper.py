@@ -64,7 +64,7 @@ from .parse_and_write_lyx_files import (Cell, TerminatedFile, get_all_cell_text_
                                         replace_all_cell_text_in_lyx_file)
 
 # This file is repeatedly written temporarily to current dir, then deleted.
-# TODO: Do in temp dir.
+# TODO: Do in a proper Python temp dir unless needed for debugging.
 tmp_saved_lyx_file_name = "tmp_save_file_lyx_notebook_xxxxx.lyxnotebook"
 
 class InteractWithLyxCells:
@@ -80,17 +80,18 @@ class InteractWithLyxCells:
         user_name = getpass.getuser()
         self.local_latex_filename = "zzzTmpTmp_"+user_name+"_LyxNotebook_TmpTmp.tex"
 
-        lyx_server_pipe = config_dict["lyx_server_pipe"]
+        self.lyx_server_pipe = config_dict["lyx_server_pipe"]
         self.lyx_server_pipe = os.path.abspath(os.path.expanduser(lyx_server_pipe))
-        lyx_temporary_directory = config_dict["lyx_temporary_directory"]
+        self.lyx_temporary_directory = config_dict["lyx_temporary_directory"]
         self.lyx_temporary_directory = os.path.abspath(
-            os.path.expanduser(lyx_temporary_directory))
+                                          os.path.expanduser(lyx_temporary_directory))
 
         self.lyx_server_read_event_buffer = []  # buffer for the events read from the pipe
 
         # a temp file is written in the Lyx temp dir
         # to avoid conflicts it uses clientname and has eight random characters added
         # (this could be improved a bit, check exists, but good enough for now)
+        # TODO: Use proper Python temp dir libraries.
         rnd_alphanum8 = \
             ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(8))

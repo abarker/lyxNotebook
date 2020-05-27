@@ -18,8 +18,8 @@ python2.params = {
     "line_continuation": "\\",     # char which denotes line continuation
     "inset_specifier": "PythonTwo", # e.g., Flex:LyxNotebook:Standard:PythonTwo
     "listings_language": "python", # the language=???? value for formatting
-    "startup_sleep_secs": 0.01,     # initialization time for interpreter startup
-    "before_read_sleep_secs": 0.01,     # delay between writing to interp and reading
+    "startup_timeout_secs": 30,     # initialization time for interpreter startup
+    "read_output_timeout_secs": 30, # delay between writing to interp and reading
     "noop_at_cell_end": "pass\n", # a command to always evaluate at cell ends
     "exit_command": "exit()\n", # the command to exit the interpreter
     "del_newline_pre_prompt": False,      # whether to remove a newline before prompt
@@ -32,7 +32,6 @@ python2.params = {
 # key=value pairs
 # last in a list can end in comma or not, since this is checked-for and corrected,
 # but should not end in a pure comment line (with nothing else but a comment)
-
 python2.general_listings_code_format = r"""
       % general_listings_code_format
       showlines=true, % keep blank lines at end of listing blocks

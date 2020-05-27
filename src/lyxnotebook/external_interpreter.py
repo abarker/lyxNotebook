@@ -61,10 +61,8 @@ class ExternalInterpreterExpect:
         self.run_arguments = interpreter_spec["run_arguments"]
         self.exit_command = interpreter_spec["exit_command"]
 
-        # Todo: These two can be renamed if this class is default; no longer "sleep".
-        # TODO: default timeout values fail, set too small... redefine spec?
-        self.startup_sleep_secs = interpreter_spec["startup_sleep_secs"]
-        self.before_read_sleep_secs = interpreter_spec["before_read_sleep_secs"]
+        self.startup_timeout_secs = interpreter_spec["startup_timeout_secs"]
+        self.read_output_timeout_secs = interpreter_spec["read_output_timeout_secs"]
 
         self.before_first_read = True
         self.before_first_read_or_write = True
@@ -77,10 +75,9 @@ class ExternalInterpreterExpect:
         prompt.  This is an internal initialization routine, called on first write."""
         try:
             child = pexpect.spawn(self.run_command, self.run_arguments,
-                                  timeout=30,#self.startup_sleep_secs,
-                                  cwd=None, env=None,
+                                  timeout=self.startup_timeout_secs, cwd=None, env=None,
                                   encoding="utf-8", echo=True)
-            child.expect_exact(self.main_prompt, timeout=30)#self.startup_sleep_secs)
+            child.expect_exact(self.main_prompt, timeout=self.startup_timeout_secs)
         except pexpect.TIMEOUT as e:
             print("\nLyxNotebook error: Timeout on initializing the interpreter started"
                   "\nwith the command '{}'.".format(self.run_command), file=sys.stderr)
@@ -93,7 +90,6 @@ class ExternalInterpreterExpect:
 
         init_msg = child.before
         print("----- initialization message of interpreter", self.prog_name)
-        print("\nDEBUG: init and read timeouts are", self.startup_sleep_secs, self.before_read_sleep_secs)
         print(init_msg)
         print("----- end initialization of interpreter", self.prog_name)
 
@@ -126,7 +122,7 @@ class ExternalInterpreterExpect:
         try:
             # Note that `index` below gives the index of the matched prompt.  Not used yet.
             index = child.expect_exact([self.main_prompt, self.cont_prompt],
-                                       timeout=30)#self.before_read_sleep_secs)
+                                       timeout=self.read_output_timeout_secs)
         except pexpect.TIMEOUT as e:
             print("\nLyxNotebook error: Timeout on reading from the interpreter started"
                   "\nwith the command '{}'.".format(self.run_command), file=sys.stderr)
@@ -186,6 +182,7 @@ class ExternalInterpreter:
     applications which expect terminal input can be run.  The only
     initialization argument is an interpreterSpec dict object which has the
     predefined collection of keys all defined."""
+    # DEPRECATED CLASS, use ExternalInterpreterPexpect.
 
     def __init__(self, interpreter_spec):
         self.debug = False # debug flag, for verbose output
@@ -197,9 +194,14 @@ class ExternalInterpreter:
         self.cont_prompt = interpreter_spec["cont_prompt"]
         self.run_command = interpreter_spec["run_command"]
         self.run_arguments = interpreter_spec["run_arguments"]
-        self.startup_sleep_secs = interpreter_spec["startup_sleep_secs"]
-        self.before_read_sleep_secs = interpreter_spec["before_read_sleep_secs"]
         self.exit_command = interpreter_spec["exit_command"]
+        #self.startup_timeout_secs = interpreter_spec["startup_timeout_secs"]
+        #self.read_output_timeout_secs = interpreter_spec["read_output_timeout_secs"]
+
+        # These two values are hardcoded to "large" values now, since the class
+        # is deprecated.
+        self.startup_sleep_secs = 4 # Hardcoded now, since this class is deprecated.
+        self.before_read_sleep_secs = 0.04 # Hardcoded now.
 
         self.running = False
         self.before_first_read = True

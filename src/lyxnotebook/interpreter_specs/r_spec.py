@@ -19,8 +19,8 @@ R.params = {
     "line_continuation": None,
     "inset_specifier": "R", # e.g., Flex:LyxNotebook:Standard:R
     "listings_language": "R",
-    "startup_sleep_secs": 1.0,
-    "before_read_sleep_secs": 0.01,
+    "startup_timeout_secs": 30,
+    "read_output_timeout_secs": 30,
     "noop_at_cell_end": None,
     "exit_command": "quit(save=\"no\")\n",
     "del_newline_pre_prompt": False,
