@@ -30,7 +30,7 @@ sage.params = {
     "line_continuation": "\\",
     "inset_specifier": "Sage", # e.g., Flex:LyxNotebook:Standard:Sage
     "listings_language": "python", # same as Python
-    "startup_timeout_secs": 30,  # sage startup is slow
+    "startup_timeout_secs": 70,  # sage startup is slow
     "read_output_timeout_secs": 30,  # sage slower than raw Python
     "noop_at_cell_end": "pass\npass\n", # two to catch some extra indent cases
     "exit_command": "exit()\n",
