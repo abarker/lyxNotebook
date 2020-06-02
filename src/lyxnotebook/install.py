@@ -73,19 +73,19 @@ def setup_key_binding_files(lyx_user_directory, source_dir,
     with open(bind_template_pathname, "r") as bind_template:
         bind_contents_str = bind_template.read()
     bind_contents_str = bind_contents_str.replace("<<lyx_user_directory>>",
-                             lyx_user_directory)
+                                                  lyx_user_directory)
 
     with tempfile.TemporaryDirectory() as tmpdir_name:
         # Write out the final user-modifiable .bind file to the temp dir.
         bind_file_pathname = path.join(tmpdir_name, "userCustomizableKeyBindings.bind")
         with open(bind_file_pathname, "w") as bind_file:
             bind_file.write(bind_contents_str)
-        print("Generated the key-binding file\n   ",
-              bind_file_pathname, "\nfrom the corresponding .template file.")
+        print("Generated the key-binding file\n   ", bind_file_pathname,
+                "\nfrom the corresponding .template file.")
 
         # Copy the user-modifiable .bind file to lyx_user_directory.
-        bind_file_dest = path.join(
-                           lyx_user_directory, "userCustomizableKeyBindings.bind")
+        bind_file_dest = path.join(lyx_user_directory,
+                                   "userCustomizableKeyBindings.bind")
         yesno = True
         if os.path.exists(bind_file_dest):
             msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
@@ -122,7 +122,7 @@ def setup_key_binding_files(lyx_user_directory, source_dir,
         # Copy the Lyx Notebook .bind file to lyx_user_directory.
         bind_file_dest = path.join(
             lyx_user_directory, "lyxNotebookKeyBindings.bind")
-        yesno = 1
+        yesno = True
         if os.path.exists(bind_file_dest):
             msg = "File\n   " + bind_file_dest + "\nalready exists.  Overwrite?"
             yesno = yesno_popup(msg, "LyX Notebook Setup")
@@ -158,8 +158,8 @@ def setup_module_files(lyx_user_directory, source_dir, has_editable_insets):
         print("\nCopying the regenerated .module files to the LyX layouts directory.")
         dot_module_files = glob.glob("*.module")
         for new_module_file in dot_module_files:
-            path_in_layouts_dir = path.join(
-                                    lyx_user_directory, "layouts", new_module_file)
+            path_in_layouts_dir = path.join(lyx_user_directory,
+                                            "layouts", new_module_file)
             shutil.copyfile(new_module_file, path_in_layouts_dir)
 
     os.chdir(prev_dir)
