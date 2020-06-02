@@ -422,9 +422,9 @@ def write_lyx_file_from_cell_list(to_file_name, all_cells):
     be in the augmented format alternating cell instances and Lyx-format strings."""
     lyx_string = get_lyx_string_from_cell_list(all_cells)
 
-    print("\n\n")
-    print(lyx_string) # DEBUG
-    return
+    #print("\n\n")
+    #print(lyx_string) # DEBUG
+    #return
     with open(to_file_name, "w") as f:
         f.write(lyx_string)
 
@@ -441,7 +441,7 @@ def get_lyx_string_from_cell_list(all_cells, *, replace_output_cells=True):
             cell_string = get_lyx_string_from_cell(c, create_output_cell=replace_output_cells)
             lyx_pieces.append(cell_string)
 
-    return "".join(lyx_pieces)
+    return "\n".join(lyx_pieces)
 
 def strip_leading_output_cell(lyx_string):
     """Return `string` with any leading output cell stripped off."""
