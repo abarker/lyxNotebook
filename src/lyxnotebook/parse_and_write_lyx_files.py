@@ -269,9 +269,9 @@ def get_all_cell_text_from_lyx_file(filename, magic_cookie_string, *,
     """
     line_list = get_all_lines_from_lyx_file(filename)
     string = "".join(line_list)
-    return get_all_cell_text_from_lyx_string(string,
-                               magic_cookie_string, also_noncell=also_noncell)
-
+    return get_all_cell_text_from_lyx_string(string, magic_cookie_string,
+                        code_language=code_language, init=init, standard=standard,
+                        also_noncell=also_noncell)
 
 def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string, *,
                                       code_language=None, init=True, standard=True,
@@ -451,13 +451,15 @@ def strip_leading_output_cell(lyx_string):
     found_cell = False
     inside_cell = False
     for count, line in enumerate(lyx_string_lines):
-        if line.startswith("\\begin_inset Flex LyxNotebookCell:Output:"):
+        if not found_cell and line.startswith("\\begin_inset Flex LyxNotebookCell:Output:"):
             found_cell = True
             inside_cell = True
         elif inside_cell and line.startswith(r"\end_inset"):
             inside_cell = False
         elif not inside_cell:
             saved_lines.append(line)
+        else:
+            pass # Do nothing; lines inside the Output cell are ignored.
 
         if count > max_search_lines and not found_cell:
             return lyx_string # No output cell found.

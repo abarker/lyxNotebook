@@ -629,7 +629,7 @@ class InteractWithLyxCells:
     #
     #
 
-    def get_all_cell_text(self, code_language=None, init=True, standard=True,
+    def get_all_cell_text(self, *, code_language=None, init=True, standard=True,
                           also_noncell=False, nodelete_tmpfile=False):
         """Returns a list of `Cell` data structures containing the text for each
         cell in the current buffer.  Always updates the file before reading it.

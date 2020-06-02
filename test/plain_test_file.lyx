@@ -201,6 +201,19 @@ int_x ^y z")
 \end_inset
 
 
+\begin_inset Flex LyxNotebookCell:Output:Python
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+int_x ^y z
+\end_layout
+
+\end_inset
+
+
 \begin_inset Formula 
 \[
 \int_{x}^{y}z
@@ -324,6 +337,16 @@ status open
 \end_inset
 
 
+\begin_inset Flex LyxNotebookCell:Output:Python
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -343,42 +366,37 @@ status open
 
 \begin_layout Plain Layout
 
- localLyx		  testGraphicFile.eps
+b_plain_test_file.lyx	testGraphicFile.eps
 \end_layout
 
 \begin_layout Plain Layout
 
- lyx_nested_comment.lyx   testGraphicFile.pdf
+localLyx		testGraphicFile.pdf
 \end_layout
 
 \begin_layout Plain Layout
 
- lyxnotebook.cfg	  testInteractWithLyxCells.lyx
+lyx_nested_comment.lyx	testInteractWithLyxCells.lyx
 \end_layout
 
 \begin_layout Plain Layout
 
-'#plain_test_file.lyx#'   testInteractWithLyxCells.lyx~
+lyxnotebook.cfg		test_lyx_file_parsing.py
 \end_layout
 
 \begin_layout Plain Layout
 
- plain_test_file.lyx	  test_lyx_file_parsing.py
+plain_test_file.lyx	tttmp.lyx
 \end_layout
 
 \begin_layout Plain Layout
 
- plain_test_file.lyx~	  tttmp.lyx
+plain_test_file.lyx~	zzzzz_lyxnotebook_tmp_debug.lyxnotebook
 \end_layout
 
 \begin_layout Plain Layout
 
- plain_test_file.lyx~~	  zzzzz_lyxnotebook_tmp_debug.lyxnotebook
-\end_layout
-
-\begin_layout Plain Layout
-
- testGraphicFile2.eps
+testGraphicFile2.eps
 \end_layout
 
 \end_inset
