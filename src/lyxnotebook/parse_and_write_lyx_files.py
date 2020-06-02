@@ -61,7 +61,8 @@ class Cell:
         return self.basic_type, self.language
 
     def lyx_string_format(self, beginning=True, code=True, ending=True):
-        """Return the Lyx string format of the cell, like in a .lyx file."""
+        """Return the Lyx string format of the cell.  That is, the string
+        reformatted so it would be valid inside a .lyx file."""
         combined_list = []
         if beginning:
             combined_list += self.lyx_starting_lines
@@ -96,15 +97,15 @@ class Cell:
         self.text_code_lines.append(line)
 
     def copy(self):
-        """Return a deep shallow copy."""
+        """Return a shallow copy."""
         return copy.copy(self)
 
     def deepcopy(self):
-        """Return a deep shallow copy."""
+        """Return a deep copy."""
         return copy.deepcopy(self)
 
     def __getitem__(self, index):
-        """Index a line in the `Cell` instance."""
+        """Index lines in the `Cell` instance text."""
         # NOTE: Slices return a list, not another Cell.
         #if isinstance(index, slice):
         #    return self.lines[index.start:index.stop:index.step]
@@ -113,7 +114,7 @@ class Cell:
         return self.text_code_lines[index]
 
     def __setitem__(self, index, value):
-        """Set a line in the `Cell` instance."""
+        """Set a line in the `Cell` instance text."""
         #if isinstance(index, slice):
         #    self.lines[index.start:index.stop:index.step] = value
         #    return
@@ -178,7 +179,7 @@ class TerminatedFile:
 
 
 def lyx_format_code_line_to_text(cell_line_list):
-    """Convert the Lyx format lines in `cell_line_list` to a line in text format."""
+    """Convert the Lyx format lines in `cell_line_list` to a string in text format."""
     cell_line_substrings = []
     for line in cell_line_list:
         if line.startswith(r"\begin_inset Quotes"):
@@ -189,7 +190,7 @@ def lyx_format_code_line_to_text(cell_line_list):
             cell_line_substrings.append("\\")
         elif line.startswith("\\"):
             # Skip all other markup starting with \, including `\end_inset` markers.
-            # This includes anything like `\lang english` which Unicode can cause.
+            # This includes things like `\lang english` which Unicode can cause.
             pass
         else: # Got a line of actual text.
             cell_line_substrings.append(line)
@@ -200,7 +201,7 @@ def convert_text_line_to_lyx_file_inset_format(text_line):
     """This utility function takes a single line of text as a string and returns
     a string corresponding to the Lyx file format of that line when it
     is inside a Lyx Notebook inset (i.e., in a Plain Layout block)."""
-    result = "\\begin_layout Plain Layout\n"
+    result = "\\begin_layout Plain Layout\n\n"
 
     # Replace all backslashes with \backslash on a separate line.
     text_line_new = text_line.replace("\\", "\n\\backslash\n")
@@ -230,34 +231,9 @@ def convert_text_line_to_lyx_file_inset_format(text_line):
             wrapped_line_new.append(line[:break_point] + "\n")
             line = line[break_point:]
 
-    wrapped_line_new.append("\\end_layout\n\n")
+    wrapped_line_new.append("\\end_layout\n")
     result += "".join(wrapped_line_new)
     return result
-
-
-def get_text_between_input_and_output_cells(inset_specifier):
-    """When creating output cells we need to insert the Lyx file code to
-    create the output cell of the correct type.  This function returns
-    that string text.  The `inset_specifier` is something like 'Python'."""
-    st = "\\begin_inset Flex LyxNotebookCell:Output:{}\nstatus open\n"
-    st = st.format(inset_specifier)
-    return st
-
-
-def convert_cell_lines_to_lyx_file_inset_format(cell, output_also=True):
-    """Convert all the lines in the cell text to have the Lyx file inset format, to be
-    written out as a .lyx file (usually after modifications to the code and/or output).
-    """
-    new_lines = []
-    for cell_line in cell:
-        new_lines.append(convert_text_line_to_lyx_file_inset_format(cell_line))
-    cell[:] = new_lines # Replace the text.
-
-    new_output_lines = []
-    if output_also:
-        for output_line in cell.evaluation_output:
-            new_output_lines.append(convert_text_line_to_lyx_file_inset_format(output_line))
-        cell.evaluation_output = new_output_lines
 
 
 def get_all_lines_from_lyx_file(filename):
@@ -278,9 +254,9 @@ def get_all_lines_from_lyx_file(filename):
                                magic_cookie_string, also_noncell=also_noncell)
 
 
-def get_all_cell_text_from_lyx_file(filename, magic_cookie_string,
-                                    code_language=None,
-                                    also_noncell=False, join_char="\n"):
+def get_all_cell_text_from_lyx_file(filename, magic_cookie_string, *,
+                                    code_language=None, init=True, standard=True,
+                                    also_noncell=False):
     """Read all the cell text from the Lyx-format string `string`."  Return a
     list of `Cell` class instances, where each cell is a list of lines (and
     some additional data) corresponding to the lines of a code cell in the
@@ -297,23 +273,23 @@ def get_all_cell_text_from_lyx_file(filename, magic_cookie_string,
                                magic_cookie_string, also_noncell=also_noncell)
 
 
-def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
-                                      code_language=None,
+def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string, *,
+                                      code_language=None, init=True, standard=True,
                                       also_noncell=False):
-    """Read all the cell text from the Lyx file format string `string`.  Return
+    """Read all the code cell text from the Lyx file format string `string`.  Return
     a list of `Cell` class instances, where each cell is a list of lines (and
     some additional data) corresponding to the lines of a code cell in the
     document (in the order that they appear in the document).  All cell types
-    are included.
+    are included by default except output cells.
 
     The `code_language` option, if set, will extract only cells of the given
-    language.  The string passed should be the capitalized name that appears
+    language.  The string passed in should be the capitalized name that appears
     at the end of the inset's name in the Lyx file, e.g., "Python".
 
-    If `also_noncell` is true then the list returned is the list of cells
-    alternating with strings holding the text in the .lyx file that is
-    between the cells.
-    """
+    If `also_noncell` is true then the returned list will contain `Cell`
+    instances alternating with strings holding the text in the .lyx file that
+    is between the cells.  This allows the file to be put back together with
+    modified cells."""
     lyx_format_lines = list(reversed(lyx_string.splitlines())) # Reversed, pop off end.
 
     cell_list = []                   # A list of the extracted cells as `Cell` instances.
@@ -340,11 +316,15 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
         if rstripped_line.startswith(r"\begin_inset Flex LyxNotebookCell:"):
             basic_type, lang = get_cell_type_from_inset_begin_line(rstripped_line)
 
-            # Treat cells as normal text if the language doesn't match.
-            if code_language:
-                if lang != code_language:
-                    text_between_cells.append(lyx_line)
-                    continue
+            # Treat cells as normal text if 1) Output cell, 2) language doesn't match,
+            # 3) Basic type doesn't match.
+            if code_language and lang != code_language:
+                text_between_cells.append(lyx_line)
+                continue
+            if (basic_type=="Output" or basic_type=="Standard" and not standard
+                                     or basic_type=="Init" and not init):
+                text_between_cells.append(lyx_line)
+                continue
 
             # Create a new cell.
             new_cell = Cell(basic_type, lang) # create a new cell
@@ -353,7 +333,7 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
 
             # Save previous text between cells and reset list to empty.
             if also_noncell:
-                cell_list.append("".join(text_between_cells))
+                cell_list.append("\n".join(text_between_cells))
             text_between_cells = []
 
             # Update states.
@@ -423,7 +403,7 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
 
     # Add the final text piece if `also_noncell` is true.
     if also_noncell:
-        cell_list.append("".join(text_between_cells))
+        cell_list.append("\n".join(text_between_cells))
 
     # Do an error-check on the number of cookies found in the files.
     using_inset_edit_method = (config_dict["has_editable_insets_noeditor_mod"]
@@ -437,81 +417,90 @@ def get_all_cell_text_from_lyx_string(lyx_string, magic_cookie_string,
                             "This will cause problems with cell evaluations.")
     return cell_list
 
-def replace_all_cell_text_in_lyx_string(lyx_string, replacement_cells, magic_cookie_string,
-                                        code_language, init=True, standard=True):
-    """Given a Lyx-format string `lyx_string` and a list of `Cell` instances
-    `all_cells`, return another string in Lyx format which has the same text
-    but where the content of all cells is replaced by the cells in
-    `all_cells`.  Only the selected code cells are replaced.  The
-    code cells are assumed to have already been evaluated with output in their
-    evaluation_output data fields."""
-    # TODO: not yet called anywhere...
+def write_lyx_file_from_cell_list(to_file_name, all_cells):
+    """Write out a .lyx file from the text in the list `all_cells`, which should
+    be in the augmented format alternating cell instances and Lyx-format strings."""
+    lyx_string = get_lyx_string_from_cell_list(all_cells)
 
-    # TODO, consider big picture; we need text for ALL cells in output...
-    # Ideally we'd only extract the particular cells to be replaced from the
-    # Lyx file, easier that way, so maybe make this an all-string or all-file
-    # operation, so we always do the extraction of cells right here...
-    #
-    # Maybe modify the extraction to take option to get corresponding output
-    # files, too, if there.
+    print("\n\n")
+    print(lyx_string) # DEBUG
+    return
+    with open(to_file_name, "w") as f:
+        f.write(lyx_string)
 
-    replacement_cells = list(reversed(replacement_cells)) # Reversed to pop off end.
+def get_lyx_string_from_cell_list(all_cells, *, replace_output_cells=True):
+    """Convert the list of `Cell` instances and Lyx-format code back into a
+    Lyx-format string (such as can be written to a .lyx file)."""
+    lyx_pieces = []
+    for c in all_cells:
+        if isinstance(c, str):
+            if replace_output_cells:
+                c = strip_leading_output_cell(c)
+            lyx_pieces.append(c)
+        else:
+            cell_string = get_lyx_string_from_cell(c, create_output_cell=replace_output_cells)
+            lyx_pieces.append(cell_string)
 
-    lyx_string_cells = get_all_cell_text_from_lyx_string(lyx_string, also_noncell=True)
-    lyx_string_cells = list(reversed(lyx_string_cells)) # Reversed to pop off end.
+    return "".join(lyx_pieces)
 
-    result_string_list = []
-    while True:
-        if not lyx_string_cells:
-            break
-        cell = lyx_string_cells.pop()
-        if isinstance(cell, str):
-            result_string_list.append(cell)
-            continue
-        basic_type, language = cell.get_cell_type()
-        if language != code_language:
-            continue
-        if basic_type == "Init" and init or basic_type == "Standard" and standard:
-            while True:
-                if not replacement_cells:
-                    msg = "Warning: Cells number and type do not match replacement cells."
-                    print(msg)
-                    gui.text_warning_popup(msg)
-                replacement_cell = replacement_cells.pop()
-                if isinstance(replacement_cell, str):
-                    continue
-                rep_basic_type, rep_language = replacement_cell.get_cell_type()
-                if (rep_basic_type, rep_language) != (basic_type, language):
-                    continue
+def strip_leading_output_cell(lyx_string):
+    """Return `string` with any leading output cell stripped off."""
+    lyx_string_lines = lyx_string.splitlines()
+    saved_lines = []
+    max_search_lines = 3
+    found_cell = False
+    inside_cell = False
+    for count, line in enumerate(lyx_string_lines):
+        if line.startswith("\\begin_inset Flex LyxNotebookCell:Output:"):
+            found_cell = True
+            inside_cell = True
+        elif inside_cell and line.startswith(r"\end_inset"):
+            inside_cell = False
+        elif not inside_cell:
+            saved_lines.append(line)
 
-                # At this point, we should have the correct replacement cell.
-                replacement_string = convert_cell_lines_to_lyx_file_inset_format(
-                                                               replacement_cell)
-                result_string_list.append(replacement_string)
+        if count > max_search_lines and not found_cell:
+            return lyx_string # No output cell found.
+    return "\n".join(saved_lines)
 
-                # Now see if output cell needs replacing, too. TODO: continue here...
-                #out_type, out_language = lyx_string_cells[-2].get_cell_type()
-                #if out_type == "Output" and not
+def get_lyx_string_from_cell(cell, create_output_cell=True):
+    """Get a Lyx-format string corresponding to the code in cell `cell`  If
+    `output_cell` is true then and output cell will be created if the
+    cell has an evaluation string set."""
+    basic_type, code_language = cell.get_cell_type()
+    flex_code_start = r"\begin_inset Flex LyxNotebookCell:{}:{}".format(basic_type, code_language)
+    flex_output_start = r"\begin_inset Flex LyxNotebookCell:Output:{}".format(code_language)
+
+    lyx_pieces = [flex_code_start, "status open\n"]
+
+    for cell_line in cell:
+        lyx_pieces.append(convert_text_line_to_lyx_file_inset_format(cell_line))
+
+    # Now end the cell.
+    lyx_pieces.append("\\end_inset\n")
+
+    # Create output cell if flagged to do so.
+    if create_output_cell:
+        lyx_pieces.append("\n" + flex_output_start)
+        lyx_pieces.append("status open\n")
+
+        eval_output = cell.evaluation_output
+        # If cell wasn't evaluated then set output to be empty.
+        if eval_output is None:
+            eval_output = []
+
+        for cell_line in eval_output:
+            lyx_pieces.append(convert_text_line_to_lyx_file_inset_format(cell_line))
+        lyx_pieces.append("\\end_inset\n")
+
+    return "\n".join(lyx_pieces)
 
 
-def replace_all_cell_text_in_lyx_file(from_file_name, to_file_name, all_cells,
-                                magig_cookie_string, init=True, standard=True):
-    """Given a .lyx file `from_file`, write out another .lyx file which has the
-    same text but in which all cells are replaced by the cells in `all_cells`.
-    Currently only the selected code cells are replaced, and the code cells
-    are assumed to have already been evaluated with output in their
-    evaluation_output data fields.  The corresponding output cells are always
-    replaced, and created if necessary, filled with the data in that field.
-    """
-    # TODO: Rewrite this big ugly thing using the regular get cells but with
-    # also_noncell=True.  Note, though, that this code is doing more.  It is
-    # handling creating output cells if necessary, and error checks, etc.
-    # Code was tested somewhat, and mostly worked, but on recent Lyx is
-    # broken again.
 
-    original_saved_lyx_file = TerminatedFile(from_file_name, r"\end_document",
-                            err_msg_location="replace_all_cell_text_in_lyx_file")
-    updated_saved_lyx_file = open(to_file_name, "w")
+
+
+
+def dummy_old_code_delete():
     current_cell = -1
     while True:
         line = original_saved_lyx_file.readline()
@@ -607,6 +596,86 @@ def replace_all_cell_text_in_lyx_file(from_file_name, to_file_name, all_cells,
             # Finished, end the output cell inset.
             updated_saved_lyx_file.write("\\end_inset\n") # 2 blanks pushed back from code cell end
 
-    original_saved_lyx_file.close()
-    updated_saved_lyx_file.close()
+def dummy_replace_all_cell_text_in_lyx_string(lyx_string, replacement_cells, magic_cookie_string,
+                                        code_language, init=True, standard=True):
+    """Given a Lyx-format string `lyx_string` and a list of `Cell` instances
+    `all_cells`, return another string in Lyx format which has the same text
+    but where the content of all cells is replaced by the cells in
+    `all_cells`.  Only the selected code cells are replaced.  The
+    code cells are assumed to have already been evaluated with output in their
+    evaluation_output data fields."""
+    # TODO: not yet called anywhere, USE BELOW FUNS INSTEAD
+
+    # TODO, consider big picture; we need text for ALL cells in output...
+    # Ideally we'd only extract the particular cells to be replaced from the
+    # Lyx file, easier that way, so maybe make this an all-string or all-file
+    # operation, so we always do the extraction of cells right here...
+    #
+    # Maybe modify the extraction to take option to get corresponding output
+    # files, too, if there.
+
+    replacement_cells = list(reversed(replacement_cells)) # Reversed to pop off end.
+
+    lyx_string_cells = get_all_cell_text_from_lyx_string(lyx_string, also_noncell=True)
+    lyx_string_cells = list(reversed(lyx_string_cells)) # Reversed to pop off end.
+
+    result_string_list = []
+    while True:
+        if not lyx_string_cells:
+            break
+        cell = lyx_string_cells.pop()
+        if isinstance(cell, str):
+            result_string_list.append(cell)
+            continue
+        basic_type, language = cell.get_cell_type()
+        if language != code_language:
+            continue
+        if basic_type == "Init" and init or basic_type == "Standard" and standard:
+            while True:
+                if not replacement_cells:
+                    msg = "Warning: Cells number and type do not match replacement cells."
+                    print(msg)
+                    gui.text_warning_popup(msg)
+                replacement_cell = replacement_cells.pop()
+                if isinstance(replacement_cell, str):
+                    continue
+                rep_basic_type, rep_language = replacement_cell.get_cell_type()
+                if (rep_basic_type, rep_language) != (basic_type, language):
+                    continue
+
+                # At this point, we should have the correct replacement cell.
+                replacement_string = convert_cell_lines_to_lyx_file_inset_format(
+                                                               replacement_cell)
+                result_string_list.append(replacement_string)
+
+                # Now see if output cell needs replacing, too. TODO: continue here...
+                #out_type, out_language = lyx_string_cells[-2].get_cell_type()
+                #if out_type == "Output" and not
+
+def dummy_convert_cell_lines_to_lyx_file_inset_format(cell, output_also=True):
+    """Convert all the lines in the cell text to have the Lyx file inset format, to be
+    written out as part of a .lyx file (usually after modifications to the code and/or
+    output)."""
+    return # DEBUG, not used, DELETE
+    new_lines = []
+    for cell_line in cell:
+        new_lines.append(convert_text_line_to_lyx_file_inset_format(cell_line))
+    cell[:] = new_lines # Replace the text.
+
+    new_output_lines = []
+    if output_also:
+        for output_line in cell.evaluation_output:
+            new_output_lines.append(convert_text_line_to_lyx_file_inset_format(output_line))
+        cell.evaluation_output = new_output_lines
+
+
+def dummy_get_text_between_input_and_output_cells(inset_specifier):
+    """When creating output cells we need to insert the Lyx file code to
+    create the output cell of the correct type.  This function returns
+    that string text.  The `inset_specifier` is something like 'Python'."""
+    st = "\\begin_inset Flex LyxNotebookCell:Output:{}\nstatus open\n"
+    st = st.format(inset_specifier)
+    return st
+
+
 

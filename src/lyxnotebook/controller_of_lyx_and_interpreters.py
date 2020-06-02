@@ -33,7 +33,7 @@ from . import gui
 from .config_file_processing import config_dict
 from .lyx_server_API_wrapper import InteractWithLyxCells
 from . import keymap # The current mapping of keys to Lyx Notebook functions.
-from .parse_and_write_lyx_files import replace_all_cell_text_in_lyx_file
+from .parse_and_write_lyx_files import write_lyx_file_from_cell_list
 from .interpreter_processes import InterpreterProcess, InterpreterProcessCollection
 
 
@@ -204,8 +204,8 @@ class ControllerOfLyxAndInterpreters:
         #
         # Batch evaluation commands.
         #
-        # TODO: could clean up and move bufferReplaceOnBatchEval conditionals to the
-        # replaceCurrentBufferFile function (after renaming it slightly)
+        # TODO: could clean up and move buffer_replace_on_batch_eval conditionals to the
+        # replace_current_buffer_file function (after renaming it slightly)
 
         elif key_action == "toggle buffer replace on batch eval":
             self.buffer_replace_on_batch_eval = not self.buffer_replace_on_batch_eval
@@ -217,17 +217,17 @@ class ControllerOfLyxAndInterpreters:
 
         elif key_action == "batch evaluate all code cells":
             to_file_name = self.batch_evaluate_all_code_cells_to_lyx_file(
-                init=True, standard=True, messages=True)
+                                      init=True, standard=True, messages=True)
             if not self.buffer_replace_on_batch_eval:
                 self.lyx_process.process_lfun("file-open", to_file_name)
             else:
                 self.replace_current_buffer_file(to_file_name,
-                                              reload_buffer=True, messages=True)
+                                                 reload_buffer=True, messages=True)
 
         elif key_action == "batch evaluate all code cells after reinit":
             self.reset_interpreters_for_buffer()
             to_file_name = self.batch_evaluate_all_code_cells_to_lyx_file(
-                init=True, standard=True, messages=True)
+                                      init=True, standard=True, messages=True)
             if not self.buffer_replace_on_batch_eval:
                 self.lyx_process.process_lfun("file-open", to_file_name)
             else:
@@ -236,7 +236,7 @@ class ControllerOfLyxAndInterpreters:
 
         elif key_action == "batch evaluate all init cells":
             to_file_name = self.batch_evaluate_all_code_cells_to_lyx_file(
-                init=True, standard=False, messages=True)
+                                      init=True, standard=False, messages=True)
             if not self.buffer_replace_on_batch_eval:
                 self.lyx_process.process_lfun("file-open", to_file_name)
             else:
@@ -246,7 +246,7 @@ class ControllerOfLyxAndInterpreters:
         elif key_action == "batch evaluate all init cells after reinit":
             self.reset_interpreters_for_buffer()
             to_file_name = self.batch_evaluate_all_code_cells_to_lyx_file(
-                init=True, standard=False, messages=True)
+                                      init=True, standard=False, messages=True)
             if not self.buffer_replace_on_batch_eval:
                 self.lyx_process.process_lfun("file-open", to_file_name)
             else:
@@ -255,23 +255,22 @@ class ControllerOfLyxAndInterpreters:
 
         elif key_action == "batch evaluate all standard cells":
             to_file_name = self.batch_evaluate_all_code_cells_to_lyx_file(
-                init=False, standard=True, messages=True)
+                                      init=False, standard=True, messages=True)
             if not self.buffer_replace_on_batch_eval:
                 self.lyx_process.process_lfun("file-open", to_file_name)
             else:
                 self.replace_current_buffer_file(to_file_name,
                                               reload_buffer=True, messages=True)
 
-        elif (key_action ==
-              "batch evaluate all standard cells after reinit"):
+        elif key_action == "batch evaluate all standard cells after reinit":
             self.reset_interpreters_for_buffer()
             to_file_name = self.batch_evaluate_all_code_cells_to_lyx_file(
-                init=False, standard=True, messages=True)
+                                      init=False, standard=True, messages=True)
             if not self.buffer_replace_on_batch_eval:
                 self.lyx_process.process_lfun("file-open", to_file_name)
             else:
                 self.replace_current_buffer_file(to_file_name,
-                                              reload_buffer=True, messages=True)
+                                            reload_buffer=True, messages=True)
 
         #
         # Misc. commands.
@@ -428,11 +427,12 @@ class ControllerOfLyxAndInterpreters:
                 self.evaluate_lyx_cell()
         print("Finished multi-cell evaluation.")
 
-    def batch_evaluate_all_code_cells_to_lyx_file(self, init=True, standard=True,
-                                           messages=False):
+    def batch_evaluate_all_code_cells_to_lyx_file(self, *, code_language=None,
+                                                  init=True, standard=True,
+                                                  messages=False):
         """Evaluate all the cells of the flagged basic types, and then write them
         to an output .lyx file.  The filename of the new file is returned."""
-        # TODO: also could print nice message to terminal like in regular routine
+        # TODO: also could print nice message to the terminal like in regular routine.
 
         if not init and not standard:
             return None
@@ -445,25 +445,24 @@ class ControllerOfLyxAndInterpreters:
 
         if messages:
             self.lyx_process.show_message("Batch evaluating all %s cells." % (cell_types,))
-        # Get all cell text from the Lyx auto-save file (saves it as a side effect).
-        all_cells = self.lyx_process.get_all_cell_text()
 
-        # evaluate all the cells in the list (results pasted onto the cells)
-        self.evaluate_list_of_cell_classes(all_cells, init=init, standard=standard,
-                                       messages=messages)
+        # Get all cell text from the Lyx auto-save file (saves it as a side effect).
+        all_cells = self.lyx_process.get_all_cell_text(code_language=code_language,
+                                                       init=init, standard=standard,
+                                                       also_noncell=True)
+        only_cells = [c for c in all_cells if not isinstance(c, str)]
+
+        # Evaluate all the cells in the list (results are set as cell attributes).
+        self.evaluate_list_of_cell_classes(only_cells, messages=messages)
 
         # Get current directory data (also changes current directory to buffer's dir).
         current_dir_data = self.lyx_process.get_updated_lyx_directory_data()
 
-        # Calc the name of the auto-save file and the new .lyx file's name.
-        from_file_name = current_dir_data[2] # prefer auto-save file
-        if from_file_name == "": from_file_name = current_dir_data[1] # buffer's file
+        # Calc the name of the new .lyx file.
         to_file_name = current_dir_data[3][:-4] + ".newOutput.lyx"
 
         # Create the new .lyx file from the evaluated list of cells.
-        replace_all_cell_text_in_lyx_file(
-            from_file_name, to_file_name, all_cells, self.lyx_process.magic_cookie,
-            init=init, standard=standard)
+        write_lyx_file_from_cell_list(to_file_name, all_cells)
 
         if messages:
             self.lyx_process.show_message(

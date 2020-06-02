@@ -60,8 +60,9 @@ import random
 import string # just for generating random filenames
 from .config_file_processing import config_dict
 from . import gui
-from .parse_and_write_lyx_files import (Cell, TerminatedFile, get_all_cell_text_from_lyx_file,
-                                        replace_all_cell_text_in_lyx_file)
+from .parse_and_write_lyx_files import (Cell, TerminatedFile,
+                                        get_all_cell_text_from_lyx_file)
+                                        #replace_all_cell_text_in_lyx_file)
 
 # This file is repeatedly written temporarily to current dir, then deleted.
 # TODO: Do in a proper Python temp dir unless needed for debugging.
@@ -628,7 +629,8 @@ class InteractWithLyxCells:
     #
     #
 
-    def get_all_cell_text(self, nodelete_tmpfile=False, also_noncell=False):
+    def get_all_cell_text(self, code_language=None, init=True, standard=True,
+                          also_noncell=False, nodelete_tmpfile=False):
         """Returns a list of `Cell` data structures containing the text for each
         cell in the current buffer.  Always updates the file before reading it.
         It can read either from a locally exported .tex Latex file (with
@@ -642,30 +644,24 @@ class InteractWithLyxCells:
          autoSaveFileName,
          full_path) = self.get_updated_lyx_directory_data()
 
-        return self.get_all_cell_text_via_lyx_file(bufferDirName,
-                                              nodelete_tmpfile=nodelete_tmpfile,
-                                              also_noncell=also_noncell)
-
-    #
-    # Get cell and modify cell info from the Lyx source file.
-    #
-
-    def get_all_cell_text_via_lyx_file(self, bufferDirName,
-                                       also_noncell=False,
-                                       nodelete_tmpfile=False):
-        """Get all Lyx cell text using the method of writing and parsing the `.lyx`
-        file."""
         # Export temporarily to a local file.
         full_tmp_name = os.path.join(bufferDirName, tmp_saved_lyx_file_name)
         self.process_lfun("buffer-export-custom",
                          "lyx mv $$FName " + full_tmp_name, warn_error=True)
         time.sleep(0.05) # let write get a slight head start before any reading
-        all_cells = get_all_cell_text_from_lyx_file(full_tmp_name,
-                                                    self.magic_cookie,
+
+        all_cells = get_all_cell_text_from_lyx_file(full_tmp_name, self.magic_cookie,
+                                                    code_language=code_language,
+                                                    init=init, standard=standard,
                                                     also_noncell=also_noncell)
+
         if not nodelete_tmpfile and os.path.exists(tmp_saved_lyx_file_name):
             os.remove(tmp_saved_lyx_file_name)
         return all_cells
+
+    #
+    # Get cell and modify cell info from the Lyx source file.
+    #
 
     def get_updated_lyx_directory_data(self, auto_save_update=False):
         """
