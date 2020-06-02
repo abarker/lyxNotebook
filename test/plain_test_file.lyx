@@ -231,6 +231,16 @@ status open
 
 \begin_layout Plain Layout
 
+# Comment!
+\end_layout
+
+\begin_layout Plain Layout
+
+import egg # Import egg module.
+\end_layout
+
+\begin_layout Plain Layout
+
 " A string test È¢"
 \end_layout
 
@@ -293,6 +303,11 @@ for i in "xy":
 \begin_layout Plain Layout
 
    print(i)
+\end_layout
+
+\begin_layout Plain Layout
+
+   bool = True
 \end_layout
 
 \end_inset

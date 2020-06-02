@@ -27,10 +27,11 @@ default_preamble_latex_code = r"""
    \definecolor{darkGray9}{gray}{0.05} % almost black, for normal text with colors
    \definecolor{green9}{rgb}{0,0.6,0}
    \definecolor{darkerGreen9}{rgb}{0,0.3,0}
-   \definecolor{darkerRed9}{rgb}{0.6,0.0,0.0}
+   \definecolor{blueGreen9}{rgb}{0.0,0.4,0.3}
+   \definecolor{darkerRed9}{rgb}{0.5,0.0,0.0}
    \definecolor{brightRed9}{rgb}{1.0,0.0,0.0}
    \definecolor{yellowGold9}{rgb}{0.7,0.5,0.0}
-   \definecolor{blue9}{rgb}{0.20,0.20,1.0}
+   \definecolor{blue9}{rgb}{0.20,0.30,0.8}
    \definecolor{darkerBlue9}{rgb}{0.20,0.20,0.60}
    \definecolor{pinkRed9}{rgb}{0.9,0.2,0.4}
    \definecolor{turquoise9}{rgb}{0.0,0.6,1.0}
@@ -170,10 +171,10 @@ default_color_listings_code_format = r"""
       %identifierstyle=\color{darkGray9},
       stringstyle=\ttfamily\color{blue9},
       %stringstyle=\ttfamily\color{darkerBlue9},
-      %stringstyle=\ttfamily\color{green9},
-      %commentstyle=\upshape\color{green9},
+      stringstyle=\ttfamily\color{blueGreen9},
+      commentstyle=\upshape\color{blue9},
       %commentstyle=\slshape\color{darkerGreen9},
-      commentstyle=\slshape\color[rgb]{0.0,0.4,0.0},
+      %commentstyle=\slshape\color[rgb]{0.0,0.4,0.0},
       keywordstyle=[1]\bfseries\color{darkerRed9},
       keywordstyle=[2]\bfseries\color{pinkRed9},
       keywordstyle=[3]\bfseries\color{yellowGold9},
@@ -219,7 +220,7 @@ default_color_listings_output_format = r"""
                  \color[rgb]{0.2,0.2,0.2}
 """
 
-class SpecRecord(object):
+class SpecRecord:
     """A class used as a data record for an interpreter specification.  All the
     data fields initialized to None should be assigned values."""
 
